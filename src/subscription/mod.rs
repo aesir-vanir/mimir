@@ -35,17 +35,21 @@ impl Subscription {
     /// the subscription needs to be maintained independently of the reference returned when the
     /// subscription was created.
     pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(externs::dpiSubscr_addRef(self.inner),
-                 Ok(()),
-                 ErrorKind::Subscription("dpiSubscr_addRef".to_string()))
+        try_dpi!(
+            externs::dpiSubscr_addRef(self.inner),
+            Ok(()),
+            ErrorKind::Subscription("dpiSubscr_addRef".to_string())
+        )
     }
 
     /// Closes the subscription now, rather than when the last reference is released. This
     /// deregisters it so that notifications will no longer be sent.
     pub fn close(&self) -> Result<()> {
-        try_dpi!(externs::dpiSubscr_close(self.inner),
-                 Ok(()),
-                 ErrorKind::Subscription("dpiSubscr_close".to_string()))
+        try_dpi!(
+            externs::dpiSubscr_close(self.inner),
+            Ok(()),
+            ErrorKind::Subscription("dpiSubscr_close".to_string())
+        )
     }
 
     /// Prepares a statement for registration on the subscription. The statement is then registered
@@ -55,9 +59,11 @@ impl Subscription {
         let mut stmt = ptr::null_mut();
         let sql_s = ODPIStr::from(sql);
 
-        try_dpi!(externs::dpiSubscr_prepareStmt(self.inner, sql_s.ptr(), sql_s.len(), &mut stmt),
-                 Ok(stmt.into()),
-                 ErrorKind::Subscription("dpiSubscr_prepareStmt".to_string()))
+        try_dpi!(
+            externs::dpiSubscr_prepareStmt(self.inner, sql_s.ptr(), sql_s.len(), &mut stmt),
+            Ok(stmt.into()),
+            ErrorKind::Subscription("dpiSubscr_prepareStmt".to_string())
+        )
     }
 
     /// Releases a reference to the subscription. A count of the references to the subscription is
@@ -65,9 +71,11 @@ impl Subscription {
     /// freed. The subscription is also deregistered so that notifications are no longer sent, if
     /// this was not already done using the function `Subscription::close()`.
     pub fn release(&self) -> Result<()> {
-        try_dpi!(externs::dpiSubscr_release(self.inner),
-                 Ok(()),
-                 ErrorKind::Subscription("dpiSubscr_release".to_string()))
+        try_dpi!(
+            externs::dpiSubscr_release(self.inner),
+            Ok(()),
+            ErrorKind::Subscription("dpiSubscr_release".to_string())
+        )
     }
 }
 

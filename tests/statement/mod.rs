@@ -33,9 +33,11 @@ fn validate_query_info(query_info: &QueryInfo) -> Result<()> {
 }
 
 fn bind_by_name(conn: &Connection, username_var: &Var) -> Result<()> {
-    let bind_by_name = conn.prepare_stmt(Some("select * from username where username = :username"),
-                                         None,
-                                         false)?;
+    let bind_by_name = conn.prepare_stmt(
+        Some("select * from username where username = :username"),
+        None,
+        false,
+    )?;
 
     bind_by_name.bind_by_name(":username", username_var)?;
 
@@ -81,12 +83,14 @@ fn stmt_res(ctxt: &Context) -> Result<()> {
     ccp.set_encoding(enc_cstr.as_ptr());
     ccp.set_nchar_encoding(enc_cstr.as_ptr());
 
-    let conn = Connection::create(ctxt,
-                                  Some(&CREDS[0]),
-                                  Some(&CREDS[1]),
-                                  Some("//oic.cbsnae86d3iv.us-east-2.rds.amazonaws.com/ORCL"),
-                                  Some(ccp),
-                                  None)?;
+    let conn = Connection::create(
+        ctxt,
+        Some(&CREDS[0]),
+        Some(&CREDS[1]),
+        Some("//oic.cbsnae86d3iv.us-east-2.rds.amazonaws.com/ORCL"),
+        Some(ccp),
+        None,
+    )?;
     let username_var = conn.new_var(Varchar, Bytes, 1, 256, false, false)?;
     username_var.set_from_bytes(0, "jozias")?;
 
@@ -96,9 +100,11 @@ fn stmt_res(ctxt: &Context) -> Result<()> {
     bind_by_name(&conn, &username_var)?;
 
     // bind_by_pos / execute test
-    let bind_by_pos = conn.prepare_stmt(Some("select * from username where username = :username"),
-                                        None,
-                                        false)?;
+    let bind_by_pos = conn.prepare_stmt(
+        Some("select * from username where username = :username"),
+        None,
+        false,
+    )?;
     bind_by_pos.bind_by_pos(1, &username_var)?;
     let mut cols = bind_by_pos.execute(flags::DPI_MODE_EXEC_DEFAULT)?;
     assert_eq!(cols, 2);
@@ -113,30 +119,50 @@ fn stmt_res(ctxt: &Context) -> Result<()> {
         encoding: enc.as_ptr() as *const ::std::os::raw::c_char,
     };
 
-    let t_data = Data::new(false, ODPIDataValueUnion { as_bytes: odpi_bytes });
-    let bind_by_value_name = conn.prepare_stmt(Some("select * from username \
-                                                     where username = :username"),
-                                               None,
-                                               false)?;
+    let t_data = Data::new(
+        false,
+        ODPIDataValueUnion {
+            as_bytes: odpi_bytes,
+        },
+    );
+    let bind_by_value_name = conn.prepare_stmt(
+        Some(
+            "select * from username \
+             where username = :username",
+        ),
+        None,
+        false,
+    )?;
     bind_by_value_name
         .bind_value_by_name(":username", Bytes, &t_data)?;
     cols = bind_by_value_name.execute(flags::DPI_MODE_EXEC_DEFAULT)?;
     assert_eq!(cols, 2);
 
     // bind_value_by_pos / execute test
-    let bind_by_value_pos = conn.prepare_stmt(Some("select * from username \
-                                                    where username = :username"),
-                                              None,
-                                              false)?;
-    let t_data_1 = Data::new(false, ODPIDataValueUnion { as_bytes: odpi_bytes });
+    let bind_by_value_pos = conn.prepare_stmt(
+        Some(
+            "select * from username \
+             where username = :username",
+        ),
+        None,
+        false,
+    )?;
+    let t_data_1 = Data::new(
+        false,
+        ODPIDataValueUnion {
+            as_bytes: odpi_bytes,
+        },
+    );
     bind_by_value_pos.bind_value_by_pos(1, Bytes, &t_data_1)?;
     cols = bind_by_value_pos.execute(flags::DPI_MODE_EXEC_DEFAULT)?;
     assert_eq!(cols, 2);
 
     // execute / fetch test
-    let fetch = conn.prepare_stmt(Some("select * from username where username = :username"),
-                                  None,
-                                  false)?;
+    let fetch = conn.prepare_stmt(
+        Some("select * from username where username = :username"),
+        None,
+        false,
+    )?;
     fetch.bind_by_pos(1, &username_var)?;
     cols = fetch.execute(flags::DPI_MODE_EXEC_DEFAULT)?;
     assert_eq!(cols, 2);
@@ -148,7 +174,7 @@ fn stmt_res(ctxt: &Context) -> Result<()> {
     let fetch_rows = conn.prepare_stmt(
         Some(
             "select * from username \
-                 where username = :username",
+             where username = :username",
         ),
         None,
         false,
@@ -162,9 +188,11 @@ fn stmt_res(ctxt: &Context) -> Result<()> {
     assert!(!more_rows);
 
     // get_bind_count / get_bind_names / get_batch_error_count / get_info tests
-    let bn = conn.prepare_stmt(Some("insert into username values (:id, :username)"),
-                               None,
-                               false)?;
+    let bn = conn.prepare_stmt(
+        Some("insert into username values (:id, :username)"),
+        None,
+        false,
+    )?;
     let bind_count = bn.get_bind_count()?;
     assert_eq!(bind_count, 2);
     let names = bn.get_bind_names(2)?;
@@ -192,9 +220,11 @@ fn stmt_res(ctxt: &Context) -> Result<()> {
     all_users.scroll(Last, 0, 0)?;
 
     // execute_many test
-    let em = conn.prepare_stmt(Some("insert into username values (:id, :username)"),
-                               None,
-                               false)?;
+    let em = conn.prepare_stmt(
+        Some("insert into username values (:id, :username)"),
+        None,
+        false,
+    )?;
     // setup the id binds.
     let id_var = conn.new_var(Number, Int64, 2, 0, false, false)?;
     let mut id_data = id_var.get_data()?;

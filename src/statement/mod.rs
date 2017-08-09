@@ -48,9 +48,11 @@ impl Statement {
     /// statement needs to be maintained independently of the reference returned when the statement
     /// was created.
     pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(externs::dpiStmt_addRef(self.inner),
-                 Ok(()),
-                 ErrorKind::Statement("dpiStmt_addRef".to_string()))
+        try_dpi!(
+            externs::dpiStmt_addRef(self.inner),
+            Ok(()),
+            ErrorKind::Statement("dpiStmt_addRef".to_string())
+        )
     }
 
     /// Binds a variable to a named placeholder in the statement. A reference to the variable is
@@ -64,9 +66,11 @@ impl Statement {
         let name_s = ODPIStr::from(name);
 
         /// TODO: Test this when Var is complete.
-        try_dpi!(externs::dpiStmt_bindByName(self.inner, name_s.ptr(), name_s.len(), var.inner()),
-                 Ok(()),
-                 ErrorKind::Statement("dpiStmt_bindByName".to_string()))
+        try_dpi!(
+            externs::dpiStmt_bindByName(self.inner, name_s.ptr(), name_s.len(), var.inner()),
+            Ok(()),
+            ErrorKind::Statement("dpiStmt_bindByName".to_string())
+        )
     }
 
     /// Binds a variable to a placeholder in the statement by position. A reference to the variable
@@ -78,9 +82,11 @@ impl Statement {
     /// 1, and duplicate names do not count as additional placeholders.
     /// * `var` - a variable which is to be bound.
     pub fn bind_by_pos(&self, pos: u32, var: &Var) -> Result<()> {
-        try_dpi!(externs::dpiStmt_bindByPos(self.inner, pos, var.inner()),
-                 Ok(()),
-                 ErrorKind::Statement("dpiStmt_bindByPos".to_string()))
+        try_dpi!(
+            externs::dpiStmt_bindByPos(self.inner, pos, var.inner()),
+            Ok(()),
+            ErrorKind::Statement("dpiStmt_bindByPos".to_string())
+        )
     }
 
     /// Binds a value to a named placeholder in the statement without the need to create a variable
@@ -94,20 +100,25 @@ impl Statement {
     /// * `data` - the data which is to be bound, as a pointer to a `ODPIData` structure. A variable
     /// will be created based on the type of data being bound and a reference to this variable
     /// retained. Once the statement has been executed, this new variable will be released.
-    pub fn bind_value_by_name(&self,
-                              name: &str,
-                              native_type: enums::ODPINativeTypeNum,
-                              data: &Data)
-                              -> Result<()> {
+    pub fn bind_value_by_name(
+        &self,
+        name: &str,
+        native_type: enums::ODPINativeTypeNum,
+        data: &Data,
+    ) -> Result<()> {
         let name_s = ODPIStr::from(name);
 
-        try_dpi!(externs::dpiStmt_bindValueByName(self.inner,
-                                                  name_s.ptr(),
-                                                  name_s.len(),
-                                                  native_type,
-                                                  data.inner()),
-                 Ok(()),
-                 ErrorKind::Statement("dpiStmt_bindValueByName".to_string()))
+        try_dpi!(
+            externs::dpiStmt_bindValueByName(
+                self.inner,
+                name_s.ptr(),
+                name_s.len(),
+                native_type,
+                data.inner()
+            ),
+            Ok(()),
+            ErrorKind::Statement("dpiStmt_bindValueByName".to_string())
+        )
     }
 
     /// Binds a value to a placeholder in the statement without the need to create a variable
@@ -122,14 +133,17 @@ impl Statement {
     /// * `data` - the data which is to be bound, as a pointer to a `ODPIData` structure. A variable
     /// will be created based on the type of data being bound and a reference to this variable
     /// retained. Once the statement has been executed, this new variable will be released.
-    pub fn bind_value_by_pos(&self,
-                             pos: u32,
-                             native_type: enums::ODPINativeTypeNum,
-                             data: &Data)
-                             -> Result<()> {
-        try_dpi!(externs::dpiStmt_bindValueByPos(self.inner, pos, native_type, data.inner()),
-                 Ok(()),
-                 ErrorKind::Statement("dpiStmt_bindValueByPos".to_string()))
+    pub fn bind_value_by_pos(
+        &self,
+        pos: u32,
+        native_type: enums::ODPINativeTypeNum,
+        data: &Data,
+    ) -> Result<()> {
+        try_dpi!(
+            externs::dpiStmt_bindValueByPos(self.inner, pos, native_type, data.inner()),
+            Ok(()),
+            ErrorKind::Statement("dpiStmt_bindValueByPos".to_string())
+        )
     }
 
     /// Closes the statement and makes it unusable for further work immediately, rather than when
@@ -141,9 +155,11 @@ impl Statement {
     /// results.
     pub fn close(&self, tag: Option<&str>) -> Result<()> {
         let tag_s = ODPIStr::from(tag);
-        try_dpi!(externs::dpiStmt_close(self.inner, tag_s.ptr(), tag_s.len()),
-                 Ok(()),
-                 ErrorKind::Statement("dpiStmt_close".to_string()))
+        try_dpi!(
+            externs::dpiStmt_close(self.inner, tag_s.ptr(), tag_s.len()),
+            Ok(()),
+            ErrorKind::Statement("dpiStmt_close".to_string())
+        )
     }
 
     // /// Defines the variable that will be used to fetch rows from the statement. A reference to
@@ -161,9 +177,11 @@ impl Statement {
     /// * `mode` - one or more of the values from the enumeration `ODPIExecMode`, OR'ed together.
     pub fn execute(&self, mode: ODPIExecMode) -> Result<u32> {
         let mut cols_queried = 0;
-        try_dpi!(externs::dpiStmt_execute(self.inner, mode, &mut cols_queried),
-                 Ok(cols_queried),
-                 ErrorKind::Statement("dpiStmt_execute".to_string()))
+        try_dpi!(
+            externs::dpiStmt_execute(self.inner, mode, &mut cols_queried),
+            Ok(cols_queried),
+            ErrorKind::Statement("dpiStmt_execute".to_string())
+        )
     }
 
     /// Executes the statement the specified number of times using the bound values. Each bound
@@ -173,9 +191,11 @@ impl Statement {
     /// * `num_iters` - the number of times the statement is executed. Each iteration corresponds to
     /// one of the elements of the array that was bound earlier.
     pub fn execute_many(&self, mode: ODPIExecMode, num_iters: u32) -> Result<()> {
-        try_dpi!(externs::dpiStmt_executeMany(self.inner, mode, num_iters),
-                 Ok(()),
-                 ErrorKind::Statement("dpiStmt_executeMany".to_string()))
+        try_dpi!(
+            externs::dpiStmt_executeMany(self.inner, mode, num_iters),
+            Ok(()),
+            ErrorKind::Statement("dpiStmt_executeMany".to_string())
+        )
     }
 
     /// Fetches a single row from the statement. If the statement does not refer to a query an error
@@ -187,9 +207,11 @@ impl Statement {
         let mut found = 0;
         let mut buffer_row_index = 0;
 
-        try_dpi!(externs::dpiStmt_fetch(self.inner, &mut found, &mut buffer_row_index),
-                 Ok((found == 1, buffer_row_index)),
-                 ErrorKind::Statement("dpiStmt_fetch".to_string()))
+        try_dpi!(
+            externs::dpiStmt_fetch(self.inner, &mut found, &mut buffer_row_index),
+            Ok((found == 1, buffer_row_index)),
+            ErrorKind::Statement("dpiStmt_fetch".to_string())
+        )
     }
 
     /// Returns the number of rows that are available in the buffers defined for the query. If no
@@ -207,13 +229,17 @@ impl Statement {
         let mut num_rows_fetched = 0;
         let mut more_rows = 0;
 
-        try_dpi!(externs::dpiStmt_fetchRows(self.inner,
-                                            max_rows,
-                                            &mut buffer_row_index,
-                                            &mut num_rows_fetched,
-                                            &mut more_rows),
-                 Ok((buffer_row_index, num_rows_fetched, more_rows == 1)),
-                 ErrorKind::Statement("dpiStmt_fetchRows".to_string()))
+        try_dpi!(
+            externs::dpiStmt_fetchRows(
+                self.inner,
+                max_rows,
+                &mut buffer_row_index,
+                &mut num_rows_fetched,
+                &mut more_rows
+            ),
+            Ok((buffer_row_index, num_rows_fetched, more_rows == 1)),
+            ErrorKind::Statement("dpiStmt_fetchRows".to_string())
+        )
     }
 
     /// Returns the number of batch errors that took place during the last execution with batch mode
@@ -221,9 +247,11 @@ impl Statement {
     pub fn get_batch_error_count(&self) -> Result<u32> {
         let mut count = 0;
 
-        try_dpi!(externs::dpiStmt_getBatchErrorCount(self.inner, &mut count),
-                 Ok(count),
-                 ErrorKind::Statement("dpiStmt_getBatchErrorCount".to_string()))
+        try_dpi!(
+            externs::dpiStmt_getBatchErrorCount(self.inner, &mut count),
+            Ok(count),
+            ErrorKind::Statement("dpiStmt_getBatchErrorCount".to_string())
+        )
     }
 
     /// Returns the batch errors that took place during the last execution with batch mode enabled.
@@ -234,30 +262,34 @@ impl Statement {
     pub fn get_batch_errors(&self, num_errors: u32) -> Result<Vec<error::Info>> {
         let err_ptr = ptr::null_mut();
 
-        try_dpi!(externs::dpiStmt_getBatchErrors(self.inner, num_errors, err_ptr),
-                 {
-                     let err_slice = unsafe { slice::from_raw_parts(err_ptr, num_errors as usize) };
-                     let odpi_vec = Vec::from(err_slice);
-                     let res_vec = odpi_vec.iter().map(|x| (*x).into()).collect();
-                     Ok(res_vec)
-                 },
-                 ErrorKind::Statement("dpiStmt_getBatchErrors".to_string()))
+        try_dpi!(
+            externs::dpiStmt_getBatchErrors(self.inner, num_errors, err_ptr),
+            {
+                let err_slice = unsafe { slice::from_raw_parts(err_ptr, num_errors as usize) };
+                let odpi_vec = Vec::from(err_slice);
+                let res_vec = odpi_vec.iter().map(|x| (*x).into()).collect();
+                Ok(res_vec)
+            },
+            ErrorKind::Statement("dpiStmt_getBatchErrors".to_string())
+        )
     }
 
     /// Returns the number of unique bind variables in the prepared statement.
     pub fn get_bind_count(&self) -> Result<u32> {
         let mut count = 0;
-        try_dpi!(externs::dpiStmt_getBindCount(self.inner, &mut count),
-                 Ok(count),
-                 ErrorKind::Statement("dpiStmt_getBindCount".to_string()))
+        try_dpi!(
+            externs::dpiStmt_getBindCount(self.inner, &mut count),
+            Ok(count),
+            ErrorKind::Statement("dpiStmt_getBindCount".to_string())
+        )
     }
 
     /// Returns the names of the unique bind variables in the prepared statement.
     #[cfg_attr(feature = "cargo-clippy", allow(used_underscore_binding))]
     pub fn get_bind_names(&self, num_bind_names: u32) -> Result<Vec<String>> {
         let mut actual_num_bind_names = num_bind_names;
-        let mut names_vec: Vec<*const ::std::os::raw::c_char> = Vec::with_capacity(num_bind_names as
-                                                                                   usize);
+        let mut names_vec: Vec<*const ::std::os::raw::c_char> =
+            Vec::with_capacity(num_bind_names as usize);
         let mut names_len_vec: Vec<u32> = Vec::with_capacity(num_bind_names as usize);
 
         for _ in 0..num_bind_names {
@@ -265,33 +297,40 @@ impl Statement {
             names_len_vec.push(0);
         }
 
-        try_dpi!(externs::dpiStmt_getBindNames(self.inner,
-                                               &mut actual_num_bind_names,
-                                               names_vec.as_mut_ptr(),
-                                               names_len_vec.as_mut_ptr()),
-                 {
-                     let mut res = Vec::new();
+        try_dpi!(
+            externs::dpiStmt_getBindNames(
+                self.inner,
+                &mut actual_num_bind_names,
+                names_vec.as_mut_ptr(),
+                names_len_vec.as_mut_ptr()
+            ),
+            {
+                let mut res = Vec::new();
 
-                     for (idx, (name, name_len)) in
-                names_vec.iter().zip(names_len_vec.iter()).enumerate() {
-                         if idx <= actual_num_bind_names as usize {
-                             let name_s = ODPIStr::new(*name, *name_len);
-                             res.push(name_s.into());
-                         }
-                     }
+                for (idx, (name, name_len)) in
+                    names_vec.iter().zip(names_len_vec.iter()).enumerate()
+                {
+                    if idx <= actual_num_bind_names as usize {
+                        let name_s = ODPIStr::new(*name, *name_len);
+                        res.push(name_s.into());
+                    }
+                }
 
-                     Ok(res)
-                 },
-                 ErrorKind::Statement("dpiStmt_getBindNames".to_string()))
+                Ok(res)
+            },
+            ErrorKind::Statement("dpiStmt_getBindNames".to_string())
+        )
     }
 
     /// Gets the array size used for performing fetches.
     pub fn get_fetch_array_size(&self) -> Result<u32> {
         let mut size = 0;
 
-        try_dpi!(externs::dpiStmt_getFetchArraySize(self.inner, &mut size),
-                 Ok(size),
-                 ErrorKind::Statement("dpiStmt_getFetchArraySize".to_string()))
+        try_dpi!(
+            externs::dpiStmt_getFetchArraySize(self.inner, &mut size),
+            Ok(size),
+            ErrorKind::Statement("dpiStmt_getFetchArraySize".to_string())
+        )
     }
 
     /// Returns the next implicit result available from the last execution of the statement.
@@ -304,27 +343,33 @@ impl Statement {
     pub fn get_info(&self) -> Result<self::Info> {
         let mut info: ODPIStmtInfo = Default::default();
 
-        try_dpi!(externs::dpiStmt_getInfo(self.inner, &mut info),
-                 Ok(Info::new(info)),
-                 ErrorKind::Statement("dpiStmt_getInfo".to_string()))
+        try_dpi!(
+            externs::dpiStmt_getInfo(self.inner, &mut info),
+            Ok(Info::new(info)),
+            ErrorKind::Statement("dpiStmt_getInfo".to_string())
+        )
     }
 
     /// Returns the number of columns that are being queried.
     pub fn get_num_query_columns(&self) -> Result<u32> {
         let mut cols = 0;
 
-        try_dpi!(externs::dpiStmt_getNumQueryColumns(self.inner, &mut cols),
-                 Ok(cols),
-                 ErrorKind::Statement("dpiStmt_getNumQueryColumns".to_string()))
+        try_dpi!(
+            externs::dpiStmt_getNumQueryColumns(self.inner, &mut cols),
+            Ok(cols),
+            ErrorKind::Statement("dpiStmt_getNumQueryColumns".to_string())
+        )
     }
 
     /// Returns information about the column that is being queried.
     pub fn get_query_info(&self, pos: u32) -> Result<query::Info> {
         let mut qi: ODPIQueryInfo = Default::default();
 
-        try_dpi!(externs::dpiStmt_getQueryInfo(self.inner, pos, &mut qi),
-                 Ok(query::Info::new(qi)),
-                 ErrorKind::Statement("dpiStmt_getQueryInfo".to_string()))
+        try_dpi!(
+            externs::dpiStmt_getQueryInfo(self.inner, pos, &mut qi),
+            Ok(query::Info::new(qi)),
+            ErrorKind::Statement("dpiStmt_getQueryInfo".to_string())
+        )
     }
 
     /// Returns the value of the column at the given position for the currently fetched row, without
@@ -333,9 +378,11 @@ impl Statement {
         let mut data = ptr::null_mut();
         let mut native_type = 0;
 
-        try_dpi!(externs::dpiStmt_getQueryValue(self.inner, pos, &mut native_type, &mut data),
-                 Ok((native_type.into(), data)),
-                 ErrorKind::Statement("dpiStmt_getQueryValue".to_string()))
+        try_dpi!(
+            externs::dpiStmt_getQueryValue(self.inner, pos, &mut native_type, &mut data),
+            Ok((native_type.into(), data)),
+            ErrorKind::Statement("dpiStmt_getQueryValue".to_string())
+        )
     }
 
     /// Returns the number of rows affected by the last DML statement that was executed or the
@@ -343,9 +390,11 @@ impl Statement {
     pub fn get_row_count(&self) -> Result<u64> {
         let mut count = 0;
 
-        try_dpi!(externs::dpiStmt_getRowCount(self.inner, &mut count),
-                 Ok(count),
-                 ErrorKind::Statement("dpiStmt_getRowCount".to_string()))
+        try_dpi!(
+            externs::dpiStmt_getRowCount(self.inner, &mut count),
+            Ok(count),
+            ErrorKind::Statement("dpiStmt_getRowCount".to_string())
+        )
     }
 
     /// Returns an array of row counts affected by the last invocation of `Statement::executeMany()`
@@ -366,9 +415,11 @@ impl Statement {
     /// freed and the statement is closed if that has not already taken place using the function
     /// `close()`.
     pub fn release(&self) -> Result<()> {
-        try_dpi!(externs::dpiStmt_release(self.inner),
-                 Ok(()),
-                 ErrorKind::Statement("dpiStmt_release".to_string()))
+        try_dpi!(
+            externs::dpiStmt_release(self.inner),
+            Ok(()),
+            ErrorKind::Statement("dpiStmt_release".to_string())
+        )
     }
 
     /// Scrolls the statement to the position in the cursor specified by the mode and offset.
@@ -377,14 +428,17 @@ impl Statement {
     /// * `offset` - a value which is used with the mode in order to determine the row position in
     /// the cursor.
     /// * `row_count_offset` -
-    pub fn scroll(&self,
-                  mode: enums::ODPIFetchMode,
-                  offset: i32,
-                  row_count_offset: i32)
-                  -> Result<()> {
-        try_dpi!(externs::dpiStmt_scroll(self.inner, mode, offset, row_count_offset),
-                 Ok(()),
-                 ErrorKind::Statement("dpiStmt_scroll".to_string()))
+    pub fn scroll(
+        &self,
+        mode: enums::ODPIFetchMode,
+        offset: i32,
+        row_count_offset: i32,
+    ) -> Result<()> {
+        try_dpi!(
+            externs::dpiStmt_scroll(self.inner, mode, offset, row_count_offset),
+            Ok(()),
+            ErrorKind::Statement("dpiStmt_scroll".to_string())
+        )
     }
 
     /// Sets the array size used for performing fetches. All variables defined for fetching must

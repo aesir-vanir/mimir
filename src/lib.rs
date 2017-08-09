@@ -9,7 +9,7 @@
 //! Rust bindings over the Oracle Database Programming Interface for Drivers and Applications.
 #![deny(missing_docs)]
 #![feature(untagged_unions)]
-#![recursion_limit="128"]
+#![recursion_limit = "128"]
 #![cfg_attr(feature = "cargo-clippy", allow(unseparated_literal_suffix))]
 
 #[macro_use]

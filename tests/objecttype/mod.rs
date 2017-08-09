@@ -1,7 +1,7 @@
 use CREDS;
 use chrono::{TimeZone, Utc};
-use mimir::{Connection, Context, Data, Object, ObjectAttr, ObjectType, ODPIData,
-            ODPIObjectAttrInfo, ODPIObjectTypeInfo, ODPIStr, Statement};
+use mimir::{Connection, Context, Data, ODPIData, ODPIObjectAttrInfo, ODPIObjectTypeInfo, ODPIStr,
+            Object, ObjectAttr, ObjectType, Statement};
 use mimir::enums;
 use mimir::error::Result;
 use mimir::flags;
@@ -33,8 +33,10 @@ fn validate_object_type_info(type_info: &ODPIObjectTypeInfo) -> Result<()> {
     assert_eq!(name_str, "UDT_OBJECT");
     assert_eq!(type_info.is_collection, 0);
     // assert_eq!(type_info.element_oracle_type_num, Max);
-    assert_eq!(type_info.element_default_native_type_num,
-               enums::ODPINativeTypeNum::Invalid);
+    assert_eq!(
+        type_info.element_default_native_type_num,
+        enums::ODPINativeTypeNum::Invalid
+    );
     assert!(type_info.element_object_type.is_null());
     assert_eq!(type_info.num_attributes, 7);
 
@@ -110,10 +112,14 @@ fn validate_objectarr(obj_type: &ObjectType) -> Result<()> {
     assert_eq!(schema_str, "ODPIC");
     assert_eq!(name_str, "UDT_OBJECTARRAY");
     assert_eq!(type_info.is_collection, 1);
-    assert_eq!(type_info.element_oracle_type_num,
-               enums::ODPIOracleTypeNum::Object);
-    assert_eq!(type_info.element_default_native_type_num,
-               enums::ODPINativeTypeNum::Object);
+    assert_eq!(
+        type_info.element_oracle_type_num,
+        enums::ODPIOracleTypeNum::Object
+    );
+    assert_eq!(
+        type_info.element_default_native_type_num,
+        enums::ODPINativeTypeNum::Object
+    );
     assert!(!type_info.element_object_type.is_null());
 
     let arr_obj_type: ObjectType = type_info.element_object_type.into();
@@ -170,11 +176,12 @@ fn validate_object(idx: usize, attr_info: &ODPIObjectAttrInfo, attr_data: &ODPID
     Ok(())
 }
 
-fn validate_query_value(idx: usize,
-                        obj: &Object,
-                        obj_attr: &ObjectAttr,
-                        attr_info: &ODPIObjectAttrInfo)
-                        -> Result<()> {
+fn validate_query_value(
+    idx: usize,
+    obj: &Object,
+    obj_attr: &ObjectAttr,
+    attr_info: &ODPIObjectAttrInfo,
+) -> Result<()> {
     let attr_data = obj.get_attribute_value(obj_attr, attr_info)?;
     match attr_info.default_native_type_num {
         enums::ODPINativeTypeNum::Bytes => validate_bytes(idx, &attr_data)?,
@@ -238,21 +245,27 @@ fn obj_type(ctxt: &Context) -> Result<()> {
     ccp.set_encoding(enc_cstr.as_ptr());
     ccp.set_nchar_encoding(enc_cstr.as_ptr());
 
-    let conn = Connection::create(ctxt,
-                                  Some(&CREDS[2]),
-                                  Some(&CREDS[3]),
-                                  Some("//oic.cbsnae86d3iv.us-east-2.rds.amazonaws.com/ORCL"),
-                                  Some(ccp),
-                                  None)?;
+    let conn = Connection::create(
+        ctxt,
+        Some(&CREDS[2]),
+        Some(&CREDS[3]),
+        Some("//oic.cbsnae86d3iv.us-east-2.rds.amazonaws.com/ORCL"),
+        Some(ccp),
+        None,
+    )?;
 
     conn.add_ref()?;
 
     // Query with object
-    let object_col = conn.prepare_stmt(Some("select ObjectCol \
-                                                 from TestObjects \
-                                                 order by IntCol"),
-                                       None,
-                                       false)?;
+    let object_col = conn.prepare_stmt(
+        Some(
+            "select ObjectCol \
+             from TestObjects \
+             order by IntCol",
+        ),
+        None,
+        false,
+    )?;
 
     let cols = object_col.execute(flags::DPI_MODE_EXEC_DEFAULT)?;
     assert_eq!(cols, 1);

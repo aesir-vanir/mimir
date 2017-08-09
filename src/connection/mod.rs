@@ -48,9 +48,11 @@ impl Connection {
     /// connection needs to be maintained independently of the reference returned when the
     /// connection was created.
     pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(externs::dpiConn_addRef(self.inner),
-                 Ok(()),
-                 ErrorKind::Connection("dpiConn_addRef".to_string()))
+        try_dpi!(
+            externs::dpiConn_addRef(self.inner),
+            Ok(()),
+            ErrorKind::Connection("dpiConn_addRef".to_string())
+        )
     }
 
     /// Begins a distributed transaction using the specified transaction id (XID) made up of the
@@ -71,23 +73,29 @@ impl Connection {
         } else if branch_id_s.len() > 64 {
             Err(ErrorKind::BranchId.into())
         } else {
-            try_dpi!(externs::dpiConn_beginDistribTrans(self.inner,
-                                                        format_id,
-                                                        txn_id_s.ptr(),
-                                                        txn_id_s.len(),
-                                                        branch_id_s.ptr(),
-                                                        branch_id_s.len()),
-                     Ok(()),
-                     ErrorKind::Connection("dpiConn_beginDistribTrans".to_string()))
+            try_dpi!(
+                externs::dpiConn_beginDistribTrans(
+                    self.inner,
+                    format_id,
+                    txn_id_s.ptr(),
+                    txn_id_s.len(),
+                    branch_id_s.ptr(),
+                    branch_id_s.len()
+                ),
+                Ok(()),
+                ErrorKind::Connection("dpiConn_beginDistribTrans".to_string())
+            )
         }
     }
 
     /// Performs an immediate (asynchronous) termination of any currently executing function on the
     /// server associated with the connection.
     pub fn break_execution(&self) -> Result<()> {
-        try_dpi!(externs::dpiConn_breakExecution(self.inner),
-                 Ok(()),
-                 ErrorKind::Connection("dpiConn_breakExecution".to_string()))
+        try_dpi!(
+            externs::dpiConn_breakExecution(self.inner),
+            Ok(()),
+            ErrorKind::Connection("dpiConn_breakExecution".to_string())
+        )
     }
 
     /// Changes the password of the specified user.
@@ -98,24 +106,29 @@ impl Connection {
     /// string in the encoding used for CHAR data.
     /// * `new_password` - the new password of the user whose password is to be changed, as a byte
     /// string in the encoding used for CHAR data.
-    pub fn change_password(&self,
-                           username: &str,
-                           old_password: &str,
-                           new_password: &str)
-                           -> Result<()> {
+    pub fn change_password(
+        &self,
+        username: &str,
+        old_password: &str,
+        new_password: &str,
+    ) -> Result<()> {
         let username_s = ODPIStr::from(username);
         let old_password_s = ODPIStr::from(old_password);
         let new_password_s = ODPIStr::from(new_password);
 
-        try_dpi!(externs::dpiConn_changePassword(self.inner,
-                                                 username_s.ptr(),
-                                                 username_s.len(),
-                                                 old_password_s.ptr(),
-                                                 old_password_s.len(),
-                                                 new_password_s.ptr(),
-                                                 new_password_s.len()),
-                 Ok(()),
-                 ErrorKind::Connection("dpiConn_changePassword".to_string()))
+        try_dpi!(
+            externs::dpiConn_changePassword(
+                self.inner,
+                username_s.ptr(),
+                username_s.len(),
+                old_password_s.ptr(),
+                old_password_s.len(),
+                new_password_s.ptr(),
+                new_password_s.len()
+            ),
+            Ok(()),
+            ErrorKind::Connection("dpiConn_changePassword".to_string())
+        )
     }
 
     /// Closes the connection and makes it unusable for further activity.
@@ -129,16 +142,20 @@ impl Connection {
     pub fn close(&self, mode: flags::ODPIConnCloseMode, tag: Option<&str>) -> Result<()> {
         let tag_s = ODPIStr::from(tag);
 
-        try_dpi!(externs::dpiConn_close(self.inner, mode, tag_s.ptr(), tag_s.len()),
-                 Ok(()),
-                 ErrorKind::Connection("dpiConn_close".to_string()))
+        try_dpi!(
+            externs::dpiConn_close(self.inner, mode, tag_s.ptr(), tag_s.len()),
+            Ok(()),
+            ErrorKind::Connection("dpiConn_close".to_string())
+        )
     }
 
     /// Commits the current active transaction.
     pub fn commit(&self) -> Result<()> {
-        try_dpi!(externs::dpiConn_commit(self.inner),
-                 Ok(()),
-                 ErrorKind::Connection("dpiConn_commit".to_string()))
+        try_dpi!(
+            externs::dpiConn_commit(self.inner),
+            Ok(()),
+            ErrorKind::Connection("dpiConn_commit".to_string())
+        )
     }
 
     /// Creates a standalone connection to a database or acquires a connection from a session pool
@@ -164,13 +181,14 @@ impl Connection {
     /// * `conn_create_params` - An optional `ConnCreate` structure which is used to specify
     /// parameters for connection creation. None is also acceptable in which case all default
     /// parameters will be used when creating the connection.
-    pub fn create(context: &Context,
-                  username: Option<&str>,
-                  password: Option<&str>,
-                  connect_string: Option<&str>,
-                  common_create_params: Option<CommonCreate>,
-                  conn_create_params: Option<ConnCreate>)
-                  -> Result<Connection> {
+    pub fn create(
+        context: &Context,
+        username: Option<&str>,
+        password: Option<&str>,
+        connect_string: Option<&str>,
+        common_create_params: Option<CommonCreate>,
+        conn_create_params: Option<ConnCreate>,
+    ) -> Result<Connection> {
         let username_s = ODPIStr::from(username);
         let password_s = ODPIStr::from(password);
         let connect_string_s = ODPIStr::from(connect_string);
@@ -188,18 +206,22 @@ impl Connection {
             context.init_conn_create_params()?
         };
 
-        try_dpi!(externs::dpiConn_create(context.inner(),
-                                         username_s.ptr(),
-                                         username_s.len(),
-                                         password_s.ptr(),
-                                         password_s.len(),
-                                         connect_string_s.ptr(),
-                                         connect_string_s.len(),
-                                         &comm_cp.inner(),
-                                         &mut conn_cp.inner(),
-                                         &mut inner),
-                 Ok(inner.into()),
-                 ErrorKind::Connection("dpiConn_create".to_string()))
+        try_dpi!(
+            externs::dpiConn_create(
+                context.inner(),
+                username_s.ptr(),
+                username_s.len(),
+                password_s.ptr(),
+                password_s.len(),
+                connect_string_s.ptr(),
+                connect_string_s.len(),
+                &comm_cp.inner(),
+                &mut conn_cp.inner(),
+                &mut inner
+            ),
+            Ok(inner.into()),
+            ErrorKind::Connection("dpiConn_create".to_string())
+        )
     }
 
     /// Dequeues a message from a queue.
@@ -210,26 +232,31 @@ impl Connection {
     /// message from the queue.
     /// * `props` -- a reference to the message properties that will be populated with information
     /// from the message that is dequeued.
-    pub fn deque_object(&self,
-                        queue_name: &str,
-                        options: &dequeue::Options,
-                        props: &Properties)
-                        -> Result<(String, Object)> {
+    pub fn deque_object(
+        &self,
+        queue_name: &str,
+        options: &dequeue::Options,
+        props: &Properties,
+    ) -> Result<(String, Object)> {
         let queue_s = ODPIStr::from(queue_name);
         let payload = ptr::null_mut();
         let mut pdst = ptr::null();
         let mut dstlen = 0;
 
-        try_dpi!(externs::dpiConn_deqObject(self.inner,
-                                            queue_s.ptr(),
-                                            queue_s.len(),
-                                            options.inner(),
-                                            props.inner(),
-                                            payload,
-                                            &mut pdst,
-                                            &mut dstlen),
-                 Ok((ODPIStr::new(pdst, dstlen).into(), payload.into())),
-                 ErrorKind::Connection("dpiConn_deqObject".to_string()))
+        try_dpi!(
+            externs::dpiConn_deqObject(
+                self.inner,
+                queue_s.ptr(),
+                queue_s.len(),
+                options.inner(),
+                props.inner(),
+                payload,
+                &mut pdst,
+                &mut dstlen
+            ),
+            Ok((ODPIStr::new(pdst, dstlen).into(), payload.into())),
+            ErrorKind::Connection("dpiConn_deqObject".to_string())
+        )
     }
 
     /// Enqueues a message to a queue.
@@ -240,26 +267,31 @@ impl Connection {
     /// message to the queue.
     /// * `props` - a reference to the message properties that will affect the message that is
     /// enqueued.
-    pub fn enqueue_object(&self,
-                          queue_name: &str,
-                          options: &enqueue::Options,
-                          props: &Properties)
-                          -> Result<(String, Object)> {
+    pub fn enqueue_object(
+        &self,
+        queue_name: &str,
+        options: &enqueue::Options,
+        props: &Properties,
+    ) -> Result<(String, Object)> {
         let payload = ptr::null_mut();
         let queue_s = ODPIStr::from(queue_name);
         let mut pdst = ptr::null();
         let mut dstlen = 0;
 
-        try_dpi!(externs::dpiConn_enqObject(self.inner,
-                                            queue_s.ptr(),
-                                            queue_s.len(),
-                                            options.inner(),
-                                            props.inner(),
-                                            payload,
-                                            &mut pdst,
-                                            &mut dstlen),
-                 Ok((ODPIStr::new(pdst, dstlen).into(), payload.into())),
-                 ErrorKind::Connection("dpiConn_enqObject".to_string()))
+        try_dpi!(
+            externs::dpiConn_enqObject(
+                self.inner,
+                queue_s.ptr(),
+                queue_s.len(),
+                options.inner(),
+                props.inner(),
+                payload,
+                &mut pdst,
+                &mut dstlen
+            ),
+            Ok((ODPIStr::new(pdst, dstlen).into(), payload.into())),
+            ErrorKind::Connection("dpiConn_enqObject".to_string())
+        )
     }
 
     /// Get the current schema.
@@ -267,9 +299,11 @@ impl Connection {
         let mut pdst = ptr::null();
         let mut dstlen = 0;
 
-        try_dpi!(externs::dpiConn_getCurrentSchema(self.inner, &mut pdst, &mut dstlen),
-                 Ok(ODPIStr::new(pdst, dstlen).into()),
-                 ErrorKind::Connection("dpiConn_getCurrentSchema".to_string()))
+        try_dpi!(
+            externs::dpiConn_getCurrentSchema(self.inner, &mut pdst, &mut dstlen),
+            Ok(ODPIStr::new(pdst, dstlen).into()),
+            ErrorKind::Connection("dpiConn_getCurrentSchema".to_string())
+        )
     }
 
     /// Returns the edition that is being used by the connection.
@@ -277,9 +311,11 @@ impl Connection {
         let mut pdst = ptr::null();
         let mut dstlen = 0;
 
-        try_dpi!(externs::dpiConn_getEdition(self.inner, &mut pdst, &mut dstlen),
-                 Ok(ODPIStr::new(pdst, dstlen).into()),
-                 ErrorKind::Connection("dpiConn_getEdition".to_string()))
+        try_dpi!(
+            externs::dpiConn_getEdition(self.inner, &mut pdst, &mut dstlen),
+            Ok(ODPIStr::new(pdst, dstlen).into()),
+            ErrorKind::Connection("dpiConn_getEdition".to_string())
+        )
     }
 
     /// Returns the encoding information used by the connection. This will be equivalent to the
@@ -288,9 +324,11 @@ impl Connection {
     pub fn get_encoding_info(&self) -> Result<encoding::Info> {
         let mut encoding_info: ODPIEncodingInfo = Default::default();
 
-        try_dpi!(externs::dpiConn_getEncodingInfo(self.inner, &mut encoding_info),
-                 Ok(encoding_info.into()),
-                 ErrorKind::Connection("dpiConn_getEncodingInfo".to_string()))
+        try_dpi!(
+            externs::dpiConn_getEncodingInfo(self.inner, &mut encoding_info),
+            Ok(encoding_info.into()),
+            ErrorKind::Connection("dpiConn_getEncodingInfo".to_string())
+        )
     }
 
     /// Returns the external name that is being used by the connection. This value is used when
@@ -299,24 +337,25 @@ impl Connection {
         let mut pdst = ptr::null();
         let mut dstlen = 0;
 
-        try_dpi!(externs::dpiConn_getExternalName(self.inner, &mut pdst, &mut dstlen),
-                 {
-                     if pdst.is_null() {
-                         let err = "dpiConn_getExternalName: null pointer!".to_string();
-                         Err(ErrorKind::Connection(err).into())
-                     } else {
-                         let external_name_cstr = unsafe { CStr::from_ptr(pdst) };
-                         let external_name = external_name_cstr.to_string_lossy().into_owned();
-                         if external_name.len() == dstlen as usize {
-                             Ok(external_name_cstr.to_string_lossy().into_owned())
-                         } else {
-                             let err = "dpiConn_getExternalName: invalid string length!"
-                                 .to_string();
-                             Err(ErrorKind::Connection(err).into())
-                         }
-                     }
-                 },
-                 ErrorKind::Connection("dpiConn_getExternalName".to_string()))
+        try_dpi!(
+            externs::dpiConn_getExternalName(self.inner, &mut pdst, &mut dstlen),
+            {
+                if pdst.is_null() {
+                    let err = "dpiConn_getExternalName: null pointer!".to_string();
+                    Err(ErrorKind::Connection(err).into())
+                } else {
+                    let external_name_cstr = unsafe { CStr::from_ptr(pdst) };
+                    let external_name = external_name_cstr.to_string_lossy().into_owned();
+                    if external_name.len() == dstlen as usize {
+                        Ok(external_name_cstr.to_string_lossy().into_owned())
+                    } else {
+                        let err = "dpiConn_getExternalName: invalid string length!".to_string();
+                        Err(ErrorKind::Connection(err).into())
+                    }
+                }
+            },
+            ErrorKind::Connection("dpiConn_getExternalName".to_string())
+        )
     }
 
     #[doc(hidden)]
@@ -326,12 +365,14 @@ impl Connection {
     pub fn get_handle(&self) -> Result<()> {
         let mut pdst = ptr::null_mut();
 
-        try_dpi!(externs::dpiConn_getHandle(self.inner, &mut pdst),
-                 {
-                     // TODO: cast pdst to a svcctx struct
-                     Ok(())
-                 },
-                 ErrorKind::Connection("dpiConn_getHandle".to_string()))
+        try_dpi!(
+            externs::dpiConn_getHandle(self.inner, &mut pdst),
+            {
+                // TODO: cast pdst to a svcctx struct
+                Ok(())
+            },
+            ErrorKind::Connection("dpiConn_getHandle".to_string())
+        )
     }
 
     /// Returns the internal name that is being used by the connection. This value is used when
@@ -340,24 +381,25 @@ impl Connection {
         let mut pdst = ptr::null();
         let mut dstlen = 0;
 
-        try_dpi!(externs::dpiConn_getInternalName(self.inner, &mut pdst, &mut dstlen),
-                 {
-                     if pdst.is_null() {
-                         let err = "dpiConn_getInternalName: null pointer!".to_string();
-                         Err(ErrorKind::Connection(err).into())
-                     } else {
-                         let external_name_cstr = unsafe { CStr::from_ptr(pdst) };
-                         let external_name = external_name_cstr.to_string_lossy().into_owned();
-                         if external_name.len() == dstlen as usize {
-                             Ok(external_name_cstr.to_string_lossy().into_owned())
-                         } else {
-                             let err = "dpiConn_getInternalName: invalid string length!"
-                                 .to_string();
-                             Err(ErrorKind::Connection(err).into())
-                         }
-                     }
-                 },
-                 ErrorKind::Connection("dpiConn_getInternalName".to_string()))
+        try_dpi!(
+            externs::dpiConn_getInternalName(self.inner, &mut pdst, &mut dstlen),
+            {
+                if pdst.is_null() {
+                    let err = "dpiConn_getInternalName: null pointer!".to_string();
+                    Err(ErrorKind::Connection(err).into())
+                } else {
+                    let external_name_cstr = unsafe { CStr::from_ptr(pdst) };
+                    let external_name = external_name_cstr.to_string_lossy().into_owned();
+                    if external_name.len() == dstlen as usize {
+                        Ok(external_name_cstr.to_string_lossy().into_owned())
+                    } else {
+                        let err = "dpiConn_getInternalName: invalid string length!".to_string();
+                        Err(ErrorKind::Connection(err).into())
+                    }
+                }
+            },
+            ErrorKind::Connection("dpiConn_getInternalName".to_string())
+        )
     }
 
     /// Returns the logical transaction id for the connection. This value is used in Transaction
@@ -367,9 +409,11 @@ impl Connection {
         let mut pdst = ptr::null();
         let mut dstlen = 0;
 
-        try_dpi!(externs::dpiConn_getLTXID(self.inner, &mut pdst, &mut dstlen),
-                 Ok(ODPIStr::new(pdst, dstlen).into()),
-                 ErrorKind::Connection("dpiConn_getLTXID".to_string()))
+        try_dpi!(
+            externs::dpiConn_getLTXID(self.inner, &mut pdst, &mut dstlen),
+            Ok(ODPIStr::new(pdst, dstlen).into()),
+            ErrorKind::Connection("dpiConn_getLTXID".to_string())
+        )
     }
 
     /// Looks up an object type by name in the database and returns a reference to it. The reference
@@ -381,9 +425,11 @@ impl Connection {
         let mut pobj = ptr::null_mut();
         let name_s = ODPIStr::from(name);
 
-        try_dpi!(externs::dpiConn_getObjectType(self.inner, name_s.ptr(), name_s.len(), &mut pobj),
-                 Ok(pobj.into()),
-                 ErrorKind::Connection("dpiConn_getObjectType".to_string()))
+        try_dpi!(
+            externs::dpiConn_getObjectType(self.inner, name_s.ptr(), name_s.len(), &mut pobj),
+            Ok(pobj.into()),
+            ErrorKind::Connection("dpiConn_getObjectType".to_string())
+        )
     }
 
     /// Returns the version information of the Oracle Database to which the connection has been
@@ -393,26 +439,32 @@ impl Connection {
         let mut dstlen = 0;
         let mut version_info: ODPIVersionInfo = Default::default();
 
-        try_dpi!(externs::dpiConn_getServerVersion(self.inner,
-                                                   &mut pdst,
-                                                   &mut dstlen,
-                                                   &mut version_info),
-                 {
-                     let mut ver_info: version::Info = version_info.into();
-                     let release_s = ODPIStr::new(pdst, dstlen);
-                     ver_info.set_release(Some(release_s.into()));
-                     Ok(ver_info)
-                 },
-                 ErrorKind::Connection("dpiConn_getServerVersion".to_string()))
+        try_dpi!(
+            externs::dpiConn_getServerVersion(
+                self.inner,
+                &mut pdst,
+                &mut dstlen,
+                &mut version_info
+            ),
+            {
+                let mut ver_info: version::Info = version_info.into();
+                let release_s = ODPIStr::new(pdst, dstlen);
+                ver_info.set_release(Some(release_s.into()));
+                Ok(ver_info)
+            },
+            ErrorKind::Connection("dpiConn_getServerVersion".to_string())
+        )
     }
 
     /// Returns the size of the statement cache, in number of statements.
     pub fn get_statement_cache_size(&self) -> Result<u32> {
         let mut size = 0;
 
-        try_dpi!(externs::dpiConn_getStmtCacheSize(self.inner, &mut size),
-                 Ok(size),
-                 ErrorKind::Connection("dpiConn_getStmtCacheSize".to_string()))
+        try_dpi!(
+            externs::dpiConn_getStmtCacheSize(self.inner, &mut size),
+            Ok(size),
+            ErrorKind::Connection("dpiConn_getStmtCacheSize".to_string())
+        )
     }
 
     /// Returns a reference to a new set of dequeue options, used in dequeuing objects from a queue.
@@ -420,9 +472,11 @@ impl Connection {
     pub fn new_deq_options(&self) -> Result<dequeue::Options> {
         let mut deq_ptr = ptr::null_mut();
 
-        try_dpi!(externs::dpiConn_newDeqOptions(self.inner, &mut deq_ptr),
-                 Ok(deq_ptr.into()),
-                 ErrorKind::Connection("dpiConn_newDeqOptions".to_string()))
+        try_dpi!(
+            externs::dpiConn_newDeqOptions(self.inner, &mut deq_ptr),
+            Ok(deq_ptr.into()),
+            ErrorKind::Connection("dpiConn_newDeqOptions".to_string())
+        )
     }
 
     /// Returns a reference to a new set of enqueue options, used in enqueuing objects into a queue.
@@ -430,42 +484,53 @@ impl Connection {
     pub fn new_enq_options(&self) -> Result<enqueue::Options> {
         let mut enq_ptr = ptr::null_mut();
 
-        try_dpi!(externs::dpiConn_newEnqOptions(self.inner, &mut enq_ptr),
-                 Ok(enq_ptr.into()),
-                 ErrorKind::Connection("dpiConn_newEnqOptions".to_string()))
+        try_dpi!(
+            externs::dpiConn_newEnqOptions(self.inner, &mut enq_ptr),
+            Ok(enq_ptr.into()),
+            ErrorKind::Connection("dpiConn_newEnqOptions".to_string())
+        )
     }
 
     /// Returns a reference to a new set of message properties, used in enqueuing and dequeuing
     /// objects in a queue. The reference should be released as soon as it is no longer needed.
     pub fn new_msg_props(&self) -> Result<Properties> {
         let mut msg_props_ptr = ptr::null_mut();
-        try_dpi!(externs::dpiConn_newMsgProps(self.inner, &mut msg_props_ptr),
-                 Ok(msg_props_ptr.into()),
-                 ErrorKind::Connection("dpiConn_newMsgProps".to_string()))
+        try_dpi!(
+            externs::dpiConn_newMsgProps(self.inner, &mut msg_props_ptr),
+            Ok(msg_props_ptr.into()),
+            ErrorKind::Connection("dpiConn_newMsgProps".to_string())
+        )
     }
 
     /// Returns a reference to a subscription which is used for requesting notifications of changes
     /// on tables or queries that are made in the database. The reference should be released as soon
     /// as it is no longer needed.
-    pub fn new_subscription(&self,
-                            subscr_create_params: SubscrCreate)
-                            -> Result<(u32, Subscription)> {
+    pub fn new_subscription(
+        &self,
+        subscr_create_params: SubscrCreate,
+    ) -> Result<(u32, Subscription)> {
         let mut subscr_ptr = ptr::null_mut();
         let mut subscr_id = 0;
 
-        try_dpi!(externs::dpiConn_newSubscription(self.inner,
-                                                  &mut subscr_create_params.inner(),
-                                                  &mut subscr_ptr,
-                                                  &mut subscr_id),
-                 {
-                     if subscr_ptr.is_null() {
-                         Err(ErrorKind::Connection("dpiConn_newSubscription".to_string()).into())
-                     } else {
-                         let sub: Subscription = subscr_ptr.into();
-                         Ok((subscr_id, sub))
-                     }
-                 },
-                 ErrorKind::Connection("dpiConn_newSubscription".to_string()))
+        try_dpi!(
+            externs::dpiConn_newSubscription(
+                self.inner,
+                &mut subscr_create_params.inner(),
+                &mut subscr_ptr,
+                &mut subscr_id
+            ),
+            {
+                if subscr_ptr.is_null() {
+                    Err(
+                        ErrorKind::Connection("dpiConn_newSubscription".to_string()).into(),
+                    )
+                } else {
+                    let sub: Subscription = subscr_ptr.into();
+                    Ok((subscr_id, sub))
+                }
+            },
+            ErrorKind::Connection("dpiConn_newSubscription".to_string())
+        )
     }
 
     /// Returns a reference to a new temporary LOB which may subsequently be written and bound to a
@@ -480,12 +545,18 @@ impl Connection {
             enums::ODPIOracleTypeNum::Clob |
             enums::ODPIOracleTypeNum::NClob |
             enums::ODPIOracleTypeNum::Blob => {}
-            _ => return Err(ErrorKind::Connection("invalid oracle type".to_string()).into()),
+            _ => {
+                return Err(
+                    ErrorKind::Connection("invalid oracle type".to_string()).into(),
+                )
+            }
         }
 
-        try_dpi!(externs::dpiConn_newTempLob(self.inner, lob_type, &mut lob_ptr),
-                 Ok(lob_ptr.into()),
-                 ErrorKind::Connection("dpiConn_newTempLob".to_string()))
+        try_dpi!(
+            externs::dpiConn_newTempLob(self.inner, lob_type, &mut lob_ptr),
+            Ok(lob_ptr.into()),
+            ErrorKind::Connection("dpiConn_newTempLob".to_string())
+        )
     }
 
     /// Returns a reference to a new variable which can be used for binding data to a statement or
@@ -507,14 +578,15 @@ impl Connection {
     /// bytes. This flag is only used if the variable refers to character data.
     /// * `is_array` - boolean value indicating if the variable refers to a PL/SQL array or simply
     /// to buffers used for binding or fetching data.
-    pub fn new_var(&self,
-                   oracle_type_num: enums::ODPIOracleTypeNum,
-                   native_type_num: enums::ODPINativeTypeNum,
-                   max_array_size: u32,
-                   size: u32,
-                   size_is_bytes: bool,
-                   is_array: bool)
-                   -> Result<Var> {
+    pub fn new_var(
+        &self,
+        oracle_type_num: enums::ODPIOracleTypeNum,
+        native_type_num: enums::ODPINativeTypeNum,
+        max_array_size: u32,
+        size: u32,
+        size_is_bytes: bool,
+        is_array: bool,
+    ) -> Result<Var> {
         let mut var_ptr = ptr::null_mut();
         let mut data_ptr = ptr::null_mut();
         let object_type = ptr::null_mut();
@@ -523,34 +595,42 @@ impl Connection {
         let ia = if is_array { 1 } else { 0 };
 
         /// TODO: Fix object_type when Object is implemented fully.
-        try_dpi!(externs::dpiConn_newVar(self.inner,
-                                         oracle_type_num,
-                                         native_type_num,
-                                         max_array_size,
-                                         size,
-                                         sib,
-                                         ia,
-                                         object_type,
-                                         &mut var_ptr,
-                                         &mut data_ptr),
-                 Ok(var_ptr.into()),
-                 ErrorKind::Connection("dpiConn_newVar".to_string()))
+        try_dpi!(
+            externs::dpiConn_newVar(
+                self.inner,
+                oracle_type_num,
+                native_type_num,
+                max_array_size,
+                size,
+                sib,
+                ia,
+                object_type,
+                &mut var_ptr,
+                &mut data_ptr
+            ),
+            Ok(var_ptr.into()),
+            ErrorKind::Connection("dpiConn_newVar".to_string())
+        )
     }
 
     /// Pings the database to verify that the connection is still alive.
     pub fn ping(&self) -> Result<()> {
-        try_dpi!(externs::dpiConn_ping(self.inner),
-                 Ok(()),
-                 ErrorKind::Connection("dpiConn_ping".to_string()))
+        try_dpi!(
+            externs::dpiConn_ping(self.inner),
+            Ok(()),
+            ErrorKind::Connection("dpiConn_ping".to_string())
+        )
     }
 
     /// Prepares a distributed transaction for commit. This function should only be called after
     /// dpiConn_beginDistribTrans() is called and before dpiConn_commit() is called.
     pub fn prepare_distrib_trans(&self) -> Result<bool> {
         let mut commit_needed = 0;
-        try_dpi!(externs::dpiConn_prepareDistribTrans(self.inner, &mut commit_needed),
-                 Ok(commit_needed != 0),
-                 ErrorKind::Connection("dpiConn_prepareDistribTrans".to_string()))
+        try_dpi!(
+            externs::dpiConn_prepareDistribTrans(self.inner, &mut commit_needed),
+            Ok(commit_needed != 0),
+            ErrorKind::Connection("dpiConn_prepareDistribTrans".to_string())
+        )
     }
 
     /// Returns a reference to a statement prepared for execution. The reference should be released
@@ -565,25 +645,30 @@ impl Connection {
     /// scrollable, `Statement::scroll()` can be used to reposition the cursor; otherwise, rows are
     /// retrieved in order from the statement until the rows are exhausted. This value is ignored
     /// for statements that do not refer to a query.
-    pub fn prepare_stmt(&self,
-                        sql: Option<&str>,
-                        tag: Option<&str>,
-                        scrollable: bool)
-                        -> Result<Statement> {
+    pub fn prepare_stmt(
+        &self,
+        sql: Option<&str>,
+        tag: Option<&str>,
+        scrollable: bool,
+    ) -> Result<Statement> {
         let sql_s = ODPIStr::from(sql);
         let tag_s = ODPIStr::from(tag);
         let scroll_i = if scrollable { 0 } else { 1 };
         let mut stmt_ptr = ptr::null_mut();
 
-        try_dpi!(externs::dpiConn_prepareStmt(self.inner,
-                                              scroll_i,
-                                              sql_s.ptr(),
-                                              sql_s.len(),
-                                              tag_s.ptr(),
-                                              tag_s.len(),
-                                              &mut stmt_ptr),
-                 Ok(Statement::new(stmt_ptr)),
-                 ErrorKind::Connection("dpiConn_prepareStmt".to_string()))
+        try_dpi!(
+            externs::dpiConn_prepareStmt(
+                self.inner,
+                scroll_i,
+                sql_s.ptr(),
+                sql_s.len(),
+                tag_s.ptr(),
+                tag_s.len(),
+                &mut stmt_ptr
+            ),
+            Ok(Statement::new(stmt_ptr)),
+            ErrorKind::Connection("dpiConn_prepareStmt".to_string())
+        )
     }
 
     /// Releases a reference to the connection. A count of the references to the connection is
@@ -591,16 +676,20 @@ impl Connection {
     /// freed and the connection is closed or released back to the session pool if that has not
     /// already taken place using the function `close()`.
     pub fn release(&self) -> Result<()> {
-        try_dpi!(externs::dpiConn_release(self.inner),
-                 Ok(()),
-                 ErrorKind::Connection("dpiConn_release".to_string()))
+        try_dpi!(
+            externs::dpiConn_release(self.inner),
+            Ok(()),
+            ErrorKind::Connection("dpiConn_release".to_string())
+        )
     }
 
     /// Rolls back the current active transaction.
     pub fn rollback(&self) -> Result<()> {
-        try_dpi!(externs::dpiConn_rollback(self.inner),
-                 Ok(()),
-                 ErrorKind::Connection("dpiConn_rollback".to_string()))
+        try_dpi!(
+            externs::dpiConn_rollback(self.inner),
+            Ok(()),
+            ErrorKind::Connection("dpiConn_rollback".to_string())
+        )
     }
 
     /// Sets the action attribute on the connection. This is one of the end-to-end tracing
@@ -612,9 +701,11 @@ impl Connection {
     pub fn set_action(&self, action: &str) -> Result<()> {
         let action_s = ODPIStr::from(action);
 
-        try_dpi!(externs::dpiConn_setAction(self.inner, action_s.ptr(), action_s.len()),
-                 Ok(()),
-                 ErrorKind::Connection("dpiConn_setAction".to_string()))
+        try_dpi!(
+            externs::dpiConn_setAction(self.inner, action_s.ptr(), action_s.len()),
+            Ok(()),
+            ErrorKind::Connection("dpiConn_setAction".to_string())
+        )
     }
 
     /// Sets the client identifier attribute on the connection. This is one of the end-to-end
@@ -626,9 +717,11 @@ impl Connection {
     pub fn set_client_identifier(&self, id: &str) -> Result<()> {
         let id_s = ODPIStr::from(id);
 
-        try_dpi!(externs::dpiConn_setClientIdentifier(self.inner, id_s.ptr(), id_s.len()),
-                 Ok(()),
-                 ErrorKind::Connection("dpiConn_setClientIdentifier".to_string()))
+        try_dpi!(
+            externs::dpiConn_setClientIdentifier(self.inner, id_s.ptr(), id_s.len()),
+            Ok(()),
+            ErrorKind::Connection("dpiConn_setClientIdentifier".to_string())
+        )
     }
 
     /// Sets the client info attribute on the connection. This is one of the end-to-end tracing
@@ -640,9 +733,11 @@ impl Connection {
     pub fn set_client_info(&self, info: &str) -> Result<()> {
         let info_s = ODPIStr::from(info);
 
-        try_dpi!(externs::dpiConn_setClientInfo(self.inner, info_s.ptr(), info_s.len()),
-                 Ok(()),
-                 ErrorKind::Connection("dpiConn_setClientInfo".to_string()))
+        try_dpi!(
+            externs::dpiConn_setClientInfo(self.inner, info_s.ptr(), info_s.len()),
+            Ok(()),
+            ErrorKind::Connection("dpiConn_setClientInfo".to_string())
+        )
     }
 
     /// Sets the current schema to be used on the connection. This has the same effect as the SQL
@@ -656,11 +751,11 @@ impl Connection {
     /// current schema.
     pub fn set_current_schema(&self, schema: &str) -> Result<()> {
         let curr_schema_s = ODPIStr::from(schema);
-        try_dpi!(externs::dpiConn_setCurrentSchema(self.inner,
-                                                   curr_schema_s.ptr(),
-                                                   curr_schema_s.len()),
-                 Ok(()),
-                 ErrorKind::Connection("dpiConn_setCurrentSchema".to_string()))
+        try_dpi!(
+            externs::dpiConn_setCurrentSchema(self.inner, curr_schema_s.ptr(), curr_schema_s.len()),
+            Ok(()),
+            ErrorKind::Connection("dpiConn_setCurrentSchema".to_string())
+        )
     }
 
     /// Sets the database operation attribute on the connection. This is one of the end-to-end
@@ -672,9 +767,11 @@ impl Connection {
     pub fn set_db_op(&self, op: &str) -> Result<()> {
         let db_op_s = ODPIStr::from(op);
 
-        try_dpi!(externs::dpiConn_setDbOp(self.inner, db_op_s.ptr(), db_op_s.len()),
-                 Ok(()),
-                 ErrorKind::Connection("dpiConn_setDbOp".to_string()))
+        try_dpi!(
+            externs::dpiConn_setDbOp(self.inner, db_op_s.ptr(), db_op_s.len()),
+            Ok(()),
+            ErrorKind::Connection("dpiConn_setDbOp".to_string())
+        )
     }
 
 
@@ -689,11 +786,15 @@ impl Connection {
         let external_name_len = external_name.len() + 1;
 
         if external_name_len <= u32::max_value() as usize {
-            try_dpi!(externs::dpiConn_setExternalName(self.inner,
-                                                      external_name_cstr.as_ptr(),
-                                                      external_name_len as u32),
-                     Ok(()),
-                     ErrorKind::Connection("dpiConn_setExternalName".to_string()))
+            try_dpi!(
+                externs::dpiConn_setExternalName(
+                    self.inner,
+                    external_name_cstr.as_ptr(),
+                    external_name_len as u32
+                ),
+                Ok(()),
+                ErrorKind::Connection("dpiConn_setExternalName".to_string())
+            )
         } else {
             let err = "dpiConn_setExternalName: length out of bounds".to_string();
             Err(ErrorKind::Connection(err).into())
@@ -712,11 +813,15 @@ impl Connection {
         let internal_name_len = internal_name.len() + 1;
 
         if internal_name_len <= u32::max_value() as usize {
-            try_dpi!(externs::dpiConn_setInternalName(self.inner,
-                                                      internal_name_cstr.as_ptr(),
-                                                      internal_name_len as u32),
-                     Ok(()),
-                     ErrorKind::Connection("dpiConn_setInternalName".to_string()))
+            try_dpi!(
+                externs::dpiConn_setInternalName(
+                    self.inner,
+                    internal_name_cstr.as_ptr(),
+                    internal_name_len as u32
+                ),
+                Ok(()),
+                ErrorKind::Connection("dpiConn_setInternalName".to_string())
+            )
         } else {
             let err = "dpiConn_setInternalName: length out of bounds".to_string();
             Err(ErrorKind::Connection(err).into())
@@ -732,18 +837,22 @@ impl Connection {
     pub fn set_module(&self, module: &str) -> Result<()> {
         let module_s = ODPIStr::from(module);
 
-        try_dpi!(externs::dpiConn_setModule(self.inner, module_s.ptr(), module_s.len()),
-                 Ok(()),
-                 ErrorKind::Connection("dpiConn_setModule".to_string()))
+        try_dpi!(
+            externs::dpiConn_setModule(self.inner, module_s.ptr(), module_s.len()),
+            Ok(()),
+            ErrorKind::Connection("dpiConn_setModule".to_string())
+        )
     }
 
     /// Sets the size of the statement cache.
     ///
     /// * `size` - the new size of the statement cache, in number of statements.
     pub fn set_statement_cache_size(&self, size: u32) -> Result<()> {
-        try_dpi!(externs::dpiConn_setStmtCacheSize(self.inner, size),
-                 Ok(()),
-                 ErrorKind::Connection("dpiConn_setStmtCacheSize".to_string()))
+        try_dpi!(
+            externs::dpiConn_setStmtCacheSize(self.inner, size),
+            Ok(()),
+            ErrorKind::Connection("dpiConn_setStmtCacheSize".to_string())
+        )
     }
 
     /// Shuts down the database. This function must be called twice for the database to be shut down
@@ -754,18 +863,22 @@ impl Connection {
     ///
     /// * `mode` - one of the values from the enumeration `ODPIShutdownMode`.
     pub fn shutdown_database(self, mode: enums::ODPIShutdownMode) -> Result<()> {
-        try_dpi!(externs::dpiConn_shutdownDatabase(self.inner, mode),
-                 Ok(()),
-                 ErrorKind::Connection("dpiConn_shutdownDatabase".to_string()))
+        try_dpi!(
+            externs::dpiConn_shutdownDatabase(self.inner, mode),
+            Ok(()),
+            ErrorKind::Connection("dpiConn_shutdownDatabase".to_string())
+        )
     }
 
     /// Starts up a database
     ///
     /// * `mode` - one of the values from the enumeration `ODPIStartupMode`.
     pub fn start_database(self, mode: enums::ODPIStartupMode) -> Result<()> {
-        try_dpi!(externs::dpiConn_startupDatabase(self.inner, mode),
-                 Ok(()),
-                 ErrorKind::Connection("dpiConn_startupDatabase".to_string()))
+        try_dpi!(
+            externs::dpiConn_startupDatabase(self.inner, mode),
+            Ok(()),
+            ErrorKind::Connection("dpiConn_startupDatabase".to_string())
+        )
     }
 }
 

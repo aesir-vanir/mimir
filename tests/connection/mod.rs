@@ -10,8 +10,10 @@ use mimir::error::Result;
 use rand::{self, Rng};
 use std::ffi::CString;
 
-extern "C" fn subscr_callback(_context: *mut ::std::os::raw::c_void,
-                              _message: *mut ODPISubscrMessage) {
+extern "C" fn subscr_callback(
+    _context: *mut ::std::os::raw::c_void,
+    _message: *mut ODPISubscrMessage,
+) {
     // For testing
 }
 
@@ -22,12 +24,14 @@ fn conn(ctxt: &Context) -> Result<()> {
     common_create_params.set_nchar_encoding(enc_cstr.as_ptr());
     common_create_params.set_create_mode(flags::DPI_MODE_CREATE_EVENTS);
 
-    let conn = Connection::create(ctxt,
-                                  Some(&CREDS[0]),
-                                  Some(&CREDS[1]),
-                                  Some("//oic.cbsnae86d3iv.us-east-2.rds.amazonaws.com/ORCL"),
-                                  Some(common_create_params),
-                                  None)?;
+    let conn = Connection::create(
+        ctxt,
+        Some(&CREDS[0]),
+        Some(&CREDS[1]),
+        Some("//oic.cbsnae86d3iv.us-east-2.rds.amazonaws.com/ORCL"),
+        Some(common_create_params),
+        None,
+    )?;
     // add_ref / release / break_execution test
     conn.add_ref()?;
     conn.release()?;
@@ -72,9 +76,11 @@ fn conn(ctxt: &Context) -> Result<()> {
     let version_info = conn.get_server_version()?;
     assert_eq!(version_info.version(), "12.1.0.2.0");
     assert_eq!(version_info.version_num(), 1201000200);
-    assert_eq!(version_info.release(),
-               "Oracle Database 12c Standard Edition Release 12.1.0.2.0 - \
-                64bit Production");
+    assert_eq!(
+        version_info.release(),
+        "Oracle Database 12c Standard Edition Release 12.1.0.2.0 - \
+         64bit Production"
+    );
 
     // new_deq_options
     let deq_opts = conn.new_deq_options()?;

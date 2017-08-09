@@ -11,7 +11,7 @@
 //! (such as Go) do not have the ability to manipulate structures containing unions or the ability
 //! to process macros. For this reason, none of these functions perform any error checking. They are
 //! assumed to be replacements for direct manipulation of the various members of the structure.
-use chrono::{Datelike, DateTime, Duration, Timelike, TimeZone, Utc};
+use chrono::{DateTime, Datelike, Duration, TimeZone, Timelike, Utc};
 use odpi::opaque;
 use odpi::structs::{ODPIData, ODPIDataValueUnion};
 use util::ODPIStr;
@@ -45,7 +45,9 @@ impl Data {
             is_null: if is_null { 1 } else { 0 },
             value: val,
         };
-        Data { inner: &mut odpi_data }
+        Data {
+            inner: &mut odpi_data,
+        }
     }
 
     /// Get the `inner` value.

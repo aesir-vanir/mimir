@@ -53,8 +53,8 @@ impl AppContext {
     /// byte string in the encoding specified in the `ODPIConnCreateParams` structure and must not
     /// be NULL.
     pub fn get_namespace_name(&self) -> String {
-        let namespace_name_s = ODPIStr::new(self.ctxt.namespace_name,
-                                            self.ctxt.namespace_name_length);
+        let namespace_name_s =
+            ODPIStr::new(self.ctxt.namespace_name, self.ctxt.namespace_name_length);
         namespace_name_s.into()
     }
 
@@ -140,9 +140,10 @@ impl CommonCreate {
     }
 
     /// Set the `nchar_encoding` value.
-    pub fn set_nchar_encoding(&mut self,
-                              nchar_encoding: *const ::std::os::raw::c_char)
-                              -> &mut CommonCreate {
+    pub fn set_nchar_encoding(
+        &mut self,
+        nchar_encoding: *const ::std::os::raw::c_char,
+    ) -> &mut CommonCreate {
         self.ccp.nchar_encoding = nchar_encoding;
         self
     }
@@ -230,8 +231,10 @@ impl ConnCreate {
     /// expected to be NULL (meaning that no connection class will be set) or a byte string in the
     /// encoding used for CHAR data. The default value is NULL.
     pub fn get_connection_class(&self) -> String {
-        let connection_class_s = ODPIStr::new(self.conn.connection_class,
-                                              self.conn.connection_class_length);
+        let connection_class_s = ODPIStr::new(
+            self.conn.connection_class,
+            self.conn.connection_class_length,
+        );
         connection_class_s.into()
     }
 
@@ -345,9 +348,10 @@ impl ConnCreate {
     }
 
     /// Set the `external_handle` value.
-    pub fn set_external_handle(&mut self,
-                               external_handle: *mut ::std::os::raw::c_void)
-                               -> &mut ConnCreate {
+    pub fn set_external_handle(
+        &mut self,
+        external_handle: *mut ::std::os::raw::c_void,
+    ) -> &mut ConnCreate {
         self.conn.external_handle = external_handle;
         self
     }
@@ -614,9 +618,10 @@ impl SubscrCreate {
     }
 
     /// Set the `subscr_namespace` value.
-    pub fn set_subscr_namespace(&mut self,
-                                subscr_namespace: enums::ODPISubscrNamespace)
-                                -> &mut SubscrCreate {
+    pub fn set_subscr_namespace(
+        &mut self,
+        subscr_namespace: enums::ODPISubscrNamespace,
+    ) -> &mut SubscrCreate {
         self.subscr.subscr_namespace = subscr_namespace;
         self
     }
@@ -750,9 +755,10 @@ impl SubscrCreate {
     }
 
     /// Set the `callback_context` value.
-    pub fn set_callback_context(&mut self,
-                                callback_context: *mut ::std::os::raw::c_void)
-                                -> &mut SubscrCreate {
+    pub fn set_callback_context(
+        &mut self,
+        callback_context: *mut ::std::os::raw::c_void,
+    ) -> &mut SubscrCreate {
         self.subscr.callback_context = callback_context;
         self
     }
@@ -766,8 +772,10 @@ impl SubscrCreate {
         if self.subscr.recipient_name.is_null() {
             "".to_string()
         } else {
-            let res = ODPIStr::new(self.subscr.recipient_name,
-                                   self.subscr.recipient_name_length);
+            let res = ODPIStr::new(
+                self.subscr.recipient_name,
+                self.subscr.recipient_name_length,
+            );
             res.into()
         }
     }

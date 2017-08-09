@@ -47,11 +47,12 @@ impl Pool {
     /// * `conn_create_params` - An optional `ConnCreate` structure which is used to specify
     /// parameters for connection creation. None is acceptable in which case all default parameters
     /// will be used when creating the connection.
-    pub fn acquire_connection(&self,
-                              username: Option<&str>,
-                              password: Option<&str>,
-                              conn_create_params: Option<ConnCreate>)
-                              -> Result<Connection> {
+    pub fn acquire_connection(
+        &self,
+        username: Option<&str>,
+        password: Option<&str>,
+        conn_create_params: Option<ConnCreate>,
+    ) -> Result<Connection> {
         let username_s = ODPIStr::from(username);
         let password_s = ODPIStr::from(password);
         let conn_cp = if let Some(conn_create_params) = conn_create_params {
@@ -61,23 +62,29 @@ impl Pool {
         };
         let mut conn: *mut ODPIConn = ptr::null_mut();
 
-        try_dpi!(externs::dpiPool_acquireConnection(self.inner,
-                                                    username_s.ptr(),
-                                                    username_s.len(),
-                                                    password_s.ptr(),
-                                                    password_s.len(),
-                                                    &mut conn_cp.inner(),
-                                                    &mut conn),
-                 Ok(conn.into()),
-                 ErrorKind::Pool("dpiPool_acquireConnection".to_string()))
+        try_dpi!(
+            externs::dpiPool_acquireConnection(
+                self.inner,
+                username_s.ptr(),
+                username_s.len(),
+                password_s.ptr(),
+                password_s.len(),
+                &mut conn_cp.inner(),
+                &mut conn
+            ),
+            Ok(conn.into()),
+            ErrorKind::Pool("dpiPool_acquireConnection".to_string())
+        )
     }
 
     /// Adds a reference to the pool. This is intended for situations where a reference to the pool
     /// needs to be maintained independently of the reference returned when the pool was created.
     pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(externs::dpiPool_addRef(self.inner),
-                 Ok(()),
-                 ErrorKind::Pool("dpiPool_addRef".to_string()))
+        try_dpi!(
+            externs::dpiPool_addRef(self.inner),
+            Ok(()),
+            ErrorKind::Pool("dpiPool_addRef".to_string())
+        )
     }
 
     /// Closes the pool and makes it unusable for further activity.
@@ -85,9 +92,11 @@ impl Pool {
     /// * `close_mode` - one or more of the values from the enumeration `ODPIPoolCloseMode`, OR'ed
     /// together.
     pub fn close(&self, close_mode: flags::ODPIPoolCloseMode) -> Result<()> {
-        try_dpi!(externs::dpiPool_close(self.inner, close_mode),
-                 Ok(()),
-                 ErrorKind::Pool("dpiPool_close".to_string()))
+        try_dpi!(
+            externs::dpiPool_close(self.inner, close_mode),
+            Ok(()),
+            ErrorKind::Pool("dpiPool_close".to_string())
+        )
     }
 
     /// Creates a session pool which creates and maintains a group of stateless sessions to the
@@ -110,13 +119,14 @@ impl Pool {
     /// * `conn_create_params` - a `PoolCreate` structure which is used to specify parameters for
     /// pool creation. None is also acceptable in which case all default parameters will be used for
     /// pool creation.
-    pub fn create(context: &Context,
-                  username: Option<&str>,
-                  password: Option<&str>,
-                  connect_string: Option<&str>,
-                  common_create_params: Option<CommonCreate>,
-                  pool_create_params: Option<PoolCreate>)
-                  -> Result<Pool> {
+    pub fn create(
+        context: &Context,
+        username: Option<&str>,
+        password: Option<&str>,
+        connect_string: Option<&str>,
+        common_create_params: Option<CommonCreate>,
+        pool_create_params: Option<PoolCreate>,
+    ) -> Result<Pool> {
         let username_s = ODPIStr::from(username);
         let password_s = ODPIStr::from(password);
         let connect_string_s = ODPIStr::from(connect_string);
@@ -134,27 +144,33 @@ impl Pool {
             context.init_pool_create_params()?
         };
 
-        try_dpi!(externs::dpiPool_create(context.inner(),
-                                         username_s.ptr(),
-                                         username_s.len(),
-                                         password_s.ptr(),
-                                         password_s.len(),
-                                         connect_string_s.ptr(),
-                                         connect_string_s.len(),
-                                         &comm_cp.inner(),
-                                         &mut pool_cp.inner(),
-                                         &mut inner),
-                 Ok(inner.into()),
-                 ErrorKind::Pool("dpiPool_create".to_string()))
+        try_dpi!(
+            externs::dpiPool_create(
+                context.inner(),
+                username_s.ptr(),
+                username_s.len(),
+                password_s.ptr(),
+                password_s.len(),
+                connect_string_s.ptr(),
+                connect_string_s.len(),
+                &comm_cp.inner(),
+                &mut pool_cp.inner(),
+                &mut inner
+            ),
+            Ok(inner.into()),
+            ErrorKind::Pool("dpiPool_create".to_string())
+        )
     }
 
     /// Returns the number of sessions in the pool that are busy.
     pub fn get_busy_count(&self) -> Result<u32> {
         let mut busy_count = 0;
 
-        try_dpi!(externs::dpiPool_getBusyCount(self.inner, &mut busy_count),
-                 Ok(busy_count),
-                 ErrorKind::Pool("dpiPool_getBusyCount".to_string()))
+        try_dpi!(
+            externs::dpiPool_getBusyCount(self.inner, &mut busy_count),
+            Ok(busy_count),
+            ErrorKind::Pool("dpiPool_getBusyCount".to_string())
+        )
     }
 
     /// Returns the encoding information used by the pool. This will be equivalent to the values
@@ -163,18 +179,22 @@ impl Pool {
     pub fn get_encoding_info(&self) -> Result<encoding::Info> {
         let mut enc_info: ODPIEncodingInfo = Default::default();
 
-        try_dpi!(externs::dpiPool_getEncodingInfo(self.inner, &mut enc_info),
-                 Ok(enc_info.into()),
-                 ErrorKind::Pool("dpiPool_getEncodingInfo".to_string()))
+        try_dpi!(
+            externs::dpiPool_getEncodingInfo(self.inner, &mut enc_info),
+            Ok(enc_info.into()),
+            ErrorKind::Pool("dpiPool_getEncodingInfo".to_string())
+        )
     }
 
     /// Returns the mode used for acquiring or getting connections from the pool.
     pub fn get_get_mode(&self) -> Result<enums::ODPIPoolGetMode> {
         let mut get_mode = enums::ODPIPoolGetMode::NoWait;
 
-        try_dpi!(externs::dpiPool_getGetMode(self.inner, &mut get_mode),
-                 Ok(get_mode),
-                 ErrorKind::Pool("dpiPool_getGetMode".to_string()))
+        try_dpi!(
+            externs::dpiPool_getGetMode(self.inner, &mut get_mode),
+            Ok(get_mode),
+            ErrorKind::Pool("dpiPool_getGetMode".to_string())
+        )
     }
 
     /// Returns the maximum lifetime of all sessions in the pool, in seconds. Sessions in the pool
@@ -183,18 +203,22 @@ impl Pool {
     pub fn get_max_lifetime_session(&self) -> Result<u32> {
         let mut max_lifetime_session = 0;
 
-        try_dpi!(externs::dpiPool_getMaxLifetimeSession(self.inner, &mut max_lifetime_session),
-                 Ok(max_lifetime_session),
-                 ErrorKind::Pool("dpiPool_getMaxLifetimeSession".to_string()))
+        try_dpi!(
+            externs::dpiPool_getMaxLifetimeSession(self.inner, &mut max_lifetime_session),
+            Ok(max_lifetime_session),
+            ErrorKind::Pool("dpiPool_getMaxLifetimeSession".to_string())
+        )
     }
 
     /// Returns the number of sessions in the pool that are open.
     pub fn get_open_count(&self) -> Result<u32> {
         let mut open_count = 0;
 
-        try_dpi!(externs::dpiPool_getOpenCount(self.inner, &mut open_count),
-                 Ok(open_count),
-                 ErrorKind::Pool("dpiPool_getOpenCount".to_string()))
+        try_dpi!(
+            externs::dpiPool_getOpenCount(self.inner, &mut open_count),
+            Ok(open_count),
+            ErrorKind::Pool("dpiPool_getOpenCount".to_string())
+        )
     }
 
     /// Returns the default size of the statement cache for sessions in the pool, in number of
@@ -202,9 +226,11 @@ impl Pool {
     pub fn get_stmt_cache_size(&self) -> Result<u32> {
         let mut stmt_cache_size = 0;
 
-        try_dpi!(externs::dpiPool_getStmtCacheSize(self.inner, &mut stmt_cache_size),
-                 Ok(stmt_cache_size),
-                 ErrorKind::Pool("dpiPool_getStmtCacheSize".to_string()))
+        try_dpi!(
+            externs::dpiPool_getStmtCacheSize(self.inner, &mut stmt_cache_size),
+            Ok(stmt_cache_size),
+            ErrorKind::Pool("dpiPool_getStmtCacheSize".to_string())
+        )
     }
 
     /// Returns the amount of time, in seconds, after which idle sessions in the pool are
@@ -212,27 +238,33 @@ impl Pool {
     pub fn get_timeout(&self) -> Result<u32> {
         let mut timeout = 0;
 
-        try_dpi!(externs::dpiPool_getTimeout(self.inner, &mut timeout),
-                 Ok(timeout),
-                 ErrorKind::Pool("dpiPool_getTimeout".to_string()))
+        try_dpi!(
+            externs::dpiPool_getTimeout(self.inner, &mut timeout),
+            Ok(timeout),
+            ErrorKind::Pool("dpiPool_getTimeout".to_string())
+        )
     }
 
     /// Releases a reference to the pool. A count of the references to the pool is maintained and
     /// when this count reaches zero, the memory associated with the pool is freed and the session
     /// pool is closed if that has not already taken place using the function `Pool::close()`.
     pub fn release(&self) -> Result<()> {
-        try_dpi!(externs::dpiPool_release(self.inner),
-                 Ok(()),
-                 ErrorKind::Pool("dpiPool_release".to_string()))
+        try_dpi!(
+            externs::dpiPool_release(self.inner),
+            Ok(()),
+            ErrorKind::Pool("dpiPool_release".to_string())
+        )
     }
 
     /// Sets the mode used for acquiring or getting connections from the pool.
     ///
     /// * `get_mode` - A value from the `ODPIGetMode` enumeration.
     pub fn set_get_mode(&self, get_mode: enums::ODPIPoolGetMode) -> Result<()> {
-        try_dpi!(externs::dpiPool_setGetMode(self.inner, get_mode),
-                 Ok(()),
-                 ErrorKind::Pool("dpiPool_setGetMode".to_string()))
+        try_dpi!(
+            externs::dpiPool_setGetMode(self.inner, get_mode),
+            Ok(()),
+            ErrorKind::Pool("dpiPool_setGetMode".to_string())
+        )
     }
 
     /// Sets the maximum lifetime of all sessions in the pool, in seconds. Sessions in the pool are
@@ -241,26 +273,32 @@ impl Pool {
     ///
     /// * `max_lifetime` - the maximum lifetime of all sessions in the pool, in seconds.
     pub fn set_max_lifetime_session(&self, max_lifetime: u32) -> Result<()> {
-        try_dpi!(externs::dpiPool_setMaxLifetimeSession(self.inner, max_lifetime),
-                 Ok(()),
-                 ErrorKind::Pool("dpiPool_setMaxLifetimeSession".to_string()))
+        try_dpi!(
+            externs::dpiPool_setMaxLifetimeSession(self.inner, max_lifetime),
+            Ok(()),
+            ErrorKind::Pool("dpiPool_setMaxLifetimeSession".to_string())
+        )
     }
 
     /// Sets the default size of the statement cache for sessions in the pool.
     ///
     /// * `stmt_cache_size` - the new size of the statement cache, in number of statements.
     pub fn set_stmt_cache_size(&self, stmt_cache_size: u32) -> Result<()> {
-        try_dpi!(externs::dpiPool_setStmtCacheSize(self.inner, stmt_cache_size),
-                 Ok(()),
-                 ErrorKind::Pool("dpiPool_setStmtCacheSize".to_string()))
+        try_dpi!(
+            externs::dpiPool_setStmtCacheSize(self.inner, stmt_cache_size),
+            Ok(()),
+            ErrorKind::Pool("dpiPool_setStmtCacheSize".to_string())
+        )
     }
 
     /// Sets the amount of time, in seconds, after which idle sessions in the pool are terminated,
     /// but only when another session is released back to the pool.
     pub fn set_timeout(&self, timeout: u32) -> Result<()> {
-        try_dpi!(externs::dpiPool_setTimeout(self.inner, timeout),
-                 Ok(()),
-                 ErrorKind::Pool("dpiPool_setTimeout".to_string()))
+        try_dpi!(
+            externs::dpiPool_setTimeout(self.inner, timeout),
+            Ok(()),
+            ErrorKind::Pool("dpiPool_setTimeout".to_string())
+        )
     }
 }
 

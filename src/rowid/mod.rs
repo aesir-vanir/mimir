@@ -36,9 +36,11 @@ impl Rowid {
     /// rowid needs to be maintained independently of the reference returned when the rowid was
     /// created.
     pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(externs::dpiRowid_addRef(self.inner),
-                 Ok(()),
-                 ErrorKind::Rowid("dpiRowid_addRef".to_string()))
+        try_dpi!(
+            externs::dpiRowid_addRef(self.inner),
+            Ok(()),
+            ErrorKind::Rowid("dpiRowid_addRef".to_string())
+        )
     }
 
     /// Returns the string (base64) representation of the rowid.
@@ -46,24 +48,28 @@ impl Rowid {
         let mut value = ptr::null();
         let mut value_length = 0;
 
-        try_dpi!(externs::dpiRowid_getStringValue(self.inner, &mut value, &mut value_length),
-                 {
-                     if value.is_null() {
-                         Ok("".to_string())
-                     } else {
-                         let res = ODPIStr::new(value, value_length);
-                         Ok(res.into())
-                     }
-                 },
-                 ErrorKind::Rowid("dpiRowid_getStringValue".to_string()))
+        try_dpi!(
+            externs::dpiRowid_getStringValue(self.inner, &mut value, &mut value_length),
+            {
+                if value.is_null() {
+                    Ok("".to_string())
+                } else {
+                    let res = ODPIStr::new(value, value_length);
+                    Ok(res.into())
+                }
+            },
+            ErrorKind::Rowid("dpiRowid_getStringValue".to_string())
+        )
     }
 
     /// Releases a reference to the rowid. A count of the references to the rowid is maintained and
     /// when this count reaches zero, the memory associated with the rowid is freed.
     pub fn release(&self) -> Result<()> {
-        try_dpi!(externs::dpiRowid_release(self.inner),
-                 Ok(()),
-                 ErrorKind::Rowid("dpiRowid_release".to_string()))
+        try_dpi!(
+            externs::dpiRowid_release(self.inner),
+            Ok(()),
+            ErrorKind::Rowid("dpiRowid_release".to_string())
+        )
     }
 }
 

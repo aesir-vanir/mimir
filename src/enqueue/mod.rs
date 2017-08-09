@@ -33,9 +33,11 @@ impl Options {
     /// to the enqueue options needs to be maintained independently of the reference returned when
     /// the handle was created.
     pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(externs::dpiEnqOptions_addRef(self.inner),
-                 Ok(()),
-                 ErrorKind::EnqOptions("dpiEnqOptions_addRef".to_string()))
+        try_dpi!(
+            externs::dpiEnqOptions_addRef(self.inner),
+            Ok(()),
+            ErrorKind::EnqOptions("dpiEnqOptions_addRef".to_string())
+        )
     }
 
     /// Returns the transformation of the message to be enqueued. See function
@@ -44,17 +46,19 @@ impl Options {
         let mut txn_ptr = ptr::null();
         let mut txn_len = 0;
 
-        try_dpi!(externs::dpiEnqOptions_getTransformation(self.inner, &mut txn_ptr, &mut txn_len),
-                 {
-                     let transformation = if txn_ptr.is_null() {
-                         "".to_string()
-                     } else {
-                         let res_s = ODPIStr::new(txn_ptr, txn_len);
-                         res_s.into()
-                     };
-                     Ok(transformation)
-                 },
-                 ErrorKind::EnqOptions("dpiEnqOptions_getTransformation".to_string()))
+        try_dpi!(
+            externs::dpiEnqOptions_getTransformation(self.inner, &mut txn_ptr, &mut txn_len),
+            {
+                let transformation = if txn_ptr.is_null() {
+                    "".to_string()
+                } else {
+                    let res_s = ODPIStr::new(txn_ptr, txn_len);
+                    res_s.into()
+                };
+                Ok(transformation)
+            },
+            ErrorKind::EnqOptions("dpiEnqOptions_getTransformation".to_string())
+        )
     }
 
     /// Returns whether the message being enqueued is part of the current transaction or constitutes
@@ -62,25 +66,31 @@ impl Options {
     pub fn get_visibility(&self) -> Result<enums::ODPIVisibility> {
         let mut enq_vis_ptr = enums::ODPIVisibility::Immediate;
 
-        try_dpi!(externs::dpiEnqOptions_getVisibility(self.inner, &mut enq_vis_ptr),
-                 Ok(enq_vis_ptr),
-                 ErrorKind::EnqOptions("dpiEnqOptions_getMode".to_string()))
+        try_dpi!(
+            externs::dpiEnqOptions_getVisibility(self.inner, &mut enq_vis_ptr),
+            Ok(enq_vis_ptr),
+            ErrorKind::EnqOptions("dpiEnqOptions_getMode".to_string())
+        )
     }
 
     /// Releases a reference to the enqueue options. A count of the references to the enqueue
     /// options is maintained and when this count reaches zero, the memory associated with the
     /// options is freed.
     pub fn release(&self) -> Result<()> {
-        try_dpi!(externs::dpiEnqOptions_release(self.inner),
-                 Ok(()),
-                 ErrorKind::EnqOptions("dpiEnqOptions_release".to_string()))
+        try_dpi!(
+            externs::dpiEnqOptions_release(self.inner),
+            Ok(()),
+            ErrorKind::EnqOptions("dpiEnqOptions_release".to_string())
+        )
     }
 
     /// Sets the message delivery mode that is to be used when enqueuing messages.
     pub fn set_delivery_mode(&self, mode: enums::ODPIMessageDeliveryMode) -> Result<()> {
-        try_dpi!(externs::dpiEnqOptions_setDeliveryMode(self.inner, mode),
-                 Ok(()),
-                 ErrorKind::EnqOptions("dpiEnqOptions_setDeliveryMode".to_string()))
+        try_dpi!(
+            externs::dpiEnqOptions_setDeliveryMode(self.inner, mode),
+            Ok(()),
+            ErrorKind::EnqOptions("dpiEnqOptions_setDeliveryMode".to_string())
+        )
     }
 
     /// Sets the transformation of the message to be enqueued. The transformation is applied after
@@ -89,17 +99,21 @@ impl Options {
     pub fn set_transformation(&self, transformation: Option<&str>) -> Result<()> {
         let txn_s = ODPIStr::from(transformation);
 
-        try_dpi!(externs::dpiEnqOptions_setTransformation(self.inner, txn_s.ptr(), txn_s.len()),
-                 Ok(()),
-                 ErrorKind::EnqOptions("dpiEnqOptions_setTransformation".to_string()))
+        try_dpi!(
+            externs::dpiEnqOptions_setTransformation(self.inner, txn_s.ptr(), txn_s.len()),
+            Ok(()),
+            ErrorKind::EnqOptions("dpiEnqOptions_setTransformation".to_string())
+        )
     }
 
     /// Sets whether the message being enqueued is part of the current transaction or constitutes a
     /// transaction on its own.
     pub fn set_visibility(&self, visibility: enums::ODPIVisibility) -> Result<()> {
-        try_dpi!(externs::dpiEnqOptions_setVisibility(self.inner, visibility),
-                 Ok(()),
-                 ErrorKind::EnqOptions("dpiEnqOptions_setVisibility".to_string()))
+        try_dpi!(
+            externs::dpiEnqOptions_setVisibility(self.inner, visibility),
+            Ok(()),
+            ErrorKind::EnqOptions("dpiEnqOptions_setVisibility".to_string())
+        )
     }
 }
 

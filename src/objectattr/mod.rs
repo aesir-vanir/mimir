@@ -34,27 +34,33 @@ impl ObjectAttr {
     /// attribute needs to be maintained independently of the reference returned when the attribute
     /// was created.
     pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(externs::dpiObjectAttr_addRef(self.inner),
-                 Ok(()),
-                 ErrorKind::ObjectType("dpiObjectAttr_addRef".to_string()))
+        try_dpi!(
+            externs::dpiObjectAttr_addRef(self.inner),
+            Ok(()),
+            ErrorKind::ObjectType("dpiObjectAttr_addRef".to_string())
+        )
     }
 
     /// Returns information about the attribute.
     pub fn get_info(&self) -> Result<ODPIObjectAttrInfo> {
         let mut object_attr_info: ODPIObjectAttrInfo = Default::default();
 
-        try_dpi!(externs::dpiObjectAttr_getInfo(self.inner, &mut object_attr_info),
-                 Ok(object_attr_info),
-                 ErrorKind::ObjectType("dpiObjectAttr_getInfo".to_string()))
+        try_dpi!(
+            externs::dpiObjectAttr_getInfo(self.inner, &mut object_attr_info),
+            Ok(object_attr_info),
+            ErrorKind::ObjectType("dpiObjectAttr_getInfo".to_string())
+        )
     }
 
     /// Releases a reference to the attribute. A count of the references to the attribute is
     /// maintained and when this count reaches zero, the memory associated with the attribute is
     /// freed.
     pub fn release(&self) -> Result<()> {
-        try_dpi!(externs::dpiObjectAttr_release(self.inner),
-                 Ok(()),
-                 ErrorKind::ObjectType("dpiObjectAttr_release".to_string()))
+        try_dpi!(
+            externs::dpiObjectAttr_release(self.inner),
+            Ok(()),
+            ErrorKind::ObjectType("dpiObjectAttr_release".to_string())
+        )
     }
 }
 

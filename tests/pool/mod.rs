@@ -12,12 +12,14 @@ fn pool_res(ctxt: &Context) -> Result<()> {
     ccp.set_encoding(enc_cstr.as_ptr());
     ccp.set_nchar_encoding(enc_cstr.as_ptr());
 
-    let pool = Pool::create(ctxt,
-                            Some(&CREDS[0]),
-                            Some(&CREDS[1]),
-                            Some("//oic.cbsnae86d3iv.us-east-2.rds.amazonaws.com/ORCL"),
-                            Some(ccp),
-                            None)?;
+    let pool = Pool::create(
+        ctxt,
+        Some(&CREDS[0]),
+        Some(&CREDS[1]),
+        Some("//oic.cbsnae86d3iv.us-east-2.rds.amazonaws.com/ORCL"),
+        Some(ccp),
+        None,
+    )?;
     pool.add_ref()?;
 
     let ei = pool.get_encoding_info()?;
@@ -56,13 +58,17 @@ fn pool_res(ctxt: &Context) -> Result<()> {
     let version_info = conn.get_server_version()?;
     assert_eq!(version_info.version(), "12.1.0.2.0");
     assert_eq!(version_info.version_num(), 1201000200);
-    assert_eq!(version_info.release(),
-               "Oracle Database 12c Standard Edition Release 12.1.0.2.0 - \
-                   64bit Production");
+    assert_eq!(
+        version_info.release(),
+        "Oracle Database 12c Standard Edition Release 12.1.0.2.0 - \
+         64bit Production"
+    );
 
-    let stmt = conn.prepare_stmt(Some("select * from username where username = 'jozias'"),
-                                 None,
-                                 false)?;
+    let stmt = conn.prepare_stmt(
+        Some("select * from username where username = 'jozias'"),
+        None,
+        false,
+    )?;
 
     stmt.execute(flags::DPI_MODE_EXEC_DEFAULT)?;
     stmt.fetch()?;

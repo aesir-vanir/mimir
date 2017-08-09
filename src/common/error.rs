@@ -36,14 +36,15 @@ pub struct Info {
 
 impl Info {
     /// Create a new `Info` struct.
-    pub fn new(code: i32,
-               offset: u16,
-               message: String,
-               fn_name: String,
-               action: String,
-               sql_state: String,
-               recoverable: bool)
-               -> Info {
+    pub fn new(
+        code: i32,
+        offset: u16,
+        message: String,
+        fn_name: String,
+        action: String,
+        sql_state: String,
+        recoverable: bool,
+    ) -> Info {
         Info {
             code: code,
             offset: offset,
@@ -93,14 +94,16 @@ impl Info {
 
 impl fmt::Display for Info {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f,
-                 "{}: {}\nfn: {}\naction: {}\nsql_state: {}\nrecoverable: {}",
-                 self.code,
-                 self.message,
-                 self.fn_name,
-                 self.action,
-                 self.sql_state,
-                 self.recoverable)
+        writeln!(
+            f,
+            "{}: {}\nfn: {}\naction: {}\nsql_state: {}\nrecoverable: {}",
+            self.code,
+            self.message,
+            self.fn_name,
+            self.action,
+            self.sql_state,
+            self.recoverable
+        )
     }
 }
 
@@ -117,12 +120,14 @@ impl From<ODPIErrorInfo> for Info {
         let sql_state = unsafe { CStr::from_ptr(err.sql_state) }
             .to_string_lossy()
             .into_owned();
-        Info::new(err.code,
-                  err.offset,
-                  String::from_utf8_lossy(slice).into_owned(),
-                  fn_name,
-                  action,
-                  sql_state,
-                  err.is_recoverable.is_positive())
+        Info::new(
+            err.code,
+            err.offset,
+            String::from_utf8_lossy(slice).into_owned(),
+            fn_name,
+            action,
+            sql_state,
+            err.is_recoverable.is_positive(),
+        )
     }
 }

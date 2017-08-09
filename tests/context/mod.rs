@@ -3,8 +3,10 @@ use mimir::{AppContext, Context, ODPISubscrMessage};
 use mimir::error::Result;
 use std::ffi::CString;
 
-extern "C" fn subscr_callback(_ctxt: *mut ::std::os::raw::c_void,
-                              _message: *mut ODPISubscrMessage) {
+extern "C" fn subscr_callback(
+    _ctxt: *mut ::std::os::raw::c_void,
+    _message: *mut ODPISubscrMessage,
+) {
     // For testing
 }
 
@@ -23,8 +25,10 @@ fn ccp(ctxt: &Context) -> Result<()> {
     ccp.set_encoding(enc_cstr.as_ptr());
     ccp.set_nchar_encoding(enc_cstr.as_ptr());
 
-    assert_eq!(ccp.get_create_mode(),
-               flags::DPI_MODE_CREATE_THREADED | flags::DPI_MODE_CREATE_DEFAULT);
+    assert_eq!(
+        ccp.get_create_mode(),
+        flags::DPI_MODE_CREATE_THREADED | flags::DPI_MODE_CREATE_DEFAULT
+    );
     assert_eq!(ccp.get_encoding(), "UTF-8");
     assert_eq!(ccp.get_nchar_encoding(), "UTF-8");
     assert_eq!(ccp.get_edition(), "1.0");
@@ -57,8 +61,10 @@ fn conn_cp(ctxt: &Context) -> Result<()> {
 
     let new_app_ctxt_vec = conn.get_app_context();
 
-    assert_eq!(conn.get_auth_mode(),
-               flags::DPI_MODE_AUTH_SYSDBA | flags::DPI_MODE_AUTH_DEFAULT);
+    assert_eq!(
+        conn.get_auth_mode(),
+        flags::DPI_MODE_AUTH_SYSDBA | flags::DPI_MODE_AUTH_DEFAULT
+    );
     assert_eq!(conn.get_connection_class(), "conn_class");
     assert_eq!(conn.get_purity(), enums::ODPIPurity::New);
     assert_eq!(conn.get_new_password(), "password");
@@ -125,8 +131,10 @@ fn pcp(ctxt: &Context) -> Result<()> {
 #[cfg_attr(feature = "cargo-clippy", allow(should_assert_eq))]
 fn scp(ctxt: &Context) -> Result<()> {
     let mut scp = ctxt.init_subscr_create_params()?;
-    assert_eq!(scp.get_subscr_namespace(),
-               enums::ODPISubscrNamespace::DbChange);
+    assert_eq!(
+        scp.get_subscr_namespace(),
+        enums::ODPISubscrNamespace::DbChange
+    );
     assert_eq!(scp.get_protocol(), enums::ODPISubscrProtocol::Callback);
     assert_eq!(scp.get_qos(), flags::DPI_SUBSCR_QOS_NONE);
     assert_eq!(scp.get_operations(), flags::DPI_OPCODE_ALL_OPS);
@@ -138,7 +146,9 @@ fn scp(ctxt: &Context) -> Result<()> {
     assert_eq!(scp.get_recipient_name(), "");
 
     scp.set_protocol(enums::ODPISubscrProtocol::HTTP);
-    scp.set_qos(flags::DPI_SUBSCR_QOS_BEST_EFFORT | flags::DPI_SUBSCR_QOS_ROWIDS);
+    scp.set_qos(
+        flags::DPI_SUBSCR_QOS_BEST_EFFORT | flags::DPI_SUBSCR_QOS_ROWIDS,
+    );
     scp.set_operations(flags::DPI_OPCODE_ALTER | flags::DPI_OPCODE_DROP);
     scp.set_port_number(32276);
     scp.set_timeout(10000);
@@ -147,10 +157,14 @@ fn scp(ctxt: &Context) -> Result<()> {
     scp.set_recipient_name("yoda");
 
     assert_eq!(scp.get_protocol(), enums::ODPISubscrProtocol::HTTP);
-    assert_eq!(scp.get_qos(),
-               flags::DPI_SUBSCR_QOS_BEST_EFFORT | flags::DPI_SUBSCR_QOS_ROWIDS);
-    assert_eq!(scp.get_operations(),
-               flags::DPI_OPCODE_ALTER | flags::DPI_OPCODE_DROP);
+    assert_eq!(
+        scp.get_qos(),
+        flags::DPI_SUBSCR_QOS_BEST_EFFORT | flags::DPI_SUBSCR_QOS_ROWIDS
+    );
+    assert_eq!(
+        scp.get_operations(),
+        flags::DPI_OPCODE_ALTER | flags::DPI_OPCODE_DROP
+    );
     assert_eq!(scp.get_port_number(), 32276);
     assert_eq!(scp.get_timeout(), 10000);
     assert_eq!(scp.get_name(), "subscription");

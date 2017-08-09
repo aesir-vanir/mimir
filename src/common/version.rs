@@ -50,12 +50,14 @@ impl Info {
 
 impl From<ODPIVersionInfo> for Info {
     fn from(ovi: ODPIVersionInfo) -> Info {
-        let version = format!("{}.{}.{}.{}.{}",
-                              ovi.version_num,
-                              ovi.release_num,
-                              ovi.update_num,
-                              ovi.port_release_num,
-                              ovi.port_update_num);
+        let version = format!(
+            "{}.{}.{}.{}.{}",
+            ovi.version_num,
+            ovi.release_num,
+            ovi.update_num,
+            ovi.port_release_num,
+            ovi.port_update_num
+        );
         Info {
             version: version,
             version_num: ovi.full_version_num,
