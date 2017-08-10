@@ -133,8 +133,7 @@ fn stmt_res(ctxt: &Context) -> Result<()> {
         None,
         false,
     )?;
-    bind_by_value_name
-        .bind_value_by_name(":username", Bytes, &t_data)?;
+    bind_by_value_name.bind_value_by_name(":username", Bytes, &t_data)?;
     cols = bind_by_value_name.execute(flags::DPI_MODE_EXEC_DEFAULT)?;
     assert_eq!(cols, 2);
 
