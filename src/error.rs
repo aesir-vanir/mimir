@@ -33,6 +33,10 @@ error_chain! {
             description("Failed to create the ODPI-C context!")
             display("Failed to create the ODPI-C context!")
         }
+        Conversion {
+            description("Type conversion failed!")
+            display("Type conversion failed!")
+        }
         DeqOptions(fn_name: String) {
             description("DeqOptions: call to ODPI-C function failed!")
             display("DeqOptions: call to '{}' function failed!", fn_name)

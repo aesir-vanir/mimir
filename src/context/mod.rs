@@ -26,6 +26,7 @@ pub mod params;
 use self::params::{CommonCreate, ConnCreate, PoolCreate, SubscrCreate};
 
 /// This structure represents the context in which all activity in the library takes place.
+#[derive(Clone, Debug)]
 pub struct Context {
     /// A pointer the the ODPI-C dpiContext struct.
     context: *mut ODPIContext,

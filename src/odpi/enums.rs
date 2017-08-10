@@ -293,6 +293,49 @@ pub enum ODPIOracleTypeNum {
     Max = 2027,
 }
 
+impl From<ODPIOracleTypeNum> for String {
+    fn from(kind: ODPIOracleTypeNum) -> String {
+        let desc = match kind {
+            ODPIOracleTypeNum::Varchar => "Varchar",
+            ODPIOracleTypeNum::NVarchar => "NVarchar",
+            ODPIOracleTypeNum::Char => "Char",
+            ODPIOracleTypeNum::NChar => "NChar",
+            ODPIOracleTypeNum::RowID => "RowID",
+            ODPIOracleTypeNum::Raw => "Raw",
+            ODPIOracleTypeNum::NativeFloat => "Native Float",
+            ODPIOracleTypeNum::NativeDouble => "Native Double",
+            ODPIOracleTypeNum::NativeInt => "Native Int",
+            ODPIOracleTypeNum::Number => "Number",
+            ODPIOracleTypeNum::Date => "Date",
+            ODPIOracleTypeNum::Timestamp => "Timestamp",
+            ODPIOracleTypeNum::TimestampTz => "Timestamp with Timezone",
+            ODPIOracleTypeNum::TimestampLtz => "Timestamp with Local Timezone",
+            ODPIOracleTypeNum::IntervalDS => "Days/Seconds Interval",
+            ODPIOracleTypeNum::IntervalYM => "Years/Months Interval",
+            ODPIOracleTypeNum::Clob => "CLOB",
+            ODPIOracleTypeNum::NClob => "NCLOB",
+            ODPIOracleTypeNum::Blob => "BLOB",
+            ODPIOracleTypeNum::BFile => "Binary File",
+            ODPIOracleTypeNum::Stmt => "Statement",
+            ODPIOracleTypeNum::Boolean => "Boolean",
+            ODPIOracleTypeNum::Object => "Object",
+            ODPIOracleTypeNum::LongVarchar => "Long Varchar",
+            ODPIOracleTypeNum::LongRaw => "Long Raw",
+            ODPIOracleTypeNum::NativeUint => "Native Unsigned Int",
+            ODPIOracleTypeNum::Max => "Max",
+            ODPIOracleTypeNum::TypeNone => "Invalid Type",
+        };
+        desc.to_string()
+    }
+}
+
+impl fmt::Display for ODPIOracleTypeNum {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let desc: String = (*self).into();
+        write!(f, "{}", desc)
+    }
+}
+
 #[repr(u32)]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 /// This enumeration identifies the mode to use when getting sessions from a session pool.
