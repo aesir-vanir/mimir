@@ -52,7 +52,7 @@ pub mod error;
 pub use connection::Connection;
 pub use context::Context;
 pub use context::params::AppContext;
-pub use data::Data;
+pub use data::{Data, TypeInfo};
 pub use dequeue::Options as DeqOptions;
 pub use enqueue::Options as EnqOptions;
 pub use lob::Lob;

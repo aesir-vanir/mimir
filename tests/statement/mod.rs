@@ -1,5 +1,6 @@
 use CREDS;
-use mimir::{Connection, Context, Data, ODPIBytes, ODPIDataValueUnion, ODPIStr, QueryInfo, Var};
+use mimir::{Connection, Context, Data, ODPIBytes, ODPIDataValueUnion, ODPIStr, QueryInfo,
+            TypeInfo, Var};
 use mimir::enums::ODPIFetchMode::Last;
 use mimir::enums::ODPINativeTypeNum::{Bytes, Double, Int64};
 use mimir::enums::ODPIOracleTypeNum::{Number, Varchar};
@@ -18,17 +19,22 @@ fn add_ref_release(conn: &Connection) -> Result<()> {
     Ok(())
 }
 
+fn validate_data_type_info(data_type_info: &TypeInfo) -> Result<()> {
+    assert_eq!(data_type_info.oracle_type_num(), Number);
+    assert_eq!(data_type_info.default_native_type_num(), Double);
+    assert_eq!(data_type_info.db_size_in_bytes(), 0);
+    assert_eq!(data_type_info.client_size_in_bytes(), 0);
+    assert_eq!(data_type_info.size_in_chars(), 0);
+    assert_eq!(data_type_info.precision(), 38);
+    assert_eq!(data_type_info.scale(), 0);
+    assert!(data_type_info.object_type().is_none());
+    Ok(())
+}
+
 fn validate_query_info(query_info: &QueryInfo) -> Result<()> {
     assert_eq!(query_info.name(), "ID");
-    assert_eq!(query_info.oracle_type_num(), Number);
-    assert_eq!(query_info.default_native_type_num(), Double);
-    assert_eq!(query_info.db_size_in_bytes(), 0);
-    assert_eq!(query_info.client_size_in_bytes(), 0);
-    assert_eq!(query_info.size_in_chars(), 0);
-    assert_eq!(query_info.precision(), 38);
-    assert_eq!(query_info.scale(), 0);
     assert!(!query_info.null_ok());
-    assert!(query_info.object_type().is_none());
+    validate_data_type_info(&query_info.type_info())?;
     Ok(())
 }
 
@@ -52,15 +58,17 @@ fn bind_by_name(conn: &Connection, username_var: &Var) -> Result<()> {
 
     let query_info_un = bind_by_name.get_query_info(2)?;
     assert_eq!(query_info_un.name(), "USERNAME");
-    assert_eq!(query_info_un.oracle_type_num(), Varchar);
-    assert_eq!(query_info_un.default_native_type_num(), Bytes);
-    assert_eq!(query_info_un.db_size_in_bytes(), 256);
-    assert_eq!(query_info_un.client_size_in_bytes(), 256);
-    assert_eq!(query_info_un.size_in_chars(), 256);
-    assert_eq!(query_info_un.precision(), 0);
-    assert_eq!(query_info_un.scale(), 0);
     assert!(query_info_un.null_ok());
-    assert!(query_info_un.object_type().is_none());
+    let data_type_info = query_info_un.type_info();
+
+    assert_eq!(data_type_info.oracle_type_num(), Varchar);
+    assert_eq!(data_type_info.default_native_type_num(), Bytes);
+    assert_eq!(data_type_info.db_size_in_bytes(), 256);
+    assert_eq!(data_type_info.client_size_in_bytes(), 256);
+    assert_eq!(data_type_info.size_in_chars(), 256);
+    assert_eq!(data_type_info.precision(), 0);
+    assert_eq!(data_type_info.scale(), 0);
+    assert!(data_type_info.object_type().is_none());
 
     bind_by_name.fetch()?;
     let (id_type, id_ptr) = bind_by_name.get_query_value(1)?;
@@ -226,7 +234,7 @@ fn stmt_res(ctxt: &Context) -> Result<()> {
     )?;
     // setup the id binds.
     let id_var = conn.new_var(Number, Int64, 2, 0, false, false)?;
-    let mut id_data = id_var.get_data()?;
+    let id_data = id_var.get_data()?;
     let mut rng = rand::thread_rng();
     for data in id_data.iter_mut() {
         (*data).is_null = 0;

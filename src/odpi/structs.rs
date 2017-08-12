@@ -231,6 +231,38 @@ impl Default for ODPIData {
 }
 
 #[repr(C)]
+#[derive(Clone, Copy, Debug)]
+pub struct ODPIDataTypeInfo {
+    pub oracle_type_num: enums::ODPIOracleTypeNum,
+    pub default_native_type_num: enums::ODPINativeTypeNum,
+    pub oci_type_code: u16,
+    pub db_size_in_bytes: u32,
+    pub client_size_in_bytes: u32,
+    pub size_in_chars: u32,
+    pub precision: i16,
+    pub scale: i8,
+    pub fs_precision: u8,
+    pub object_type: *mut opaque::ODPIObjectType,
+}
+
+impl Default for ODPIDataTypeInfo {
+    fn default() -> ODPIDataTypeInfo {
+        ODPIDataTypeInfo {
+            oracle_type_num: enums::ODPIOracleTypeNum::Max,
+            default_native_type_num: enums::ODPINativeTypeNum::Invalid,
+            oci_type_code: 0,
+            db_size_in_bytes: 0,
+            client_size_in_bytes: 0,
+            size_in_chars: 0,
+            precision: 0,
+            scale: 0,
+            fs_precision: 0,
+            object_type: ptr::null_mut(),
+        }
+    }
+}
+
+#[repr(C)]
 #[derive(Clone, Copy)]
 #[cfg_attr(rustfmt, rustfmt_skip)]
 /// Struct represention C union type for `ODPIData`.
@@ -398,13 +430,7 @@ pub struct ODPIObjectAttrInfo {
     pub name_length: u32,
     /// Specifices the Oracle type of the attribute. It will be one of the values from the
     /// enumeration `ODPIOracleTypeNum`.
-    pub oracle_type_num: enums::ODPIOracleTypeNum,
-    /// Specifices the default native type of the attribute. It will be one of the values from the
-    /// enumeration `ODPINativeTypeNum`.
-    pub default_native_type_num: enums::ODPINativeTypeNum,
-    /// Specifies a reference to the object type of the attribute, if the attribute refers to a
-    /// named type; otherwise it is NULL.
-    pub object_type: *mut opaque::ODPIObjectType,
+    pub type_info: ODPIDataTypeInfo,
 }
 
 impl Default for ODPIObjectAttrInfo {
@@ -412,9 +438,7 @@ impl Default for ODPIObjectAttrInfo {
         ODPIObjectAttrInfo {
             name: ptr::null(),
             name_length: 0,
-            oracle_type_num: enums::ODPIOracleTypeNum::Max,
-            default_native_type_num: enums::ODPINativeTypeNum::Invalid,
-            object_type: ptr::null_mut(),
+            type_info: Default::default(),
         }
     }
 }
@@ -437,14 +461,7 @@ pub struct ODPIObjectTypeInfo {
     pub is_collection: ::std::os::raw::c_int,
     /// Specifies the Oracle type of the elements in the collection if the object type refers to a
     /// collection. It will be one of the values from the enumeration `ODPIOracleTypeNum`.
-    pub element_oracle_type_num: enums::ODPIOracleTypeNum,
-    /// Specifies the default native type of the elements in the collection if the object type
-    /// refers to a collection. It will be one of the values from the enumeration
-    /// `ODPINativeTypeNum`.
-    pub element_default_native_type_num: enums::ODPINativeTypeNum,
-    /// Specifies a reference to the object type of the elements in the collection if the object
-    /// type on which info is being returned refers to a collection.
-    pub element_object_type: *mut opaque::ODPIObjectType,
+    pub element_type_info: ODPIDataTypeInfo,
     /// Specifies the number of attributes that the object type has.
     pub num_attributes: u16,
 }
@@ -457,9 +474,7 @@ impl Default for ODPIObjectTypeInfo {
             name: ptr::null(),
             name_length: 0,
             is_collection: 0,
-            element_oracle_type_num: enums::ODPIOracleTypeNum::Max,
-            element_default_native_type_num: enums::ODPINativeTypeNum::Invalid,
-            element_object_type: ptr::null_mut(),
+            element_type_info: Default::default(),
             num_attributes: 0,
         }
     }
@@ -542,35 +557,10 @@ pub struct ODPIQueryInfo {
     pub name: *const ::std::os::raw::c_char,
     /// Specifies the length of the `name` member, in bytes.
     pub name_length: u32,
-    /// Specifies the type of the column that is being queried. It will be one of the values from
-    /// the enumeration `ODPIOracleTypeNum`.
-    pub oracle_type_num: enums::ODPIOracleTypeNum,
-    /// Specifies the default native type for the column that is being queried. It will be one of
-    /// the values from the enumeration `ODPINativeTypeNum`.
-    pub default_native_type_num: enums::ODPINativeTypeNum,
-    /// Specifies the size in bytes (from the database's perspective) of the column that is being
-    /// queried. This value is only populated for strings and binary columns. For all other columns
-    /// the value is zero.
-    pub db_size_in_bytes: u32,
-    /// Specifies the size in bytes (from the client's perspective) of the column that is being
-    /// queried. This value is only populated for strings and binary columns. For all other columns
-    /// the value is zero.
-    pub client_size_in_bytes: u32,
-    /// Specifies the size in characters of the column that is being queried. This value is only
-    /// populated for string columns. For all other columns the value is zero.
-    pub size_in_chars: u32,
-    /// Specifies the precision of the column that is being queried. This value is only populated
-    /// for numeric and timestamp columns. For all other columns the value is zero.
-    pub precision: i16,
-    /// Specifies the scale of the column that is being queried. This value is only populated for
-    /// numeric columns. For all other columns the value is zero.
-    pub scale: i8,
+    /// Oracle Data Type Info.
+    pub type_info: ODPIDataTypeInfo,
     /// Specifies if the column that is being queried may return null values (1) or not (0).
     pub null_ok: ::std::os::raw::c_int,
-    /// Specifies a reference to the type of the object that is being queried. This value is only
-    /// populated for named type columns. For all other columns the value is NULL. The reference
-    /// that is returned must be released when it is no longer needed.
-    pub object_type: *mut opaque::ODPIObjectType,
 }
 
 impl Default for ODPIQueryInfo {
@@ -578,15 +568,8 @@ impl Default for ODPIQueryInfo {
         ODPIQueryInfo {
             name: ptr::null(),
             name_length: 0,
-            oracle_type_num: enums::ODPIOracleTypeNum::TypeNone,
-            default_native_type_num: enums::ODPINativeTypeNum::Invalid,
-            db_size_in_bytes: 0,
-            client_size_in_bytes: 0,
-            size_in_chars: 0,
-            precision: 0,
-            scale: 0,
+            type_info: Default::default(),
             null_ok: 0,
-            object_type: ptr::null_mut(),
         }
     }
 }

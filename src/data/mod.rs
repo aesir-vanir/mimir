@@ -12,8 +12,9 @@
 //! to process macros. For this reason, none of these functions perform any error checking. They are
 //! assumed to be replacements for direct manipulation of the various members of the structure.
 use chrono::{DateTime, Datelike, Duration, TimeZone, Timelike, Utc};
-use odpi::opaque;
-use odpi::structs::{ODPIData, ODPIDataValueUnion};
+use objecttype::ObjectType;
+use odpi::{enums, opaque};
+use odpi::structs::{ODPIData, ODPIDataTypeInfo, ODPIDataValueUnion};
 use util::ODPIStr;
 
 /// This structure is used for holding Oracle year to month interval data information.
@@ -223,5 +224,94 @@ impl Data {
 impl From<*mut ODPIData> for Data {
     fn from(inner: *mut ODPIData) -> Data {
         Data { inner: inner }
+    }
+}
+
+/// Wrapper for `ODPIDataTypeInfo` struct.
+pub struct TypeInfo {
+    /// The ODPI-C data type info struct.
+    inner: ODPIDataTypeInfo,
+}
+
+impl TypeInfo {
+    /// Create a new `TypeInfo` struct.
+    pub fn new(inner: ODPIDataTypeInfo) -> TypeInfo {
+        TypeInfo { inner: inner }
+    }
+
+    /// Get the `oracle_type_num` value.
+    ///
+    /// Specifies the type of the column that is being queried. It will be one of the values from
+    /// the enumeration `ODPIOracleTypeNum`.
+    pub fn oracle_type_num(&self) -> enums::ODPIOracleTypeNum {
+        self.inner.oracle_type_num
+    }
+
+    /// Get the `default_native_type_num` value.
+    ///
+    /// Specifies the default native type for the column that is being queried. It will be one of
+    /// the values from the enumeration `ODPINativeTypeNum`.
+    pub fn default_native_type_num(&self) -> enums::ODPINativeTypeNum {
+        self.inner.default_native_type_num
+    }
+
+    /// Get the `db_size_in_bytes` value.
+    ///
+    /// Specifies the size in bytes (from the database's perspective) of the column that is being
+    /// queried. This value is only populated for strings and binary columns. For all other columns
+    /// the value is zero.
+    pub fn db_size_in_bytes(&self) -> u32 {
+        self.inner.db_size_in_bytes
+    }
+
+    /// Get the `client_size_in_bytes` value.
+    ///
+    /// Specifies the size in bytes (from the client's perspective) of the column that is being
+    /// queried. This value is only populated for strings and binary columns. For all other columns
+    /// the value is zero.
+    pub fn client_size_in_bytes(&self) -> u32 {
+        self.inner.client_size_in_bytes
+    }
+
+    /// Get the `size_in_chars` value.
+    ///
+    /// Specifies the size in characters of the column that is being queried. This value is only
+    /// populated for string columns. For all other columns the value is zero.
+    pub fn size_in_chars(&self) -> u32 {
+        self.inner.size_in_chars
+    }
+
+    /// Get the `precision` value.
+    ///
+    /// Specifies the precision of the column that is being queried. This value is only populated
+    /// for numeric and timestamp columns. For all other columns the value is zero.
+    pub fn precision(&self) -> i16 {
+        self.inner.precision
+    }
+
+    /// Get the `scale` value.
+    ///
+    /// Specifies the scale of the column that is being queried. This value is only populated for
+    /// numeric columns. For all other columns the value is zero.
+    pub fn scale(&self) -> i8 {
+        self.inner.scale
+    }
+
+    /// Get the `object_type` value.
+    ///
+    /// Specifies a reference to the type of the object that is being queried. This value is only
+    /// populated for named type columns. For all other columns the value is None.
+    pub fn object_type(&self) -> Option<ObjectType> {
+        if self.inner.object_type.is_null() {
+            None
+        } else {
+            Some(self.inner.object_type.into())
+        }
+    }
+}
+
+impl From<ODPIDataTypeInfo> for TypeInfo {
+    fn from(inner: ODPIDataTypeInfo) -> TypeInfo {
+        TypeInfo { inner: inner }
     }
 }

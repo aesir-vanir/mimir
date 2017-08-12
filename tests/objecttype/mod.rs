@@ -32,13 +32,19 @@ fn validate_object_type_info(type_info: &ODPIObjectTypeInfo) -> Result<()> {
     assert_eq!(schema_str, "ODPIC");
     assert_eq!(name_str, "UDT_OBJECT");
     assert_eq!(type_info.is_collection, 0);
-    // assert_eq!(type_info.element_oracle_type_num, Max);
+    assert_eq!(type_info.num_attributes, 7);
+
+    let element_type_info = type_info.element_type_info;
+    // TODO: Why does this fail?
+    // assert_eq!(
+    //     element_type_info.oracle_type_num,
+    //     enums::ODPIOracleTypeNum::Max
+    // );
     assert_eq!(
-        type_info.element_default_native_type_num,
+        element_type_info.default_native_type_num,
         enums::ODPINativeTypeNum::Invalid
     );
-    assert!(type_info.element_object_type.is_null());
-    assert_eq!(type_info.num_attributes, 7);
+    assert!(element_type_info.object_type.is_null());
 
     Ok(())
 }
@@ -112,24 +118,27 @@ fn validate_objectarr(obj_type: &ObjectType) -> Result<()> {
     assert_eq!(schema_str, "ODPIC");
     assert_eq!(name_str, "UDT_OBJECTARRAY");
     assert_eq!(type_info.is_collection, 1);
+    assert_eq!(type_info.num_attributes, 0);
+
+    let element_type_info = type_info.element_type_info;
     assert_eq!(
-        type_info.element_oracle_type_num,
+        element_type_info.oracle_type_num,
         enums::ODPIOracleTypeNum::Object
     );
     assert_eq!(
-        type_info.element_default_native_type_num,
+        element_type_info.default_native_type_num,
         enums::ODPINativeTypeNum::Object
     );
-    assert!(!type_info.element_object_type.is_null());
+    assert!(!element_type_info.object_type.is_null());
 
-    let arr_obj_type: ObjectType = type_info.element_object_type.into();
+    let arr_obj_type: ObjectType = element_type_info.object_type.into();
     validate_subobject(&arr_obj_type)?;
 
     Ok(())
 }
 
 fn validate_object(idx: usize, attr_info: &ODPIObjectAttrInfo, attr_data: &ODPIData) -> Result<()> {
-    let nested_obj_type_ptr = attr_info.object_type;
+    let nested_obj_type_ptr = attr_info.type_info.object_type;
 
     if nested_obj_type_ptr.is_null() {
         assert!(false);
@@ -173,6 +182,7 @@ fn validate_object(idx: usize, attr_info: &ODPIObjectAttrInfo, attr_data: &ODPID
             assert_eq!(size, 1);
         }
     }
+
     Ok(())
 }
 
@@ -183,7 +193,7 @@ fn validate_query_value(
     attr_info: &ODPIObjectAttrInfo,
 ) -> Result<()> {
     let attr_data = obj.get_attribute_value(obj_attr, attr_info)?;
-    match attr_info.default_native_type_num {
+    match attr_info.type_info.default_native_type_num {
         enums::ODPINativeTypeNum::Bytes => validate_bytes(idx, &attr_data)?,
         enums::ODPINativeTypeNum::Double => validate_double(idx, &attr_data)?,
         enums::ODPINativeTypeNum::Timestamp => validate_timestamp(idx, &attr_data)?,
@@ -271,9 +281,10 @@ fn obj_type(ctxt: &Context) -> Result<()> {
     assert_eq!(cols, 1);
 
     let query_info = object_col.get_query_info(1)?;
-    assert!(query_info.object_type().is_some());
+    let type_info = query_info.type_info();
+    assert!(type_info.object_type().is_some());
 
-    if let Some(object_type) = query_info.object_type() {
+    if let Some(object_type) = type_info.object_type() {
         validate_object_type(&object_col, &object_type)?;
     }
 

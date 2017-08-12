@@ -93,7 +93,7 @@ impl Object {
             externs::dpiObject_getAttributeValue(
                 self.inner,
                 attr.inner(),
-                info.default_native_type_num,
+                info.type_info.default_native_type_num,
                 &mut data_blah
             ),
             Ok(data_blah),
