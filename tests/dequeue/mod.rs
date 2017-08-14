@@ -42,9 +42,9 @@ fn dequeue_res(ctxt: &Context) -> Result<()> {
     // let _msg_id = dequeue_opts.get_msg_id()?;
     // assert_eq!(_msg_id, "uno");
 
-    dequeue_opts.set_wait(100000)?;
+    dequeue_opts.set_wait(100_000)?;
     let wait = dequeue_opts.get_wait()?;
-    assert_eq!(wait, 100000);
+    assert_eq!(wait, 100_000);
 
     dequeue_opts.set_transformation(Some("tsfm"))?;
     let transformation = dequeue_opts.get_transformation()?;

@@ -57,7 +57,7 @@ fn pool_res(ctxt: &Context) -> Result<()> {
 
     let version_info = conn.get_server_version()?;
     assert_eq!(version_info.version(), "12.1.0.2.0");
-    assert_eq!(version_info.version_num(), 1201000200);
+    assert_eq!(version_info.version_num(), 1_201_000_200);
     assert_eq!(
         version_info.release(),
         "Oracle Database 12c Standard Edition Release 12.1.0.2.0 - \

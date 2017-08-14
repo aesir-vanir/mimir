@@ -43,7 +43,7 @@ fn lob_res(ctxt: &Context) -> Result<()> {
     temp_lob.write_bytes(&buffer, 8133)?;
 
     let size_after_2 = temp_lob.get_size()?;
-    assert_eq!(size_after_2, 16264);
+    assert_eq!(size_after_2, 16_264);
 
     let outbuf = temp_lob.read_bytes(8132, 2)?;
     assert_eq!(outbuf, [0, 1]);

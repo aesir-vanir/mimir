@@ -150,8 +150,8 @@ fn scp(ctxt: &Context) -> Result<()> {
         flags::DPI_SUBSCR_QOS_BEST_EFFORT | flags::DPI_SUBSCR_QOS_ROWIDS,
     );
     scp.set_operations(flags::DPI_OPCODE_ALTER | flags::DPI_OPCODE_DROP);
-    scp.set_port_number(32276);
-    scp.set_timeout(10000);
+    scp.set_port_number(32_276);
+    scp.set_timeout(10_000);
     scp.set_name("subscription");
     scp.set_callback(Some(subscr_callback));
     scp.set_recipient_name("yoda");
@@ -165,8 +165,8 @@ fn scp(ctxt: &Context) -> Result<()> {
         scp.get_operations(),
         flags::DPI_OPCODE_ALTER | flags::DPI_OPCODE_DROP
     );
-    assert_eq!(scp.get_port_number(), 32276);
-    assert_eq!(scp.get_timeout(), 10000);
+    assert_eq!(scp.get_port_number(), 32_276);
+    assert_eq!(scp.get_timeout(), 10_000);
     assert_eq!(scp.get_name(), "subscription");
     assert_eq!(scp.get_recipient_name(), "yoda");
     assert!(scp.get_callback() == Some(subscr_callback));

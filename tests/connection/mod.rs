@@ -99,8 +99,8 @@ fn conn(ctxt: &Context) -> Result<()> {
 
     // new_subscr_props
     let mut subscr_create_params = ctxt.init_subscr_create_params()?;
-    subscr_create_params.set_port_number(32276);
-    subscr_create_params.set_timeout(10000);
+    subscr_create_params.set_port_number(32_276);
+    subscr_create_params.set_timeout(10_000);
     subscr_create_params.set_name("subscription");
     subscr_create_params.set_callback(Some(subscr_callback));
     subscr_create_params.set_recipient_name("yoda");
