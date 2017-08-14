@@ -232,16 +232,27 @@ impl Default for ODPIData {
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug)]
+/// Data type information.
 pub struct ODPIDataTypeInfo {
+    /// Oracle Type
     pub oracle_type_num: enums::ODPIOracleTypeNum,
+    /// Native Type
     pub default_native_type_num: enums::ODPINativeTypeNum,
+    /// Type Code
     pub oci_type_code: u16,
+    /// Size in bytes on the database
     pub db_size_in_bytes: u32,
+    /// Size in bytes on the client
     pub client_size_in_bytes: u32,
+    /// Size in chars (strings only)
     pub size_in_chars: u32,
+    /// Presicion
     pub precision: i16,
+    /// Scale
     pub scale: i8,
+    /// FS precision
     pub fs_precision: u8,
+    /// Object Type pointer
     pub object_type: *mut opaque::ODPIObjectType,
 }
 
@@ -807,7 +818,7 @@ impl From<ODPITimestamp> for DateTime<Utc> {
         let s = timestamp.second as u32;
         let fs = timestamp.fsecond * 1000;
 
-        if y == -10100 && m == 0 && d == 0 {
+        if y == -10_100 && m == 0 && d == 0 {
             Utc::now()
         } else {
             Utc.ymd(y, m, d).and_hms_micro(h, mm, s, fs)

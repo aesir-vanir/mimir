@@ -12,16 +12,16 @@ bitflags! {
     /// This enumeration identifies the mode to use when authorizing connections to the database.
     pub struct ODPIAuthMode: u32 {
         /// Default value used when creating connections.
-        const DPI_MODE_AUTH_DEFAULT = 0b00000000;
+        const DPI_MODE_AUTH_DEFAULT = 0b0000_0000;
         /// Authenticates with SYSDBA access.
-        const DPI_MODE_AUTH_SYSDBA  = 0b00000010;
+        const DPI_MODE_AUTH_SYSDBA  = 0b0000_0010;
         /// Authenticates with SYSOPER access.
-        const DPI_MODE_AUTH_SYSOPER = 0b00000100;
+        const DPI_MODE_AUTH_SYSOPER = 0b0000_0100;
         /// Used together with DPI_MODE_AUTH_SYSDBA or DPI_MODE_AUTH_SYSOPER to authenticate for
         /// certain administrative tasks (such as starting up or shutting down the database).
-        const DPI_MODE_AUTH_PRELIM  = 0b00001000;
+        const DPI_MODE_AUTH_PRELIM  = 0b0000_1000;
         /// Authenticates with SYSASM access.
-        const DPI_MODE_AUTH_SYSASM  = 0b1000000000000000;
+        const DPI_MODE_AUTH_SYSASM  = 0b1000_0000_0000_0000;
     }
 }
 
@@ -46,14 +46,14 @@ bitflags! {
     /// that the OCI objects mode is always enabled.
     pub struct ODPICreateMode: u32 {
         /// Default value used when creating connections.
-        const DPI_MODE_CREATE_DEFAULT  = 0b00000000;
+        const DPI_MODE_CREATE_DEFAULT  = 0b0000_0000;
         /// Enables threaded mode. Internal OCI structures not exposed to the user are protected
         /// from concurrent access by multiple threads. Error information is also managed in thread
         /// local storage.
-        const DPI_MODE_CREATE_THREADED = 0b00000001;
+        const DPI_MODE_CREATE_THREADED = 0b0000_0001;
         /// Enables events mode which is required for the use of advanced queuing (AQ) and
         /// continuous query notification (CQN).
-        const DPI_MODE_CREATE_EVENTS   = 0b00000100;
+        const DPI_MODE_CREATE_EVENTS   = 0b0000_0100;
     }
 }
 
@@ -76,7 +76,7 @@ bitflags! {
         const DPI_MODE_EXEC_PARSE_ONLY          = 0x100;
         /// Enable getting row counts for each DML operation when performing an array DML execution.
         /// The actual row counts can be retrieved using the function `dpiStmt_getRowCounts()`.
-        const DPI_MODE_EXEC_ARRAY_DML_ROWCOUNTS = 0x100000;
+        const DPI_MODE_EXEC_ARRAY_DML_ROWCOUNTS = 0x10_0000;
     }
 }
 
@@ -89,22 +89,22 @@ bitflags! {
     /// together to specify multiple types of operations at the same time.
     pub struct ODPIOpCode: u32 {
         /// Indicates that notifications should be sent for all operations on the table or query.
-        const DPI_OPCODE_ALL_OPS  = 0b00000000;
+        const DPI_OPCODE_ALL_OPS  = 0b0000_0000;
         /// Indicates that all rows have been changed in the table or query (or too many rows were
         /// changed or row information was not requested).
-        const DPI_OPCODE_ALL_ROWS = 0b00000001;
+        const DPI_OPCODE_ALL_ROWS = 0b0000_0001;
         /// Indicates that an insert operation has taken place in the table or query.
-        const DPI_OPCODE_INSERT   = 0b00000010;
+        const DPI_OPCODE_INSERT   = 0b0000_0010;
         /// Indicates that an update operation has taken place in the table or query.
-        const DPI_OPCODE_UPDATE   = 0b00000100;
+        const DPI_OPCODE_UPDATE   = 0b0000_0100;
         /// Indicates that a delete operation has taken place in the table or query.
-        const DPI_OPCODE_DELETE   = 0b00001000;
+        const DPI_OPCODE_DELETE   = 0b0000_1000;
         /// Indicates that the registered table or query has been altered.
-        const DPI_OPCODE_ALTER    = 0b00010000;
+        const DPI_OPCODE_ALTER    = 0b0001_0000;
         /// Indicates that the registered table or query has been dropped.
-        const DPI_OPCODE_DROP     = 0b00100000;
+        const DPI_OPCODE_DROP     = 0b0010_0000;
         /// An unknown operation has taken place.
-        const DPI_OPCODE_UNKNOWN  = 0b01000000;
+        const DPI_OPCODE_UNKNOWN  = 0b0100_0000;
     }
 }
 
@@ -127,21 +127,21 @@ bitflags! {
     /// subscriptions.
     pub struct ODPISubscrQOS: u32 {
         /// No QOS
-        const DPI_SUBSCR_QOS_NONE        = 0b00000000;
+        const DPI_SUBSCR_QOS_NONE        = 0b0000_0000;
         /// Notifications are sent reliably. If the database fails, the notifications are not lost.
         /// This is not supported for nonpersistent queues or buffered messaging.
-        const DPI_SUBSCR_QOS_RELIABLE    = 0b00000001;
+        const DPI_SUBSCR_QOS_RELIABLE    = 0b0000_0001;
         /// When the notification has been received, the subscription is removed.
-        const DPI_SUBSCR_QOS_DEREG_NFY   = 0b00000010;
+        const DPI_SUBSCR_QOS_DEREG_NFY   = 0b0000_0010;
         /// Information on the rows affected by the database or query change is sent along with the
         /// notification.
-        const DPI_SUBSCR_QOS_ROWIDS      = 0b00000100;
+        const DPI_SUBSCR_QOS_ROWIDS      = 0b0000_0100;
         /// Perform query notification instead of database change notification. Notification is done
         /// in guaranteed mode which guarantees that the query has in fact changed.
-        const DPI_SUBSCR_QOS_QUERY       = 0b00001000;
+        const DPI_SUBSCR_QOS_QUERY       = 0b0000_1000;
         /// Perform query notification in best effort mode which may result in notifications being
         /// sent when the query has not in fact changed. This is needed for complex queries that
         /// cannot be registered in guaranteed mode.
-        const DPI_SUBSCR_QOS_BEST_EFFORT = 0b00010000;
+        const DPI_SUBSCR_QOS_BEST_EFFORT = 0b0001_0000;
     }
 }
