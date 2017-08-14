@@ -192,7 +192,6 @@ impl Lob {
             },
             ErrorKind::Lob("dpiLob_readBytes".to_string())
         )
-
     }
 
     /// Releases a reference to the LOB. A count of the references to the LOB is maintained and when

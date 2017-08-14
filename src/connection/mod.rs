@@ -799,7 +799,6 @@ impl Connection {
             let err = "dpiConn_setExternalName: length out of bounds".to_string();
             Err(ErrorKind::Connection(err).into())
         }
-
     }
 
     /// Sets the internal name that is being used by the connection. This value is used when logging

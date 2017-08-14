@@ -155,7 +155,6 @@ impl Properties {
             },
             ErrorKind::MsgProps("dpiMsgProps_getOriginalMsgId".to_string())
         )
-
     }
 
     /// Returns the priority assigned to the message. See function `MsgProps::set_priority()` for
