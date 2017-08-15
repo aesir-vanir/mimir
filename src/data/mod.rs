@@ -57,6 +57,11 @@ impl Data {
         self.inner
     }
 
+    /// Is the data null?
+    pub fn null(&self) -> bool {
+        unsafe { (*self.inner).is_null == 1 }
+    }
+
     /// Get the value as a boolean when the native type is DPI_NATIVE_TYPE_BOOLEAN.
     pub fn get_boolean(&self) -> bool {
         unsafe { (*self.inner).value.as_boolean == 1 }
