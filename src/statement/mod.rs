@@ -18,7 +18,7 @@ use error::{ErrorKind, Result};
 use odpi::{enums, externs};
 use odpi::flags::ODPIExecMode;
 use odpi::opaque::ODPIStmt;
-use odpi::structs::{ODPIData, ODPIQueryInfo, ODPIStmtInfo};
+use odpi::structs::{ODPIQueryInfo, ODPIStmtInfo};
 use query;
 use std::{ptr, slice};
 use util::ODPIStr;
@@ -374,13 +374,13 @@ impl Statement {
 
     /// Returns the value of the column at the given position for the currently fetched row, without
     /// needing to provide a variable.
-    pub fn get_query_value(&self, pos: u32) -> Result<(enums::ODPINativeTypeNum, *mut ODPIData)> {
+    pub fn get_query_value(&self, pos: u32) -> Result<(enums::ODPINativeTypeNum, Data)> {
         let mut data = ptr::null_mut();
         let mut native_type = 0;
 
         try_dpi!(
             externs::dpiStmt_getQueryValue(self.inner, pos, &mut native_type, &mut data),
-            Ok((native_type.into(), data)),
+            Ok((native_type.into(), data.into())),
             ErrorKind::Statement("dpiStmt_getQueryValue".to_string())
         )
     }

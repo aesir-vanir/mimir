@@ -24,6 +24,7 @@ extern crate slog;
 mod macros;
 
 extern crate chrono;
+extern crate hex_slice;
 
 mod common;
 mod connection;

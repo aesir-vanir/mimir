@@ -155,6 +155,12 @@ pub enum ODPINativeTypeNum {
     Rowid = 3012,
 }
 
+impl Default for ODPINativeTypeNum {
+    fn default() -> ODPINativeTypeNum {
+        ODPINativeTypeNum::Invalid
+    }
+}
+
 impl From<i32> for ODPINativeTypeNum {
     fn from(val: i32) -> ODPINativeTypeNum {
         match val {

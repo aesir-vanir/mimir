@@ -12,8 +12,11 @@
 //! to process macros. For this reason, none of these functions perform any error checking. They are
 //! assumed to be replacements for direct manipulation of the various members of the structure.
 use chrono::{DateTime, Datelike, Duration, TimeZone, Timelike, Utc};
+use error::{ErrorKind, Result};
+use hex_slice::AsHex;
 use objecttype::ObjectType;
 use odpi::{enums, opaque};
+use odpi::enums::ODPIOracleTypeNum;
 use odpi::structs::{ODPIData, ODPIDataTypeInfo, ODPIDataValueUnion};
 use std::slice;
 use util::ODPIStr;
@@ -234,6 +237,31 @@ impl Data {
         odpi_int_ym.years = *val.years();
         odpi_int_ym.months = *val.months();
     }
+
+    /// Convert `Data` to a `String` given the Oracle Data Type.
+    pub fn to_string(&self, type_info: &TypeInfo) -> Result<String> {
+        use std::io::{self, Write};
+        if self.null() {
+            Ok("(null)".to_string())
+        } else {
+            let oracle_type = type_info.oracle_type_num();
+            let native_type = type_info.default_native_type_num();
+            writeln!(io::stdout(), "{} {}", oracle_type, native_type)?;
+            let res = match oracle_type {
+                ODPIOracleTypeNum::Char | ODPIOracleTypeNum::Varchar => self.get_string(),
+                ODPIOracleTypeNum::Date => self.get_utc().to_rfc3339(),
+                ODPIOracleTypeNum::Number => self.get_double().to_string(),
+                ODPIOracleTypeNum::Raw => format!("{:x}", self.get_bytes().as_hex()),
+                _ => return Err(ErrorKind::Length.into()),
+            };
+            Ok(res)
+        }
+    }
+
+    /// Get the data length (after conversion to a `String`)
+    pub fn len(&self, type_info: &TypeInfo) -> Result<usize> {
+        Ok(self.to_string(type_info)?.len())
+    }
 }
 
 impl From<*mut ODPIData> for Data {
@@ -243,6 +271,7 @@ impl From<*mut ODPIData> for Data {
 }
 
 /// Wrapper for `ODPIDataTypeInfo` struct.
+#[derive(Clone, Copy, Debug, Default)]
 pub struct TypeInfo {
     /// The ODPI-C data type info struct.
     inner: ODPIDataTypeInfo,

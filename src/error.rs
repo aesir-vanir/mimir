@@ -49,6 +49,10 @@ error_chain! {
             description("EnqOptions: call to ODPI-C function failed!")
             display("EnqOptions: call to '{}' function failed!", fn_name)
         }
+        Length {
+            description("Unable to calculate the length of the data")
+            display("Unable to calculate the length of the data")
+        }
         Lob(fn_name: String) {
             description("LOB: call to ODPI-C function failed!")
             display("LOB: call to '{}' function failed!", fn_name)
