@@ -15,6 +15,7 @@ use chrono::{DateTime, Datelike, Duration, TimeZone, Timelike, Utc};
 use objecttype::ObjectType;
 use odpi::{enums, opaque};
 use odpi::structs::{ODPIData, ODPIDataTypeInfo, ODPIDataValueUnion};
+use std::slice;
 use util::ODPIStr;
 
 /// This structure is used for holding Oracle year to month interval data information.
@@ -60,6 +61,15 @@ impl Data {
     /// Is the data null?
     pub fn null(&self) -> bool {
         unsafe { (*self.inner).is_null == 1 }
+    }
+
+    /// Get the value as a Vector of byes when the native type is DPI_NATIVE_TYPE_BYTES.
+    pub fn get_bytes(&self) -> Vec<u8> {
+        unsafe {
+            let bytes = (*self.inner).value.as_bytes;
+            let slice = slice::from_raw_parts(bytes.ptr as *mut u8, bytes.length as usize);
+            slice.into()
+        }
     }
 
     /// Get the value as a boolean when the native type is DPI_NATIVE_TYPE_BOOLEAN.
