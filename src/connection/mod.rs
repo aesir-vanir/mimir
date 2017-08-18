@@ -508,7 +508,7 @@ impl Connection {
     pub fn new_subscription(
         &self,
         subscr_create_params: SubscrCreate,
-    ) -> Result<(u32, Subscription)> {
+    ) -> Result<(u64, Subscription)> {
         let mut subscr_ptr = ptr::null_mut();
         let mut subscr_id = 0;
 

@@ -141,7 +141,7 @@ extern "C" {
         conn: *mut opaque::ODPIConn,
         params: *mut structs::ODPISubscrCreateParams,
         subscr: *mut *mut opaque::ODPISubscr,
-        subscrId: *mut u32,
+        subscrId: *mut u64,
     ) -> ::std::os::raw::c_int;
     pub fn dpiConn_newTempLob(
         conn: *mut opaque::ODPIConn,
@@ -262,6 +262,10 @@ extern "C" {
         context: *const opaque::ODPIContext,
         params: *mut structs::ODPISubscrCreateParams,
     ) -> ::std::os::raw::c_int;
+}
+
+extern "C" {
+    pub fn dpiData_getDouble(data: *mut structs::ODPIData) -> f64;
 }
 
 extern "C" {

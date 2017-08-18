@@ -15,7 +15,7 @@ use chrono::{DateTime, Datelike, Duration, TimeZone, Timelike, Utc};
 use error::{ErrorKind, Result};
 use hex_slice::AsHex;
 use objecttype::ObjectType;
-use odpi::{enums, opaque};
+use odpi::{enums, externs, opaque};
 use odpi::enums::ODPIOracleTypeNum;
 use odpi::structs::{ODPIData, ODPIDataTypeInfo, ODPIDataValueUnion};
 use std::slice;
@@ -87,7 +87,7 @@ impl Data {
 
     /// Get the value as a `f64` when the native type is DPI_NATIVE_TYPE_DOUBLE.
     pub fn get_double(&self) -> f64 {
-        unsafe { (*self.inner).value.as_double }
+        unsafe { externs::dpiData_getDouble(self.inner) }
     }
 
     /// Sets the value of the data when the native type is DPI_NATIVE_TYPE_DOUBLE.
@@ -240,27 +240,31 @@ impl Data {
 
     /// Convert `Data` to a `String` given the Oracle Data Type.
     pub fn to_string(&self, type_info: &TypeInfo) -> Result<String> {
-        use std::io::{self, Write};
-        if self.null() {
-            Ok("(null)".to_string())
+        // use std::io::{self, Write};
+        let as_str = if self.null() {
+            "(null)".to_string()
         } else {
             let oracle_type = type_info.oracle_type_num();
-            let native_type = type_info.default_native_type_num();
-            writeln!(io::stdout(), "{} {}", oracle_type, native_type)?;
-            let res = match oracle_type {
+            let _native_type = type_info.default_native_type_num();
+            match oracle_type {
                 ODPIOracleTypeNum::Char | ODPIOracleTypeNum::Varchar => self.get_string(),
                 ODPIOracleTypeNum::Date => self.get_utc().to_rfc3339(),
                 ODPIOracleTypeNum::Number => self.get_double().to_string(),
                 ODPIOracleTypeNum::Raw => format!("{:x}", self.get_bytes().as_hex()),
                 _ => return Err(ErrorKind::Length.into()),
-            };
-            Ok(res)
-        }
+            }
+        };
+        // write!(io::stdout(), "VAL: {} ", as_str)?;
+        Ok(as_str)
     }
 
     /// Get the data length (after conversion to a `String`)
     pub fn len(&self, type_info: &TypeInfo) -> Result<usize> {
-        Ok(self.to_string(type_info)?.len())
+        // use std::io::{self, Write};
+        let as_str = self.to_string(type_info)?;
+        let len = as_str.len();
+        // writeln!(io::stdout(), "LEN: {}", len)?;
+        Ok(len)
     }
 }
 
