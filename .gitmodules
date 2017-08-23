@@ -1,3 +1,4 @@
 [submodule "odpi"]
 	path = odpi
-	url = git@github.com:oracle/odpi.git
+	url = https://github.com/oracle/odpi.git
+        pushurl = git@github.com:oracle/odpi.git
