@@ -74,12 +74,12 @@ fn validate_double(idx: usize, attr_data: &ODPIData) -> Result<()> {
 
 fn validate_timestamp(idx: usize, attr_data: &ODPIData) -> Result<()> {
     let odpi_ts = unsafe { attr_data.value.as_timestamp };
-    let y = odpi_ts.year as i32;
-    let m = odpi_ts.month as u32;
-    let d = odpi_ts.day as u32;
-    let h = odpi_ts.hour as u32;
-    let mi = odpi_ts.minute as u32;
-    let se = odpi_ts.second as u32;
+    let y = i32::from(odpi_ts.year);
+    let m = u32::from(odpi_ts.month);
+    let d = u32::from(odpi_ts.day);
+    let h = u32::from(odpi_ts.hour);
+    let mi = u32::from(odpi_ts.minute);
+    let se = u32::from(odpi_ts.second);
     let ts = Utc.ymd(y, m, d).and_hms_nano(h, mi, se, odpi_ts.fsecond);
 
     if idx == 3 {

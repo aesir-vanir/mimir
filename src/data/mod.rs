@@ -98,11 +98,11 @@ impl Data {
     /// Get the value as a `Duration` when the native type is DPI_NATIVE_TYPE_INTERVAL_DS.
     pub fn get_duration(&self) -> Duration {
         let odpi_int_ds = unsafe { (*self.inner).value.as_interval_ds };
-        let mut dur = Duration::days(odpi_int_ds.days as i64);
-        dur = dur + Duration::hours(odpi_int_ds.hours as i64);
-        dur = dur + Duration::minutes(odpi_int_ds.minutes as i64);
-        dur = dur + Duration::seconds(odpi_int_ds.seconds as i64);
-        dur = dur + Duration::nanoseconds(odpi_int_ds.fseconds as i64);
+        let mut dur = Duration::days(i64::from(odpi_int_ds.days));
+        dur = dur + Duration::hours(i64::from(odpi_int_ds.hours));
+        dur = dur + Duration::minutes(i64::from(odpi_int_ds.minutes));
+        dur = dur + Duration::seconds(i64::from(odpi_int_ds.seconds));
+        dur = dur + Duration::nanoseconds(i64::from(odpi_int_ds.fseconds));
         dur
     }
 
@@ -201,12 +201,12 @@ impl Data {
     /// Get the value as a `Utc` when the native type is DPI_NATIVE_TYPE_TIMESTAMP.
     pub fn get_utc(&self) -> DateTime<Utc> {
         let odpi_ts = unsafe { (*self.inner).value.as_timestamp };
-        let y = odpi_ts.year as i32;
-        let m = odpi_ts.month as u32;
-        let d = odpi_ts.day as u32;
-        let h = odpi_ts.hour as u32;
-        let mi = odpi_ts.minute as u32;
-        let s = odpi_ts.second as u32;
+        let y = i32::from(odpi_ts.year);
+        let m = u32::from(odpi_ts.month);
+        let d = u32::from(odpi_ts.day);
+        let h = u32::from(odpi_ts.hour);
+        let mi = u32::from(odpi_ts.minute);
+        let s = u32::from(odpi_ts.second);
         Utc.ymd(y, m, d).and_hms_nano(h, mi, s, odpi_ts.fsecond)
     }
 

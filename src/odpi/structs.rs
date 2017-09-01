@@ -810,12 +810,12 @@ pub struct ODPITimestamp {
 
 impl From<ODPITimestamp> for DateTime<Utc> {
     fn from(timestamp: ODPITimestamp) -> DateTime<Utc> {
-        let y = timestamp.year as i32;
-        let m = timestamp.month as u32;
-        let d = timestamp.day as u32;
-        let h = timestamp.hour as u32;
-        let mm = timestamp.minute as u32;
-        let s = timestamp.second as u32;
+        let y = i32::from(timestamp.year);
+        let m = u32::from(timestamp.month);
+        let d = u32::from(timestamp.day);
+        let h = u32::from(timestamp.hour);
+        let mm = u32::from(timestamp.minute);
+        let s = u32::from(timestamp.second);
         let fs = timestamp.fsecond * 1000;
 
         if y == -10_100 && m == 0 && d == 0 {
