@@ -44,17 +44,6 @@ pub struct Connection {
 }
 
 impl Connection {
-    /// Adds a reference to the connection. This is intended for situations where a reference to the
-    /// connection needs to be maintained independently of the reference returned when the
-    /// connection was created.
-    pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiConn_addRef(self.inner),
-            Ok(()),
-            ErrorKind::Connection("dpiConn_addRef".to_string())
-        )
-    }
-
     /// Begins a distributed transaction using the specified transaction id (XID) made up of the
     /// formatId, transactionId and branchId.
     ///
@@ -671,18 +660,6 @@ impl Connection {
         )
     }
 
-    /// Releases a reference to the connection. A count of the references to the connection is
-    /// maintained and when this count reaches zero, the memory associated with the connection is
-    /// freed and the connection is closed or released back to the session pool if that has not
-    /// already taken place using the function `close()`.
-    pub fn release(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiConn_release(self.inner),
-            Ok(()),
-            ErrorKind::Connection("dpiConn_release".to_string())
-        )
-    }
-
     /// Rolls back the current active transaction.
     pub fn rollback(&self) -> Result<()> {
         try_dpi!(
@@ -887,6 +864,16 @@ impl From<*mut ODPIConn> for Connection {
             inner: inner,
             stdout: None,
             stderr: None,
+        }
+    }
+}
+
+impl Drop for Connection {
+    fn drop(&mut self) {
+        if !self.inner.is_null() {
+            unsafe {
+                externs::dpiConn_release(self.inner);
+            }
         }
     }
 }

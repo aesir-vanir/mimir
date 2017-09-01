@@ -12,7 +12,7 @@
 //! the version used by the application.
 use common::{error, version};
 use error::{ErrorKind, Result};
-use odpi::constants::{DPI_FAILURE, DPI_MAJOR_VERSION, DPI_MINOR_VERSION};
+use odpi::constants::{DPI_MAJOR_VERSION, DPI_MINOR_VERSION};
 use odpi::externs;
 use odpi::opaque::ODPIContext;
 use odpi::structs::{ODPICommonCreateParams, ODPIConnCreateParams, ODPIErrorInfo,
@@ -132,10 +132,10 @@ impl Context {
 
 impl Drop for Context {
     fn drop(&mut self) {
-        if unsafe { externs::dpiContext_destroy(self.context) } == DPI_FAILURE {
-            try_error!(self.stderr, "Failed to destroy context");
-        } else {
-            try_info!(self.stdout, "Successfully destroyed context");
+        if !self.context.is_null() {
+            unsafe {
+                externs::dpiContext_destroy(self.context);
+            }
         }
     }
 }

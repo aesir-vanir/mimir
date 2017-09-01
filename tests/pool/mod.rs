@@ -53,7 +53,6 @@ fn pool_res(ctxt: &Context) -> Result<()> {
     assert_eq!(timeout, 3600);
 
     let conn = pool.acquire_connection(None, None, None)?;
-    conn.add_ref()?;
 
     let version_info = conn.get_server_version()?;
     assert_eq!(version_info.version(), "12.1.0.2.0");
@@ -90,7 +89,6 @@ fn pool_res(ctxt: &Context) -> Result<()> {
     assert_eq!(open_count, 1);
 
     stmt.release()?;
-    conn.release()?;
     conn.close(flags::DPI_MODE_CONN_CLOSE_DEFAULT, None)?;
     pool.release()?;
     pool.close(flags::DPI_MODE_POOL_CLOSE_DEFAULT)?;

@@ -32,9 +32,8 @@ fn conn(ctxt: &Context) -> Result<()> {
         Some(common_create_params),
         None,
     )?;
-    // add_ref / release / break_execution test
-    conn.add_ref()?;
-    conn.release()?;
+
+    // break_execution / ping test
     conn.break_execution()?;
     conn.ping()?;
 

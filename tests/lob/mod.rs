@@ -54,7 +54,6 @@ fn lob_res(ctxt: &Context) -> Result<()> {
 
     temp_lob.release()?;
     conn.close(flags::DPI_MODE_CONN_CLOSE_DEFAULT, None)?;
-    conn.release()?;
 
     Ok(())
 }

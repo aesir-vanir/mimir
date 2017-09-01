@@ -264,8 +264,6 @@ fn obj_type(ctxt: &Context) -> Result<()> {
         None,
     )?;
 
-    conn.add_ref()?;
-
     // Query with object
     let object_col = conn.prepare_stmt(
         Some(
@@ -291,7 +289,6 @@ fn obj_type(ctxt: &Context) -> Result<()> {
     object_col.close(None)?;
     conn.close(flags::DPI_MODE_CONN_CLOSE_DEFAULT, None)?;
     object_col.release()?;
-    conn.release()?;
 
     Ok(())
 }

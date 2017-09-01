@@ -24,8 +24,6 @@ fn dequeue_res(ctxt: &Context) -> Result<()> {
         None,
     )?;
 
-    conn.add_ref()?;
-
     let dequeue_opts = conn.new_deq_options()?;
     dequeue_opts.add_ref()?;
 
@@ -69,8 +67,6 @@ fn dequeue_res(ctxt: &Context) -> Result<()> {
     assert_eq!(nav, FirstMsg);
 
     dequeue_opts.release()?;
-
-    conn.release()?;
     conn.close(flags::DPI_MODE_CONN_CLOSE_DEFAULT, None)?;
 
     Ok(())

@@ -18,7 +18,6 @@ pub type ODPISubscrCallback = Option<
 >;
 
 extern "C" {
-    pub fn dpiConn_addRef(conn: *mut opaque::ODPIConn) -> ::std::os::raw::c_int;
     pub fn dpiConn_beginDistribTrans(
         conn: *mut opaque::ODPIConn,
         formatId: ::std::os::raw::c_long,
