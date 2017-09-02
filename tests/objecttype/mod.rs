@@ -205,7 +205,6 @@ fn validate_query_value(
     Ok(())
 }
 
-#[cfg_attr(feature = "cargo-clippy", allow(used_underscore_binding))]
 fn validate_object_type(object_col: &Statement, object_type: &ObjectType) -> Result<()> {
     let attrs = object_type.get_attributes(7)?;
     let mut obj_attrs = Vec::new();

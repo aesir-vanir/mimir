@@ -16,6 +16,7 @@
 use error::{ErrorKind, Result};
 use odpi::externs;
 use odpi::opaque::ODPILob;
+use std::convert::TryFrom;
 use std::ptr;
 use util::ODPIStr;
 
@@ -54,7 +55,7 @@ impl Lob {
 
     /// Creates an independent copy of a LOB and returns a reference to the newly created LOB. This
     /// reference should be released as soon as it is no longer needed.
-    pub fn copy(&self, dst: &mut Lob) -> Result<()> {
+    pub fn copy(&self, dst: &mut Self) -> Result<()> {
         try_dpi!(
             externs::dpiLob_copy(self.inner, &mut dst.inner),
             Ok(()),
@@ -178,16 +179,16 @@ impl Lob {
     }
 
     /// Reads data from the LOB at the specified offset into the provided buffer.
-    #[cfg_attr(feature = "cargo-clippy", allow(cast_possible_truncation))]
     pub fn read_bytes(&self, offset: u64, length: u64) -> Result<Vec<i8>> {
-        let mut buffer: Vec<i8> = Vec::with_capacity(length as usize);
+        let length_usize: usize = TryFrom::try_from(length)?;
+        let mut buffer: Vec<i8> = Vec::with_capacity(length_usize);
         let buf_ptr = buffer.as_mut_ptr();
         let mut buf_len = length;
 
         try_dpi!(
             externs::dpiLob_readBytes(self.inner, offset, length, buf_ptr, &mut buf_len),
             {
-                unsafe { buffer.set_len(buf_len as usize) };
+                unsafe { buffer.set_len(TryFrom::try_from(buf_len)?) };
                 Ok(buffer)
             },
             ErrorKind::Lob("dpiLob_readBytes".to_string())
@@ -210,8 +211,8 @@ impl Lob {
     /// * `directory` - the name of the directory alias.
     /// * `filename` - the name of the file.
     pub fn set_directory_and_filename(&self, directory: &str, filename: &str) -> Result<()> {
-        let dir_s = ODPIStr::from(directory);
-        let fn_s = ODPIStr::from(filename);
+        let dir_s: ODPIStr = TryFrom::try_from(directory)?;
+        let fn_s: ODPIStr = TryFrom::try_from(filename)?;
 
         try_dpi!(
             externs::dpiLob_setDirectoryAndFileName(
@@ -273,7 +274,7 @@ impl Lob {
 }
 
 impl From<*mut ODPILob> for Lob {
-    fn from(inner: *mut ODPILob) -> Lob {
-        Lob { inner: inner }
+    fn from(inner: *mut ODPILob) -> Self {
+        Self { inner: inner }
     }
 }

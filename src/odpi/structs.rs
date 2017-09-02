@@ -43,8 +43,8 @@ pub struct ODPIAppContext {
 }
 
 impl Default for ODPIAppContext {
-    fn default() -> ODPIAppContext {
-        ODPIAppContext {
+    fn default() -> Self {
+        Self {
             namespace_name: ptr::null(),
             namespace_name_length: 0,
             name: ptr::null(),
@@ -73,7 +73,7 @@ pub struct ODPIBytes {
 }
 
 impl From<ODPIBytes> for String {
-    fn from(odpi_bytes: ODPIBytes) -> String {
+    fn from(odpi_bytes: ODPIBytes) -> Self {
         let res_s = ODPIStr::new(odpi_bytes.ptr, odpi_bytes.length);
         res_s.into()
     }
@@ -110,8 +110,8 @@ pub struct ODPICommonCreateParams {
 }
 
 impl Default for ODPICommonCreateParams {
-    fn default() -> ODPICommonCreateParams {
-        ODPICommonCreateParams {
+    fn default() -> Self {
+        Self {
             create_mode: flags::DPI_MODE_CREATE_DEFAULT,
             encoding: ptr::null(),
             nchar_encoding: ptr::null(),
@@ -200,8 +200,8 @@ pub struct ODPIConnCreateParams {
 }
 
 impl Default for ODPIConnCreateParams {
-    fn default() -> ODPIConnCreateParams {
-        ODPIConnCreateParams {
+    fn default() -> Self {
+        Self {
             auth_mode: flags::DPI_MODE_AUTH_DEFAULT,
             connection_class: ptr::null(),
             connection_class_length: 0,
@@ -235,8 +235,8 @@ pub struct ODPIData {
 }
 
 impl Default for ODPIData {
-    fn default() -> ODPIData {
-        ODPIData {
+    fn default() -> Self {
+        Self {
             is_null: 1,
             value: ODPIDataValueUnion { as_boolean: 0 },
         }
@@ -270,8 +270,8 @@ pub struct ODPIDataTypeInfo {
 }
 
 impl Default for ODPIDataTypeInfo {
-    fn default() -> ODPIDataTypeInfo {
-        ODPIDataTypeInfo {
+    fn default() -> Self {
+        Self {
             oracle_type_num: enums::ODPIOracleTypeNum::Max,
             default_native_type_num: enums::ODPINativeTypeNum::Invalid,
             oci_type_code: 0,
@@ -357,8 +357,8 @@ pub struct ODPIEncodingInfo {
 }
 
 impl Default for ODPIEncodingInfo {
-    fn default() -> ODPIEncodingInfo {
-        ODPIEncodingInfo {
+    fn default() -> Self {
+        Self {
             encoding: ptr::null(),
             max_bytes_per_character: 0,
             nchar_encoding: ptr::null(),
@@ -400,8 +400,8 @@ pub struct ODPIErrorInfo {
 }
 
 impl Default for ODPIErrorInfo {
-    fn default() -> ODPIErrorInfo {
-        ODPIErrorInfo {
+    fn default() -> Self {
+        Self {
             code: 0,
             offset: 0,
             message: ptr::null(),
@@ -458,8 +458,8 @@ pub struct ODPIObjectAttrInfo {
 }
 
 impl Default for ODPIObjectAttrInfo {
-    fn default() -> ODPIObjectAttrInfo {
-        ODPIObjectAttrInfo {
+    fn default() -> Self {
+        Self {
             name: ptr::null(),
             name_length: 0,
             type_info: Default::default(),
@@ -491,8 +491,8 @@ pub struct ODPIObjectTypeInfo {
 }
 
 impl Default for ODPIObjectTypeInfo {
-    fn default() -> ODPIObjectTypeInfo {
-        ODPIObjectTypeInfo {
+    fn default() -> Self {
+        Self {
             schema: ptr::null(),
             schema_length: 0,
             name: ptr::null(),
@@ -554,8 +554,8 @@ pub struct ODPIPoolCreateParams {
 }
 
 impl Default for ODPIPoolCreateParams {
-    fn default() -> ODPIPoolCreateParams {
-        ODPIPoolCreateParams {
+    fn default() -> Self {
+        Self {
             min_sessions: 0,
             max_sessions: 1,
             session_increment: 0,
@@ -588,8 +588,8 @@ pub struct ODPIQueryInfo {
 }
 
 impl Default for ODPIQueryInfo {
-    fn default() -> ODPIQueryInfo {
-        ODPIQueryInfo {
+    fn default() -> Self {
+        Self {
             name: ptr::null(),
             name_length: 0,
             type_info: Default::default(),
@@ -622,8 +622,8 @@ pub struct ODPIStmtInfo {
 }
 
 impl Default for ODPIStmtInfo {
-    fn default() -> ODPIStmtInfo {
-        ODPIStmtInfo {
+    fn default() -> Self {
+        Self {
             is_query: 0,
             is_plsql: 0,
             is_ddl: 0,
@@ -694,8 +694,8 @@ pub struct ODPISubscrCreateParams {
 }
 
 impl Default for ODPISubscrCreateParams {
-    fn default() -> ODPISubscrCreateParams {
-        ODPISubscrCreateParams {
+    fn default() -> Self {
+        Self {
             subscr_namespace: enums::ODPISubscrNamespace::DbChange,
             protocol: enums::ODPISubscrProtocol::Callback,
             qos: flags::DPI_SUBSCR_QOS_NONE,
@@ -822,7 +822,7 @@ pub struct ODPITimestamp {
 }
 
 impl From<ODPITimestamp> for DateTime<Utc> {
-    fn from(timestamp: ODPITimestamp) -> DateTime<Utc> {
+    fn from(timestamp: ODPITimestamp) -> Self {
         let y = i32::from(timestamp.year);
         let m = u32::from(timestamp.month);
         let d = u32::from(timestamp.day);
@@ -859,8 +859,8 @@ pub struct ODPIVersionInfo {
 }
 
 impl Default for ODPIVersionInfo {
-    fn default() -> ODPIVersionInfo {
-        ODPIVersionInfo {
+    fn default() -> Self {
+        Self {
             version_num: 0,
             release_num: 0,
             update_num: 0,

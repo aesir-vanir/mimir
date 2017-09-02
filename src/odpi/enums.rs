@@ -156,13 +156,13 @@ pub enum ODPINativeTypeNum {
 }
 
 impl Default for ODPINativeTypeNum {
-    fn default() -> ODPINativeTypeNum {
+    fn default() -> Self {
         ODPINativeTypeNum::Invalid
     }
 }
 
 impl From<i32> for ODPINativeTypeNum {
-    fn from(val: i32) -> ODPINativeTypeNum {
+    fn from(val: i32) -> Self {
         match val {
             3000 => ODPINativeTypeNum::Int64,
             3001 => ODPINativeTypeNum::Uint64,
@@ -300,7 +300,7 @@ pub enum ODPIOracleTypeNum {
 }
 
 impl From<ODPIOracleTypeNum> for String {
-    fn from(kind: ODPIOracleTypeNum) -> String {
+    fn from(kind: ODPIOracleTypeNum) -> Self {
         let desc = match kind {
             ODPIOracleTypeNum::Varchar => "Varchar",
             ODPIOracleTypeNum::NVarchar => "NVarchar",

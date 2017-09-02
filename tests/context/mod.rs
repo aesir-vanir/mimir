@@ -21,7 +21,7 @@ fn ccp(ctxt: &Context) -> Result<()> {
     let enc_cstr = CString::new("UTF-8").expect("badness");
 
     ccp.set_create_mode(new_flags);
-    ccp.set_edition("1.0");
+    ccp.set_edition("1.0")?;
     ccp.set_encoding(enc_cstr.as_ptr());
     ccp.set_nchar_encoding(enc_cstr.as_ptr());
 
@@ -41,8 +41,8 @@ fn conn_cp(ctxt: &Context) -> Result<()> {
     let auth_default_flags = conn.get_auth_mode();
     let auth_new_flags = auth_default_flags | flags::DPI_MODE_AUTH_SYSDBA;
     let purity_default_flags = conn.get_purity();
-    let app_ctxt = AppContext::new("ns", "name", "value");
-    let app_ctxt_1 = AppContext::new("ns", "name1", "value1");
+    let app_ctxt = AppContext::new("ns", "name", "value")?;
+    let app_ctxt_1 = AppContext::new("ns", "name1", "value1")?;
     let mut app_ctxt_vec = Vec::new();
     app_ctxt_vec.push(app_ctxt);
     app_ctxt_vec.push(app_ctxt_1);
@@ -50,12 +50,12 @@ fn conn_cp(ctxt: &Context) -> Result<()> {
     assert_eq!(purity_default_flags, enums::ODPIPurity::DefaultPurity);
 
     conn.set_auth_mode(auth_new_flags);
-    conn.set_connection_class("conn_class");
+    conn.set_connection_class("conn_class")?;
     conn.set_purity(enums::ODPIPurity::New);
-    conn.set_new_password("password");
-    conn.set_app_context(app_ctxt_vec);
+    conn.set_new_password("password")?;
+    conn.set_app_context(app_ctxt_vec)?;
     conn.set_external_auth(1);
-    conn.set_tag("you're it");
+    conn.set_tag("you're it")?;
     conn.set_match_any_tag(true);
 
     let new_app_ctxt_vec = conn.get_app_context()?;
@@ -151,9 +151,9 @@ fn scp(ctxt: &Context) -> Result<()> {
     scp.set_operations(flags::DPI_OPCODE_ALTER | flags::DPI_OPCODE_DROP);
     scp.set_port_number(32_276);
     scp.set_timeout(10_000);
-    scp.set_name("subscription");
+    scp.set_name("subscription")?;
     scp.set_callback(Some(subscr_callback));
-    scp.set_recipient_name("yoda");
+    scp.set_recipient_name("yoda")?;
 
     assert_eq!(scp.get_protocol(), enums::ODPISubscrProtocol::HTTP);
     assert_eq!(

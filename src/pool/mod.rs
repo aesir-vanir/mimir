@@ -18,6 +18,7 @@ use error::{ErrorKind, Result};
 use odpi::{enums, externs, flags};
 use odpi::opaque::{ODPIConn, ODPIPool};
 use odpi::structs::ODPIEncodingInfo;
+use std::convert::TryFrom;
 use std::ptr;
 use util::ODPIStr;
 
@@ -53,8 +54,8 @@ impl Pool {
         password: Option<&str>,
         conn_create_params: Option<ConnCreate>,
     ) -> Result<Connection> {
-        let username_s = ODPIStr::from(username);
-        let password_s = ODPIStr::from(password);
+        let username_s: ODPIStr = TryFrom::try_from(username)?;
+        let password_s: ODPIStr = TryFrom::try_from(password)?;
         let conn_cp = if let Some(conn_create_params) = conn_create_params {
             conn_create_params
         } else {
@@ -126,10 +127,10 @@ impl Pool {
         connect_string: Option<&str>,
         common_create_params: Option<CommonCreate>,
         pool_create_params: Option<PoolCreate>,
-    ) -> Result<Pool> {
-        let username_s = ODPIStr::from(username);
-        let password_s = ODPIStr::from(password);
-        let connect_string_s = ODPIStr::from(connect_string);
+    ) -> Result<Self> {
+        let username_s: ODPIStr = TryFrom::try_from(username)?;
+        let password_s: ODPIStr = TryFrom::try_from(password)?;
+        let connect_string_s: ODPIStr = TryFrom::try_from(connect_string)?;
         let mut inner: *mut ODPIPool = ptr::null_mut();
 
         let comm_cp = if let Some(common_create_params) = common_create_params {
@@ -303,7 +304,7 @@ impl Pool {
 }
 
 impl From<*mut ODPIPool> for Pool {
-    fn from(inner: *mut ODPIPool) -> Pool {
-        Pool { inner: inner }
+    fn from(inner: *mut ODPIPool) -> Self {
+        Self { inner: inner }
     }
 }

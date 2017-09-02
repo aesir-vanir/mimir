@@ -13,6 +13,7 @@
 use error::{ErrorKind, Result};
 use odpi::{enums, externs};
 use odpi::opaque::ODPIEnqOptions;
+use std::convert::TryFrom;
 use std::ptr;
 use util::ODPIStr;
 
@@ -97,7 +98,7 @@ impl Options {
     /// the message is enqueued but before it is returned to the application. It must be created
     /// using DBMS_TRANSFORM.
     pub fn set_transformation(&self, transformation: Option<&str>) -> Result<()> {
-        let txn_s = ODPIStr::from(transformation);
+        let txn_s: ODPIStr = TryFrom::try_from(transformation)?;
 
         try_dpi!(
             externs::dpiEnqOptions_setTransformation(self.inner, txn_s.ptr(), txn_s.len()),
@@ -118,7 +119,7 @@ impl Options {
 }
 
 impl From<*mut ODPIEnqOptions> for Options {
-    fn from(inner: *mut ODPIEnqOptions) -> Options {
-        Options { inner: inner }
+    fn from(inner: *mut ODPIEnqOptions) -> Self {
+        Self { inner: inner }
     }
 }

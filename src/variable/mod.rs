@@ -21,6 +21,7 @@ use odpi::structs::ODPIData;
 use rowid::Rowid;
 use statement::Statement;
 use std::{ptr, slice};
+use std::convert::TryFrom;
 use util::ODPIStr;
 
 /// This structure represents memory areas used for transferring data to and from the database and
@@ -134,7 +135,7 @@ impl Var {
     /// * `value` - a string which contains the data to be set. The data is copied to the variable
     /// buffer and does not need to be retained after this function call has completed.
     pub fn set_from_bytes(&self, pos: u32, value: &str) -> Result<()> {
-        let value_s = ODPIStr::from(value);
+        let value_s: ODPIStr = TryFrom::try_from(value)?;
         try_dpi!(
             externs::dpiVar_setFromBytes(self.inner, pos, value_s.ptr(), value_s.len()),
             Ok(()),

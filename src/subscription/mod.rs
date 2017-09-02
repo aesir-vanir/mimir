@@ -15,6 +15,7 @@ use error::{ErrorKind, Result};
 use odpi::externs;
 use odpi::opaque::ODPISubscr;
 use statement::Statement;
+use std::convert::TryFrom;
 use std::ptr;
 use util::ODPIStr;
 
@@ -57,7 +58,7 @@ impl Subscription {
     /// returned should be released as soon as it is no longer needed.
     pub fn prepare_statement(&self, sql: &str) -> Result<Statement> {
         let mut stmt = ptr::null_mut();
-        let sql_s = ODPIStr::from(sql);
+        let sql_s: ODPIStr = TryFrom::try_from(sql)?;
 
         try_dpi!(
             externs::dpiSubscr_prepareStmt(self.inner, sql_s.ptr(), sql_s.len(), &mut stmt),
@@ -80,7 +81,7 @@ impl Subscription {
 }
 
 impl From<*mut ODPISubscr> for Subscription {
-    fn from(inner: *mut ODPISubscr) -> Subscription {
-        Subscription { inner: inner }
+    fn from(inner: *mut ODPISubscr) -> Self {
+        Self { inner: inner }
     }
 }

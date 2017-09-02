@@ -18,6 +18,7 @@ use odpi::opaque::ODPIContext;
 use odpi::structs::{ODPICommonCreateParams, ODPIConnCreateParams, ODPIErrorInfo,
                     ODPIPoolCreateParams, ODPISubscrCreateParams, ODPIVersionInfo};
 use slog::Logger;
+use std::convert::TryFrom;
 use std::ptr;
 use util::ODPIStr;
 
@@ -45,7 +46,7 @@ pub struct Context {
 
 impl Context {
     /// Create a new `Context` struct.
-    pub fn create() -> Result<Context> {
+    pub fn create() -> Result<Self> {
         let mut ctxt = ptr::null_mut();
         let mut err: ODPIErrorInfo = Default::default();
 
@@ -94,7 +95,7 @@ impl Context {
                 let mut driver_name = String::from(env!("CARGO_PKG_NAME"));
                 driver_name.push(' ');
                 driver_name.push_str(env!("CARGO_PKG_VERSION"));
-                let driver_name_s = ODPIStr::from(driver_name);
+                let driver_name_s: ODPIStr = TryFrom::try_from(driver_name)?;
                 ccp.driver_name = driver_name_s.ptr();
                 ccp.driver_name_length = driver_name_s.len();
                 Ok(ccp.into())
@@ -136,8 +137,8 @@ impl Context {
 }
 
 impl From<*mut ODPIContext> for Context {
-    fn from(inner: *mut ODPIContext) -> Context {
-        Context {
+    fn from(inner: *mut ODPIContext) -> Self {
+        Self {
             inner: inner,
             stdout: None,
             stderr: None,

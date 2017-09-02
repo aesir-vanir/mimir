@@ -10,7 +10,6 @@
 #![deny(missing_docs)]
 #![feature(try_from, untagged_unions)]
 #![recursion_limit = "128"]
-#![cfg_attr(feature = "cargo-clippy", allow(unseparated_literal_suffix))]
 
 #[macro_use]
 extern crate bitflags;

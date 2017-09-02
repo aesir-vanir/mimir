@@ -18,6 +18,7 @@ use objecttype::ObjectType;
 use odpi::{enums, externs, opaque};
 use odpi::enums::ODPIOracleTypeNum;
 use odpi::structs::{ODPIData, ODPIDataTypeInfo, ODPIDataValueUnion};
+use std::convert::TryFrom;
 use std::slice;
 use util::ODPIStr;
 
@@ -45,12 +46,12 @@ pub struct Data {
 impl Data {
     /// Create a new `Data` struct;
     #[doc(hidden)]
-    pub fn new(is_null: bool, val: ODPIDataValueUnion) -> Data {
+    pub fn new(is_null: bool, val: ODPIDataValueUnion) -> Self {
         let mut odpi_data = ODPIData {
             is_null: if is_null { 1 } else { 0 },
             value: val,
         };
-        Data {
+        Self {
             inner: &mut odpi_data,
         }
     }
@@ -107,18 +108,18 @@ impl Data {
     }
 
     /// Sets the value of the data when the native type is DPI_NATIVE_TYPE_INTERVAL_DS.
-    #[cfg_attr(feature = "cargo-clippy", allow(cast_possible_truncation))]
-    pub fn set_duration(&self, val: Duration) {
+    pub fn set_duration(&self, val: Duration) -> Result<()> {
         let mut odpi_int_ds = unsafe { (*self.inner).value.as_interval_ds };
-        odpi_int_ds.days = val.num_days() as i32;
-        odpi_int_ds.hours = val.num_hours() as i32;
-        odpi_int_ds.minutes = val.num_minutes() as i32;
-        odpi_int_ds.seconds = val.num_seconds() as i32;
+        odpi_int_ds.days = TryFrom::try_from(val.num_days())?;
+        odpi_int_ds.hours = TryFrom::try_from(val.num_hours())?;
+        odpi_int_ds.minutes = TryFrom::try_from(val.num_minutes())?;
+        odpi_int_ds.seconds = TryFrom::try_from(val.num_seconds())?;
         odpi_int_ds.fseconds = if let Some(ns) = val.num_nanoseconds() {
-            ns as i32
+            TryFrom::try_from(ns)?
         } else {
             0
         };
+        Ok(())
     }
 
     /// Get the value as a `f32` when the native type is DPI_NATIVE_TYPE_FLOAT.
@@ -181,11 +182,12 @@ impl Data {
     }
 
     /// Sets the value of the data when the native type is DPI_NATIVE_TYPE_BYTES.
-    pub fn set_string(&self, val: &str) {
-        let val_s = ODPIStr::from(val);
+    pub fn set_string(&self, val: &str) -> Result<()> {
+        let val_s: ODPIStr = TryFrom::try_from(val)?;
         let mut bytes = unsafe { (*self.inner).value.as_bytes };
         bytes.ptr = val_s.ptr() as *mut i8;
         bytes.length = val_s.len();
+        Ok(())
     }
 
     /// Get the value as a `u64` when the native type is DPI_NATIVE_TYPE_UINT64.
@@ -211,15 +213,15 @@ impl Data {
     }
 
     /// Sets the value of the data when the native type is DPI_NATIVE_TYPE_TIMESTAMP.
-    #[cfg_attr(feature = "cargo-clippy", allow(cast_possible_truncation))]
-    pub fn set_utc(&self, val: DateTime<Utc>) {
+    pub fn set_utc(&self, val: DateTime<Utc>) -> Result<()> {
         let mut odpi_ts = unsafe { (*self.inner).value.as_timestamp };
-        odpi_ts.year = val.year() as i16;
-        odpi_ts.month = val.month() as u8;
-        odpi_ts.day = val.day() as u8;
-        odpi_ts.hour = val.hour() as u8;
-        odpi_ts.minute = val.minute() as u8;
-        odpi_ts.second = val.second() as u8;
+        odpi_ts.year = TryFrom::try_from(val.year())?;
+        odpi_ts.month = TryFrom::try_from(val.month())?;
+        odpi_ts.day = TryFrom::try_from(val.day())?;
+        odpi_ts.hour = TryFrom::try_from(val.hour())?;
+        odpi_ts.minute = TryFrom::try_from(val.minute())?;
+        odpi_ts.second = TryFrom::try_from(val.second())?;
+        Ok(())
     }
 
     /// Get the value as a `YearsMonths` when the native type is DPI_NATIVE_TYPE_INTERVAL_YM.
@@ -269,8 +271,8 @@ impl Data {
 }
 
 impl From<*mut ODPIData> for Data {
-    fn from(inner: *mut ODPIData) -> Data {
-        Data { inner: inner }
+    fn from(inner: *mut ODPIData) -> Self {
+        Self { inner: inner }
     }
 }
 
@@ -283,8 +285,8 @@ pub struct TypeInfo {
 
 impl TypeInfo {
     /// Create a new `TypeInfo` struct.
-    pub fn new(inner: ODPIDataTypeInfo) -> TypeInfo {
-        TypeInfo { inner: inner }
+    pub fn new(inner: ODPIDataTypeInfo) -> Self {
+        Self { inner: inner }
     }
 
     /// Get the `oracle_type_num` value.
@@ -359,7 +361,7 @@ impl TypeInfo {
 }
 
 impl From<ODPIDataTypeInfo> for TypeInfo {
-    fn from(inner: ODPIDataTypeInfo) -> TypeInfo {
-        TypeInfo { inner: inner }
+    fn from(inner: ODPIDataTypeInfo) -> Self {
+        Self { inner: inner }
     }
 }

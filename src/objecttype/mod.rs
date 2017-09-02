@@ -97,7 +97,7 @@ impl ObjectType {
 }
 
 impl From<*mut ODPIObjectType> for ObjectType {
-    fn from(oot: *mut ODPIObjectType) -> ObjectType {
-        ObjectType { inner: oot }
+    fn from(oot: *mut ODPIObjectType) -> Self {
+        Self { inner: oot }
     }
 }

@@ -21,6 +21,7 @@ use odpi::opaque::ODPIStmt;
 use odpi::structs::{ODPIQueryInfo, ODPIStmtInfo};
 use query;
 use std::{ptr, slice};
+use std::convert::TryFrom;
 use util::ODPIStr;
 use variable::Var;
 
@@ -34,8 +35,8 @@ pub struct Statement {
 impl Statement {
     /// Create a new statement from an `ODPIStmt` pointer
     #[doc(hidden)]
-    pub fn new(inner: *mut ODPIStmt) -> Statement {
-        Statement { inner: inner }
+    pub fn new(inner: *mut ODPIStmt) -> Self {
+        Self { inner: inner }
     }
 
     /// Get the `inner` value.
@@ -63,7 +64,7 @@ impl Statement {
     /// which is to be bound.
     /// * `var` - a variable which is to be bound.
     pub fn bind_by_name(&self, name: &str, var: &Var) -> Result<()> {
-        let name_s = ODPIStr::from(name);
+        let name_s: ODPIStr = TryFrom::try_from(name)?;
 
         /// TODO: Test this when Var is complete.
         try_dpi!(
@@ -106,7 +107,7 @@ impl Statement {
         native_type: enums::ODPINativeTypeNum,
         data: &Data,
     ) -> Result<()> {
-        let name_s = ODPIStr::from(name);
+        let name_s: ODPIStr = TryFrom::try_from(name)?;
 
         try_dpi!(
             externs::dpiStmt_bindValueByName(
@@ -154,7 +155,7 @@ impl Statement {
     /// is ignored for statements that are acquired through bind variables (REF CURSOR) or implicit
     /// results.
     pub fn close(&self, tag: Option<&str>) -> Result<()> {
-        let tag_s = ODPIStr::from(tag);
+        let tag_s: ODPIStr = TryFrom::try_from(tag)?;
         try_dpi!(
             externs::dpiStmt_close(self.inner, tag_s.ptr(), tag_s.len()),
             Ok(()),
@@ -285,7 +286,6 @@ impl Statement {
     }
 
     /// Returns the names of the unique bind variables in the prepared statement.
-    #[cfg_attr(feature = "cargo-clippy", allow(used_underscore_binding))]
     pub fn get_bind_names(&self, num_bind_names: u32) -> Result<Vec<String>> {
         let mut actual_num_bind_names = num_bind_names;
         let mut names_vec: Vec<*const ::std::os::raw::c_char> =
@@ -462,8 +462,8 @@ pub struct Info {
 impl Info {
     /// Create a new statement from an `ODPIStmtInfo` pointer
     #[doc(hidden)]
-    pub fn new(inner: ODPIStmtInfo) -> Info {
-        Info { inner: inner }
+    pub fn new(inner: ODPIStmtInfo) -> Self {
+        Self { inner: inner }
     }
 
     /// Specifies if the statement refers to a query or not.
@@ -502,7 +502,7 @@ impl Info {
 }
 
 impl From<*mut ODPIStmt> for Statement {
-    fn from(inner: *mut ODPIStmt) -> Statement {
-        Statement { inner: inner }
+    fn from(inner: *mut ODPIStmt) -> Self {
+        Self { inner: inner }
     }
 }

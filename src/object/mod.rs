@@ -61,7 +61,7 @@ impl Object {
 
     /// Creates an independent copy of an object and returns a reference to the newly created
     /// object. This reference should be released as soon as it is no longer needed.
-    pub fn copy_object(&self) -> Result<Object> {
+    pub fn copy_object(&self) -> Result<Self> {
         let mut copied = ptr::null_mut();
 
         try_dpi!(
@@ -245,7 +245,7 @@ impl Object {
 }
 
 impl From<*mut ODPIObject> for Object {
-    fn from(inner: *mut ODPIObject) -> Object {
-        Object { inner: inner }
+    fn from(inner: *mut ODPIObject) -> Self {
+        Self { inner: inner }
     }
 }

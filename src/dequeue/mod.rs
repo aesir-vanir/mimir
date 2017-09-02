@@ -13,6 +13,7 @@
 use error::{ErrorKind, Result};
 use odpi::{enums, externs};
 use odpi::opaque::ODPIDeqOptions;
+use std::convert::TryFrom;
 use std::ptr;
 use util::ODPIStr;
 
@@ -213,7 +214,7 @@ impl Options {
     /// * `condition` - a string in the encoding used for CHAR data, or None if the condition is to
     /// be cleared.
     pub fn set_condition(&self, condition: Option<&str>) -> Result<()> {
-        let cond_s = ODPIStr::from(condition);
+        let cond_s: ODPIStr = TryFrom::try_from(condition)?;
 
         try_dpi!(
             externs::dpiDeqOptions_setCondition(self.inner, cond_s.ptr(), cond_s.len()),
@@ -228,7 +229,7 @@ impl Options {
     /// * `consumer_name` - a string in the encoding used for CHAR data, or None if the consumer
     /// name is to be cleared.
     pub fn set_consumer_name(&self, cosumer_name: Option<&str>) -> Result<()> {
-        let cons_s = ODPIStr::from(cosumer_name);
+        let cons_s: ODPIStr = TryFrom::try_from(cosumer_name)?;
 
         try_dpi!(
             externs::dpiDeqOptions_setConsumerName(self.inner, cons_s.ptr(), cons_s.len()),
@@ -244,7 +245,7 @@ impl Options {
     /// * `correlation` - a string in the encoding used for CHAR data, or None if the correlation is
     /// to be cleared.
     pub fn set_correlation(&self, correlation: Option<&str>) -> Result<()> {
-        let corr_s = ODPIStr::from(correlation);
+        let corr_s: ODPIStr = TryFrom::try_from(correlation)?;
 
         try_dpi!(
             externs::dpiDeqOptions_setCorrelation(self.inner, corr_s.ptr(), corr_s.len()),
@@ -270,7 +271,7 @@ impl Options {
     /// * `msg_id` - a string making up the message identifier, or None if no specific message is to
     /// be dequeued.
     pub fn set_msg_id(&self, msg_id: Option<&str>) -> Result<()> {
-        let msg_id_s = ODPIStr::from(msg_id);
+        let msg_id_s: ODPIStr = TryFrom::try_from(msg_id)?;
 
         try_dpi!(
             externs::dpiDeqOptions_setMsgId(self.inner, msg_id_s.ptr(), msg_id_s.len()),
@@ -298,7 +299,7 @@ impl Options {
     /// * `transform` - a string in the encoding used for CHAR data, or None if the transformation
     /// is to be cleared.
     pub fn set_transformation(&self, transform: Option<&str>) -> Result<()> {
-        let transform_s = ODPIStr::from(transform);
+        let transform_s: ODPIStr = TryFrom::try_from(transform)?;
 
         try_dpi!(
             externs::dpiDeqOptions_setTransformation(
@@ -339,7 +340,7 @@ impl Options {
 }
 
 impl From<*mut ODPIDeqOptions> for Options {
-    fn from(inner: *mut ODPIDeqOptions) -> Options {
-        Options { inner: inner }
+    fn from(inner: *mut ODPIDeqOptions) -> Self {
+        Self { inner: inner }
     }
 }

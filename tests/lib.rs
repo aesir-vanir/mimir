@@ -1,3 +1,4 @@
+#![feature(try_from)]
 #[macro_use]
 extern crate lazy_static;
 #[macro_use]
@@ -28,7 +29,6 @@ lazy_static! {
         if let Ok(file) = File::open(".creds/oic-test") {
             let buf_reader = BufReader::new(file);
 
-            #[cfg_attr(feature = "cargo-clippy", allow(used_underscore_binding))]
             for line_res in buf_reader.lines() {
                 if let Ok(line) = line_res {
                     let parts = line.split(':').map(|x| {

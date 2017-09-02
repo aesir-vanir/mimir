@@ -13,7 +13,7 @@ use odpi::{enums, externs, flags};
 use odpi::structs::{ODPIAppContext, ODPICommonCreateParams, ODPIConnCreateParams,
                     ODPIPoolCreateParams, ODPISubscrCreateParams};
 use pool::Pool;
-use std::convert::TryInto;
+use std::convert::{TryFrom, TryInto};
 use std::ffi::CStr;
 use util::ODPIStr;
 
@@ -29,10 +29,10 @@ pub struct AppContext {
 
 impl AppContext {
     /// Create a new `AppContext` struct.
-    pub fn new(namespace: &str, name: &str, value: &str) -> Self {
-        let namespace_s = ODPIStr::from(namespace);
-        let name_s = ODPIStr::from(name);
-        let value_s = ODPIStr::from(value);
+    pub fn new(namespace: &str, name: &str, value: &str) -> Result<Self> {
+        let namespace_s: ODPIStr = TryFrom::try_from(namespace)?;
+        let name_s: ODPIStr = TryFrom::try_from(name)?;
+        let value_s: ODPIStr = TryFrom::try_from(value)?;
 
         let ctxt = ODPIAppContext {
             namespace_name: namespace_s.ptr(),
@@ -43,7 +43,7 @@ impl AppContext {
             value_length: value_s.len(),
         };
 
-        AppContext { inner: ctxt }
+        Ok(Self { inner: ctxt })
     }
 
     /// Get the `namespace_name` value.
@@ -79,8 +79,8 @@ impl AppContext {
 }
 
 impl From<ODPIAppContext> for AppContext {
-    fn from(inner: ODPIAppContext) -> AppContext {
-        AppContext { inner: inner }
+    fn from(inner: ODPIAppContext) -> Self {
+        Self { inner: inner }
     }
 }
 
@@ -107,7 +107,7 @@ impl CommonCreate {
     }
 
     /// Set the `create_mode` value.
-    pub fn set_create_mode(&mut self, create_mode: flags::ODPICreateMode) -> &mut CommonCreate {
+    pub fn set_create_mode(&mut self, create_mode: flags::ODPICreateMode) -> &mut Self {
         self.inner.create_mode = create_mode;
         self
     }
@@ -123,7 +123,7 @@ impl CommonCreate {
     }
 
     /// Set the `encoding` value.
-    pub fn set_encoding(&mut self, encoding: *const ::std::os::raw::c_char) -> &mut CommonCreate {
+    pub fn set_encoding(&mut self, encoding: *const ::std::os::raw::c_char) -> &mut Self {
         self.inner.encoding = encoding;
         self
     }
@@ -142,7 +142,7 @@ impl CommonCreate {
     pub fn set_nchar_encoding(
         &mut self,
         nchar_encoding: *const ::std::os::raw::c_char,
-    ) -> &mut CommonCreate {
+    ) -> &mut Self {
         self.inner.nchar_encoding = nchar_encoding;
         self
     }
@@ -158,11 +158,11 @@ impl CommonCreate {
     }
 
     /// Set the `edition` value.
-    pub fn set_edition(&mut self, edition: &str) -> &mut CommonCreate {
-        let edition_s = ODPIStr::from(edition);
+    pub fn set_edition(&mut self, edition: &str) -> Result<&mut Self> {
+        let edition_s: ODPIStr = TryFrom::try_from(edition)?;
         self.inner.edition = edition_s.ptr();
         self.inner.edition_length = edition_s.len();
-        self
+        Ok(self)
     }
 
     /// Get the `driver_name` value.
@@ -176,17 +176,17 @@ impl CommonCreate {
     }
 
     /// Set the `driver_name` value.
-    pub fn set_driver_name(&mut self, driver_name: &str) -> &mut CommonCreate {
-        let driver_name_s = ODPIStr::from(driver_name);
+    pub fn set_driver_name(&mut self, driver_name: &str) -> Result<&mut Self> {
+        let driver_name_s: ODPIStr = TryFrom::try_from(driver_name)?;
         self.inner.driver_name = driver_name_s.ptr();
         self.inner.driver_name_length = driver_name_s.len();
-        self
+        Ok(self)
     }
 }
 
 impl From<ODPICommonCreateParams> for CommonCreate {
-    fn from(inner: ODPICommonCreateParams) -> CommonCreate {
-        CommonCreate { inner: inner }
+    fn from(inner: ODPICommonCreateParams) -> Self {
+        Self { inner: inner }
     }
 }
 
@@ -224,7 +224,7 @@ impl ConnCreate {
     }
 
     /// Set the `auth_mode` value.
-    pub fn set_auth_mode(&mut self, auth_mode: flags::ODPIAuthMode) -> &mut ConnCreate {
+    pub fn set_auth_mode(&mut self, auth_mode: flags::ODPIAuthMode) -> &mut Self {
         self.conn.auth_mode = auth_mode;
         self
     }
@@ -244,11 +244,11 @@ impl ConnCreate {
     }
 
     /// Set the `connection_class` value.
-    pub fn set_connection_class(&mut self, connection_class: &str) -> &mut ConnCreate {
-        let connection_class_s = ODPIStr::from(connection_class);
+    pub fn set_connection_class(&mut self, connection_class: &str) -> Result<&mut Self> {
+        let connection_class_s: ODPIStr = TryFrom::try_from(connection_class)?;
         self.conn.connection_class = connection_class_s.ptr();
         self.conn.connection_class_length = connection_class_s.len();
-        self
+        Ok(self)
     }
 
     /// Get the `purity` value.
@@ -261,7 +261,7 @@ impl ConnCreate {
     }
 
     /// Set the `purity` value.
-    pub fn set_purity(&mut self, purity: enums::ODPIPurity) -> &mut ConnCreate {
+    pub fn set_purity(&mut self, purity: enums::ODPIPurity) -> &mut Self {
         self.conn.purity = purity;
         self
     }
@@ -279,11 +279,11 @@ impl ConnCreate {
     }
 
     /// Set the `new_password` value.
-    pub fn set_new_password(&mut self, new_password: &str) -> &mut ConnCreate {
-        let new_password_s = ODPIStr::from(new_password);
+    pub fn set_new_password(&mut self, new_password: &str) -> Result<&mut Self> {
+        let new_password_s: ODPIStr = TryFrom::try_from(new_password)?;
         self.conn.new_password = new_password_s.ptr();
         self.conn.new_password_length = new_password_s.len();
-        self
+        Ok(self)
     }
 
     /// Get the `app_context` value.
@@ -304,7 +304,7 @@ impl ConnCreate {
     }
 
     /// Set the `app_context` value.
-    pub fn set_app_context(&mut self, app_contexts: Vec<AppContext>) -> Result<&mut ConnCreate> {
+    pub fn set_app_context(&mut self, app_contexts: Vec<AppContext>) -> Result<&mut Self> {
         let len: u32 = TryInto::try_into(app_contexts.len())?;
         let mut oac_vec: Vec<ODPIAppContext> = Vec::new();
         for ac in &app_contexts {
@@ -335,7 +335,7 @@ impl ConnCreate {
     }
 
     /// Set the `external_auth` value.
-    pub fn set_external_auth(&mut self, external_auth: i32) -> &mut ConnCreate {
+    pub fn set_external_auth(&mut self, external_auth: i32) -> &mut Self {
         self.conn.external_auth = external_auth;
         self
     }
@@ -352,7 +352,7 @@ impl ConnCreate {
     pub fn set_external_handle(
         &mut self,
         external_handle: *mut ::std::os::raw::c_void,
-    ) -> &mut ConnCreate {
+    ) -> &mut Self {
         self.conn.external_handle = external_handle;
         self
     }
@@ -366,7 +366,7 @@ impl ConnCreate {
     }
 
     /// Set the `pool` value.
-    pub fn set_pool(&mut self, pool: Pool) -> &mut ConnCreate {
+    pub fn set_pool(&mut self, pool: Pool) -> &mut Self {
         self.conn.pool = pool.inner();
         self
     }
@@ -387,11 +387,11 @@ impl ConnCreate {
     }
 
     /// Set the `tag` value.
-    pub fn set_tag(&mut self, tag: &str) -> &mut ConnCreate {
-        let tag_s = ODPIStr::from(tag);
+    pub fn set_tag(&mut self, tag: &str) -> Result<&mut Self> {
+        let tag_s: ODPIStr = TryFrom::try_from(tag)?;
         self.conn.tag = tag_s.ptr();
         self.conn.tag_length = tag_s.len();
-        self
+        Ok(self)
     }
 
     /// Get the `match_any_tag` value.
@@ -404,7 +404,7 @@ impl ConnCreate {
     }
 
     /// Set the `match_any_tag` value.
-    pub fn set_match_any_tag(&mut self, match_any_tag: bool) -> &mut ConnCreate {
+    pub fn set_match_any_tag(&mut self, match_any_tag: bool) -> &mut Self {
         self.conn.match_any_tag = if match_any_tag { 1 } else { 0 };
         self
     }
@@ -441,8 +441,8 @@ pub struct PoolCreate {
 impl PoolCreate {
     /// Create a new `PoolCreate` struct.
     #[doc(hidden)]
-    pub fn new(pool: ODPIPoolCreateParams) -> PoolCreate {
-        PoolCreate { pool: pool }
+    pub fn new(pool: ODPIPoolCreateParams) -> Self {
+        Self { pool: pool }
     }
 
     /// Get the inner FFI struct.
@@ -460,7 +460,7 @@ impl PoolCreate {
     }
 
     /// Set the `min_sessions` value.
-    pub fn set_min_sessions(&mut self, min_sessions: u32) -> &mut PoolCreate {
+    pub fn set_min_sessions(&mut self, min_sessions: u32) -> &mut Self {
         self.pool.min_sessions = min_sessions;
         self
     }
@@ -474,7 +474,7 @@ impl PoolCreate {
     }
 
     /// Set the `max_sessions` value.
-    pub fn set_max_sessions(&mut self, max_sessions: u32) -> &mut PoolCreate {
+    pub fn set_max_sessions(&mut self, max_sessions: u32) -> &mut Self {
         self.pool.max_sessions = max_sessions;
         self
     }
@@ -490,7 +490,7 @@ impl PoolCreate {
     }
 
     /// Set the `session_increment` value.
-    pub fn set_session_increment(&mut self, session_increment: u32) -> &mut PoolCreate {
+    pub fn set_session_increment(&mut self, session_increment: u32) -> &mut Self {
         self.pool.session_increment = session_increment;
         self
     }
@@ -506,7 +506,7 @@ impl PoolCreate {
     }
 
     /// Set the `ping_interval` value.
-    pub fn set_ping_interval(&mut self, ping_interval: i32) -> &mut PoolCreate {
+    pub fn set_ping_interval(&mut self, ping_interval: i32) -> &mut Self {
         self.pool.ping_interval = ping_interval;
         self
     }
@@ -522,7 +522,7 @@ impl PoolCreate {
     }
 
     /// Set the `ping_timeout` value.
-    pub fn set_ping_timeout(&mut self, ping_timeout: i32) -> &mut PoolCreate {
+    pub fn set_ping_timeout(&mut self, ping_timeout: i32) -> &mut Self {
         self.pool.ping_timeout = ping_timeout;
         self
     }
@@ -537,7 +537,7 @@ impl PoolCreate {
     }
 
     /// Set the `homogeneous` value.
-    pub fn set_homogeneous(&mut self, homogeneous: bool) -> &mut PoolCreate {
+    pub fn set_homogeneous(&mut self, homogeneous: bool) -> &mut Self {
         self.pool.homogeneous = if homogeneous { 1 } else { 0 };
         self
     }
@@ -553,7 +553,7 @@ impl PoolCreate {
     }
 
     /// Set the `external_auth` value.
-    pub fn set_external_auth(&mut self, external_auth: bool) -> &mut PoolCreate {
+    pub fn set_external_auth(&mut self, external_auth: bool) -> &mut Self {
         self.pool.external_auth = if external_auth { 1 } else { 0 };
         self
     }
@@ -568,7 +568,7 @@ impl PoolCreate {
     }
 
     /// Set the `get_mode` value.
-    pub fn set_get_mode(&mut self, get_mode: enums::ODPIPoolGetMode) -> &mut PoolCreate {
+    pub fn set_get_mode(&mut self, get_mode: enums::ODPIPoolGetMode) -> &mut Self {
         self.pool.get_mode = get_mode;
         self
     }
@@ -599,8 +599,8 @@ pub struct SubscrCreate {
 impl SubscrCreate {
     #[doc(hidden)]
     /// Create a new `SubscrCreate` struct.
-    pub fn new(subscr: ODPISubscrCreateParams) -> SubscrCreate {
-        SubscrCreate { subscr: subscr }
+    pub fn new(subscr: ODPISubscrCreateParams) -> Self {
+        Self { subscr: subscr }
     }
 
     /// Get the inner FFI struct.
@@ -622,7 +622,7 @@ impl SubscrCreate {
     pub fn set_subscr_namespace(
         &mut self,
         subscr_namespace: enums::ODPISubscrNamespace,
-    ) -> &mut SubscrCreate {
+    ) -> &mut Self {
         self.subscr.subscr_namespace = subscr_namespace;
         self
     }
@@ -637,7 +637,7 @@ impl SubscrCreate {
     }
 
     /// Set the `protocol` value.
-    pub fn set_protocol(&mut self, protocol: enums::ODPISubscrProtocol) -> &mut SubscrCreate {
+    pub fn set_protocol(&mut self, protocol: enums::ODPISubscrProtocol) -> &mut Self {
         self.subscr.protocol = protocol;
         self
     }
@@ -652,7 +652,7 @@ impl SubscrCreate {
     }
 
     /// Set the `qos` value.
-    pub fn set_qos(&mut self, qos: flags::ODPISubscrQOS) -> &mut SubscrCreate {
+    pub fn set_qos(&mut self, qos: flags::ODPISubscrQOS) -> &mut Self {
         self.subscr.qos = qos;
         self
     }
@@ -667,7 +667,7 @@ impl SubscrCreate {
     }
 
     /// Set the `operations` value.
-    pub fn set_operations(&mut self, operations: flags::ODPIOpCode) -> &mut SubscrCreate {
+    pub fn set_operations(&mut self, operations: flags::ODPIOpCode) -> &mut Self {
         self.subscr.operations = operations;
         self
     }
@@ -681,7 +681,7 @@ impl SubscrCreate {
     }
 
     /// Set the `port_number` value.
-    pub fn set_port_number(&mut self, port_number: u32) -> &mut SubscrCreate {
+    pub fn set_port_number(&mut self, port_number: u32) -> &mut Self {
         self.subscr.port_number = port_number;
         self
     }
@@ -696,7 +696,7 @@ impl SubscrCreate {
     }
 
     /// Set the `timeout` value.
-    pub fn set_timeout(&mut self, timeout: u32) -> &mut SubscrCreate {
+    pub fn set_timeout(&mut self, timeout: u32) -> &mut Self {
         self.subscr.timeout = timeout;
         self
     }
@@ -716,11 +716,11 @@ impl SubscrCreate {
     }
 
     /// Set the `name` value.
-    pub fn set_name(&mut self, name: &str) -> &mut SubscrCreate {
-        let name_s = ODPIStr::from(name);
+    pub fn set_name(&mut self, name: &str) -> Result<&mut Self> {
+        let name_s: ODPIStr = TryFrom::try_from(name)?;
         self.subscr.name = name_s.ptr();
         self.subscr.name_length = name_s.len();
-        self
+        Ok(self)
     }
 
     /// Get the `callback` value.
@@ -742,7 +742,7 @@ impl SubscrCreate {
     }
 
     /// Set the `callback` value.
-    pub fn set_callback(&mut self, callback: externs::ODPISubscrCallback) -> &mut SubscrCreate {
+    pub fn set_callback(&mut self, callback: externs::ODPISubscrCallback) -> &mut Self {
         self.subscr.callback = callback;
         self
     }
@@ -759,7 +759,7 @@ impl SubscrCreate {
     pub fn set_callback_context(
         &mut self,
         callback_context: *mut ::std::os::raw::c_void,
-    ) -> &mut SubscrCreate {
+    ) -> &mut Self {
         self.subscr.callback_context = callback_context;
         self
     }
@@ -782,10 +782,10 @@ impl SubscrCreate {
     }
 
     /// Set the `recipient_name` value.
-    pub fn set_recipient_name(&mut self, recipient_name: &str) -> &mut SubscrCreate {
-        let recipient_name_s = ODPIStr::from(recipient_name);
+    pub fn set_recipient_name(&mut self, recipient_name: &str) -> Result<&mut Self> {
+        let recipient_name_s: ODPIStr = TryFrom::try_from(recipient_name)?;
         self.subscr.recipient_name = recipient_name_s.ptr();
         self.subscr.recipient_name_length = recipient_name_s.len();
-        self
+        Ok(self)
     }
 }

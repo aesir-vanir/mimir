@@ -53,17 +53,20 @@ impl Default for ODPIStr {
     }
 }
 
-impl<'a> From<Option<&'a str>> for ODPIStr {
-    fn from(opt_s: Option<&str>) -> Self {
+impl<'a> TryFrom<Option<&'a str>> for ODPIStr {
+    type Error = Error;
+
+    fn try_from(opt_s: Option<&str>) -> Result<Self> {
         match opt_s {
-            Some(s) => Self::from(s),
-            None => Default::default(),
+            Some(s) => TryFrom::try_from(s),
+            None => Ok(Default::default()),
         }
     }
 }
 
 impl<'a> TryFrom<&'a str> for ODPIStr {
     type Error = Error;
+
     fn try_from(s: &str) -> Result<Self> {
         let s_len: u32 = TryInto::try_into(s.len())?;
         Ok(Self {
@@ -75,6 +78,7 @@ impl<'a> TryFrom<&'a str> for ODPIStr {
 
 impl TryFrom<String> for ODPIStr {
     type Error = Error;
+
     fn try_from(s: String) -> Result<Self> {
         let s_len: u32 = TryInto::try_into(s.len())?;
         Ok(Self {

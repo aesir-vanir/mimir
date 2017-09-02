@@ -65,7 +65,7 @@ impl ObjectAttr {
 }
 
 impl From<*mut ODPIObjectAttr> for ObjectAttr {
-    fn from(oot: *mut ODPIObjectAttr) -> ObjectAttr {
-        ObjectAttr { inner: oot }
+    fn from(oot: *mut ODPIObjectAttr) -> Self {
+        Self { inner: oot }
     }
 }

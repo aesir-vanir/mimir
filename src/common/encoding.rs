@@ -52,12 +52,12 @@ impl Info {
 }
 
 impl From<ODPIEncodingInfo> for Info {
-    fn from(oei: ODPIEncodingInfo) -> Info {
+    fn from(oei: ODPIEncodingInfo) -> Self {
         unsafe {
             let enc = CStr::from_ptr(oei.encoding);
             let nchar_enc = CStr::from_ptr(oei.nchar_encoding);
 
-            Info {
+            Self {
                 encoding: enc.to_string_lossy().into_owned(),
                 nchar_encoding: nchar_enc.to_string_lossy().into_owned(),
                 max_bytes_per_char: oei.max_bytes_per_character,

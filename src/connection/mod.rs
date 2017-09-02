@@ -102,9 +102,9 @@ impl Connection {
         old_password: &str,
         new_password: &str,
     ) -> Result<()> {
-        let username_s = ODPIStr::from(username);
-        let old_password_s = ODPIStr::from(old_password);
-        let new_password_s = ODPIStr::from(new_password);
+        let username_s: ODPIStr = TryFrom::try_from(username)?;
+        let old_password_s: ODPIStr = TryFrom::try_from(old_password)?;
+        let new_password_s: ODPIStr = TryFrom::try_from(new_password)?;
 
         try_dpi!(
             externs::dpiConn_changePassword(
@@ -130,7 +130,7 @@ impl Connection {
     /// indicating that the tag should be cleared. This value is ignored unless the close mode
     /// includes the value DPI_MODE_CONN_CLOSE_RETAG.
     pub fn close(&self, mode: flags::ODPIConnCloseMode, tag: Option<&str>) -> Result<()> {
-        let tag_s = ODPIStr::from(tag);
+        let tag_s: ODPIStr = TryFrom::try_from(tag)?;
 
         try_dpi!(
             externs::dpiConn_close(self.inner, mode, tag_s.ptr(), tag_s.len()),
@@ -178,10 +178,10 @@ impl Connection {
         connect_string: Option<&str>,
         common_create_params: Option<CommonCreate>,
         conn_create_params: Option<ConnCreate>,
-    ) -> Result<Connection> {
-        let username_s = ODPIStr::from(username);
-        let password_s = ODPIStr::from(password);
-        let connect_string_s = ODPIStr::from(connect_string);
+    ) -> Result<Self> {
+        let username_s: ODPIStr = TryFrom::try_from(username)?;
+        let password_s: ODPIStr = TryFrom::try_from(password)?;
+        let connect_string_s: ODPIStr = TryFrom::try_from(connect_string)?;
         let mut inner: *mut ODPIConn = ptr::null_mut();
 
         let comm_cp = if let Some(common_create_params) = common_create_params {
@@ -228,7 +228,7 @@ impl Connection {
         options: &dequeue::Options,
         props: &Properties,
     ) -> Result<(String, Object)> {
-        let queue_s = ODPIStr::from(queue_name);
+        let queue_s: ODPIStr = TryFrom::try_from(queue_name)?;
         let payload = ptr::null_mut();
         let mut pdst = ptr::null();
         let mut dstlen = 0;
@@ -264,7 +264,7 @@ impl Connection {
         props: &Properties,
     ) -> Result<(String, Object)> {
         let payload = ptr::null_mut();
-        let queue_s = ODPIStr::from(queue_name);
+        let queue_s: ODPIStr = TryFrom::try_from(queue_name)?;
         let mut pdst = ptr::null();
         let mut dstlen = 0;
 
@@ -413,7 +413,7 @@ impl Connection {
     /// CHAR data.
     pub fn get_object_type(&self, name: &str) -> Result<ObjectType> {
         let mut pobj = ptr::null_mut();
-        let name_s = ODPIStr::from(name);
+        let name_s: ODPIStr = TryFrom::try_from(name)?;
 
         try_dpi!(
             externs::dpiConn_getObjectType(self.inner, name_s.ptr(), name_s.len(), &mut pobj),
@@ -641,8 +641,8 @@ impl Connection {
         tag: Option<&str>,
         scrollable: bool,
     ) -> Result<Statement> {
-        let sql_s = ODPIStr::from(sql);
-        let tag_s = ODPIStr::from(tag);
+        let sql_s: ODPIStr = TryFrom::try_from(sql)?;
+        let tag_s: ODPIStr = TryFrom::try_from(tag)?;
         let scroll_i = if scrollable { 0 } else { 1 };
         let mut stmt_ptr = ptr::null_mut();
 
@@ -677,7 +677,7 @@ impl Connection {
     /// * `action` - a string in the encoding used for CHAR data which will be used to set the
     /// action attribute.
     pub fn set_action(&self, action: &str) -> Result<()> {
-        let action_s = ODPIStr::from(action);
+        let action_s: ODPIStr = TryFrom::try_from(action)?;
 
         try_dpi!(
             externs::dpiConn_setAction(self.inner, action_s.ptr(), action_s.len()),
@@ -693,7 +693,7 @@ impl Connection {
     /// * `id` - a string in the encoding used for CHAR data which will be used to set the client
     /// identifier attribute.
     pub fn set_client_identifier(&self, id: &str) -> Result<()> {
-        let id_s = ODPIStr::from(id);
+        let id_s: ODPIStr = TryFrom::try_from(id)?;
 
         try_dpi!(
             externs::dpiConn_setClientIdentifier(self.inner, id_s.ptr(), id_s.len()),
@@ -709,7 +709,7 @@ impl Connection {
     /// * `info` - a string in the encoding used for CHAR data which will be used to set the client
     /// info attribute.
     pub fn set_client_info(&self, info: &str) -> Result<()> {
-        let info_s = ODPIStr::from(info);
+        let info_s: ODPIStr = TryFrom::try_from(info)?;
 
         try_dpi!(
             externs::dpiConn_setClientInfo(self.inner, info_s.ptr(), info_s.len()),
@@ -728,7 +728,7 @@ impl Connection {
     /// * `schema` - A string in the encoding used for CHAR data which will be used to set the
     /// current schema.
     pub fn set_current_schema(&self, schema: &str) -> Result<()> {
-        let curr_schema_s = ODPIStr::from(schema);
+        let curr_schema_s: ODPIStr = TryFrom::try_from(schema)?;
         try_dpi!(
             externs::dpiConn_setCurrentSchema(self.inner, curr_schema_s.ptr(), curr_schema_s.len()),
             Ok(()),
@@ -743,7 +743,7 @@ impl Connection {
     /// * `op` - a string in the encoding used for CHAR data which will be used to set the database
     /// operation attribute.
     pub fn set_db_op(&self, op: &str) -> Result<()> {
-        let db_op_s = ODPIStr::from(op);
+        let db_op_s: ODPIStr = TryFrom::try_from(op)?;
 
         try_dpi!(
             externs::dpiConn_setDbOp(self.inner, db_op_s.ptr(), db_op_s.len()),
@@ -758,7 +758,6 @@ impl Connection {
     ///
     /// * `external_name` - a string in the encoding used for CHAR data which will be used to set
     /// the external name.
-    #[cfg_attr(feature = "cargo-clippy", allow(cast_possible_truncation))]
     pub fn set_external_name(&self, external_name: &str) -> Result<()> {
         let external_name_cstr = CString::new(external_name)?;
         let external_name_len = external_name.len() + 1;
@@ -768,7 +767,7 @@ impl Connection {
                 externs::dpiConn_setExternalName(
                     self.inner,
                     external_name_cstr.as_ptr(),
-                    external_name_len as u32
+                    TryFrom::try_from(external_name_len)?
                 ),
                 Ok(()),
                 ErrorKind::Connection("dpiConn_setExternalName".to_string())
@@ -784,7 +783,6 @@ impl Connection {
     ///
     /// * `internal_name` - a string in the encoding used for CHAR data which will be used to set
     /// the internal name.
-    #[cfg_attr(feature = "cargo-clippy", allow(cast_possible_truncation))]
     pub fn set_internal_name(&self, internal_name: &str) -> Result<()> {
         let internal_name_cstr = CString::new(internal_name)?;
         let internal_name_len = internal_name.len() + 1;
@@ -794,7 +792,7 @@ impl Connection {
                 externs::dpiConn_setInternalName(
                     self.inner,
                     internal_name_cstr.as_ptr(),
-                    internal_name_len as u32
+                    TryFrom::try_from(internal_name_len)?
                 ),
                 Ok(()),
                 ErrorKind::Connection("dpiConn_setInternalName".to_string())
@@ -812,7 +810,7 @@ impl Connection {
     /// * `module` - a string in the encoding used for CHAR data which will be used to set the
     /// module attribute.
     pub fn set_module(&self, module: &str) -> Result<()> {
-        let module_s = ODPIStr::from(module);
+        let module_s: ODPIStr = TryFrom::try_from(module)?;
 
         try_dpi!(
             externs::dpiConn_setModule(self.inner, module_s.ptr(), module_s.len()),
@@ -860,8 +858,8 @@ impl Connection {
 }
 
 impl From<*mut ODPIConn> for Connection {
-    fn from(inner: *mut ODPIConn) -> Connection {
-        Connection {
+    fn from(inner: *mut ODPIConn) -> Self {
+        Self {
             inner: inner,
             stdout: None,
             stderr: None,

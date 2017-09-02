@@ -8,6 +8,7 @@ use mimir::enums::ODPIStatementType::Insert;
 use mimir::error::Result;
 use mimir::flags;
 use rand::{self, Rng};
+use std::convert::TryFrom;
 use std::ffi::CString;
 
 fn add_ref_release(conn: &Connection) -> Result<()> {
@@ -84,7 +85,6 @@ fn bind_by_name(conn: &Connection, username_var: &Var) -> Result<()> {
     Ok(())
 }
 
-#[cfg_attr(feature = "cargo-clippy", allow(used_underscore_binding))]
 fn stmt_res(ctxt: &Context) -> Result<()> {
     let mut ccp = ctxt.init_common_create_params()?;
     let enc_cstr = CString::new("UTF-8").expect("badness");
@@ -118,7 +118,7 @@ fn stmt_res(ctxt: &Context) -> Result<()> {
     assert_eq!(cols, 2);
 
     // bind_value_by_name / execute test
-    let blah = ODPIStr::from("test");
+    let blah: ODPIStr = TryFrom::try_from("test")?;
     let enc = String::from("UTF-8\0");
 
     let odpi_bytes = ODPIBytes {

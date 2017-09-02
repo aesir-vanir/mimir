@@ -44,8 +44,8 @@ impl Info {
         action: String,
         sql_state: String,
         recoverable: bool,
-    ) -> Info {
-        Info {
+    ) -> Self {
+        Self {
             code: code,
             offset: offset,
             message: message,
@@ -108,7 +108,7 @@ impl fmt::Display for Info {
 }
 
 impl From<ODPIErrorInfo> for Info {
-    fn from(err: ODPIErrorInfo) -> Info {
+    fn from(err: ODPIErrorInfo) -> Self {
         let slice =
             unsafe { slice::from_raw_parts(err.message as *mut u8, err.message_length as usize) };
         let fn_name = unsafe { CStr::from_ptr(err.fn_name) }
@@ -120,7 +120,7 @@ impl From<ODPIErrorInfo> for Info {
         let sql_state = unsafe { CStr::from_ptr(err.sql_state) }
             .to_string_lossy()
             .into_owned();
-        Info::new(
+        Self::new(
             err.code,
             err.offset,
             String::from_utf8_lossy(slice).into_owned(),

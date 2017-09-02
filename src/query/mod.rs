@@ -22,8 +22,8 @@ pub struct Info {
 
 impl Info {
     /// Create a new `Info` struct.
-    pub fn new(inner: ODPIQueryInfo) -> Info {
-        Info { inner: inner }
+    pub fn new(inner: ODPIQueryInfo) -> Self {
+        Self { inner: inner }
     }
 
     /// Get the `name` value.

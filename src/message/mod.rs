@@ -15,6 +15,7 @@ use error::{ErrorKind, Result};
 use odpi::{enums, externs};
 use odpi::opaque::ODPIMsgProps;
 use odpi::structs::ODPITimestamp;
+use std::convert::TryFrom;
 use std::ptr;
 use util::ODPIStr;
 
@@ -195,7 +196,7 @@ impl Properties {
     /// as the percent sign (%) and the underscore (_) can be used. If multiple messages satisfy the
     /// pattern, the order of dequeuing is undetermined.
     pub fn set_correlation(&self, correlation: &str) -> Result<()> {
-        let correlation_s = ODPIStr::from(correlation);
+        let correlation_s: ODPIStr = TryFrom::try_from(correlation)?;
 
         try_dpi!(
             externs::dpiMsgProps_setCorrelation(
@@ -225,7 +226,7 @@ impl Properties {
     /// the maximum allowed number or if the message has expired. All messages in the exception
     /// queue are in the `Expired` state.
     pub fn set_exception_q(&self, queue_name: &str) -> Result<()> {
-        let queue_name_s = ODPIStr::from(queue_name);
+        let queue_name_s: ODPIStr = TryFrom::try_from(queue_name)?;
 
         try_dpi!(
             externs::dpiMsgProps_setExceptionQ(self.inner, queue_name_s.ptr(), queue_name_s.len()),
@@ -248,7 +249,7 @@ impl Properties {
 
     /// Sets the id of the message in the last queue that generated this message.
     pub fn set_original_msg_id(&self, id: &str) -> Result<()> {
-        let id_s = ODPIStr::from(id);
+        let id_s: ODPIStr = TryFrom::try_from(id)?;
 
         try_dpi!(
             externs::dpiMsgProps_setOriginalMsgId(self.inner, id_s.ptr(), id_s.len()),
@@ -269,7 +270,7 @@ impl Properties {
 }
 
 impl From<*mut ODPIMsgProps> for Properties {
-    fn from(inner: *mut ODPIMsgProps) -> Properties {
-        Properties { inner: inner }
+    fn from(inner: *mut ODPIMsgProps) -> Self {
+        Self { inner: inner }
     }
 }

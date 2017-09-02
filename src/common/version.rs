@@ -42,14 +42,14 @@ impl Info {
     }
 
     /// Set the `release` value.
-    pub fn set_release(&mut self, release: Option<String>) -> &mut Info {
+    pub fn set_release(&mut self, release: Option<String>) -> &mut Self {
         self.release = release;
         self
     }
 }
 
 impl From<ODPIVersionInfo> for Info {
-    fn from(ovi: ODPIVersionInfo) -> Info {
+    fn from(ovi: ODPIVersionInfo) -> Self {
         let version = format!(
             "{}.{}.{}.{}.{}",
             ovi.version_num,
@@ -58,7 +58,7 @@ impl From<ODPIVersionInfo> for Info {
             ovi.port_release_num,
             ovi.port_update_num
         );
-        Info {
+        Self {
             version: version,
             version_num: ovi.full_version_num,
             release: None,
