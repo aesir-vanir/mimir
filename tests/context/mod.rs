@@ -32,11 +32,10 @@ fn ccp(ctxt: &Context) -> Result<()> {
     assert_eq!(ccp.get_encoding(), "UTF-8");
     assert_eq!(ccp.get_nchar_encoding(), "UTF-8");
     assert_eq!(ccp.get_edition(), "1.0");
-    assert_eq!(ccp.get_driver_name(), "Rust Oracle: 0.1.0");
+    assert_eq!(ccp.get_driver_name(), "mimir 0.2.0");
     Ok(())
 }
 
-#[cfg_attr(feature = "cargo-clippy", allow(used_underscore_binding))]
 fn conn_cp(ctxt: &Context) -> Result<()> {
     let mut conn = ctxt.init_conn_create_params()?;
     let auth_default_flags = conn.get_auth_mode();
@@ -59,7 +58,7 @@ fn conn_cp(ctxt: &Context) -> Result<()> {
     conn.set_tag("you're it");
     conn.set_match_any_tag(true);
 
-    let new_app_ctxt_vec = conn.get_app_context();
+    let new_app_ctxt_vec = conn.get_app_context()?;
 
     assert_eq!(
         conn.get_auth_mode(),

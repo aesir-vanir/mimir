@@ -26,13 +26,20 @@ pub mod params;
 use self::params::{CommonCreate, ConnCreate, PoolCreate, SubscrCreate};
 
 /// This structure represents the context in which all activity in the library takes place.
-#[derive(Clone, Debug)]
+#[derive(Builder, Clone, Debug, Getters, Setters)]
 pub struct Context {
     /// A pointer the the ODPI-C dpiContext struct.
-    context: *mut ODPIContext,
+    #[builder(default = "self.default_context()?")]
+    inner: *mut ODPIContext,
     /// Optional stdout logger.
+    #[get = "pub"]
+    #[set = "pub"]
+    #[builder(default)]
     stdout: Option<Logger>,
     /// Optoinal stderr logger.
+    #[get = "pub"]
+    #[set = "pub"]
+    #[builder(default)]
     stderr: Option<Logger>,
 }
 
@@ -44,11 +51,7 @@ impl Context {
 
         try_dpi!(
             externs::dpiContext_create(DPI_MAJOR_VERSION, DPI_MINOR_VERSION, &mut ctxt, &mut err),
-            Ok(Context {
-                context: ctxt,
-                stdout: None,
-                stderr: None,
-            }),
+            Ok(ctxt.into()),
             ErrorKind::Context("dpiContext_create".to_string())
         )
     }
@@ -56,14 +59,14 @@ impl Context {
     /// Get the pointer to the inner ODPI struct.
     #[doc(hidden)]
     pub fn inner(&self) -> *mut ODPIContext {
-        self.context
+        self.inner
     }
 
     /// Return information about the version of the Oracle Client that is being used.
     pub fn get_client_version(&self) -> Result<version::Info> {
         let mut version_info: ODPIVersionInfo = Default::default();
         try_dpi!(
-            externs::dpiContext_getClientVersion(self.context, &mut version_info),
+            externs::dpiContext_getClientVersion(self.inner, &mut version_info),
             Ok(version_info.into()),
             ErrorKind::Connection("dpiContext_getClientVersion".to_string())
         )
@@ -76,7 +79,7 @@ impl Context {
     pub fn get_error(&self) -> error::Info {
         let mut error_info: ODPIErrorInfo = Default::default();
         unsafe {
-            externs::dpiContext_getError(self.context, &mut error_info);
+            externs::dpiContext_getError(self.inner, &mut error_info);
             error_info.into()
         }
     }
@@ -86,13 +89,15 @@ impl Context {
         let mut ccp: ODPICommonCreateParams = Default::default();
 
         try_dpi!(
-            externs::dpiContext_initCommonCreateParams(self.context, &mut ccp),
+            externs::dpiContext_initCommonCreateParams(self.inner, &mut ccp),
             {
-                let driver_name = "Rust Oracle: 0.1.0";
+                let mut driver_name = String::from(env!("CARGO_PKG_NAME"));
+                driver_name.push(' ');
+                driver_name.push_str(env!("CARGO_PKG_VERSION"));
                 let driver_name_s = ODPIStr::from(driver_name);
                 ccp.driver_name = driver_name_s.ptr();
                 ccp.driver_name_length = driver_name_s.len();
-                Ok(CommonCreate::new(ccp))
+                Ok(ccp.into())
             },
             ErrorKind::Context("dpiContext_initCommonCreateParams".to_string())
         )
@@ -103,7 +108,7 @@ impl Context {
         let mut conn: ODPIConnCreateParams = Default::default();
 
         try_dpi!(
-            externs::dpiContext_initConnCreateParams(self.context, &mut conn),
+            externs::dpiContext_initConnCreateParams(self.inner, &mut conn),
             Ok(ConnCreate::new(conn)),
             ErrorKind::Context("dpiContext_initConnCreateParams".to_string())
         )
@@ -113,7 +118,7 @@ impl Context {
     pub fn init_pool_create_params(&self) -> Result<PoolCreate> {
         let mut pool: ODPIPoolCreateParams = Default::default();
         try_dpi!(
-            externs::dpiContext_initPoolCreateParams(self.context, &mut pool),
+            externs::dpiContext_initPoolCreateParams(self.inner, &mut pool),
             Ok(PoolCreate::new(pool)),
             ErrorKind::Context("dpiContext_initPoolCreateParams".to_string())
         )
@@ -123,19 +128,43 @@ impl Context {
     pub fn init_subscr_create_params(&self) -> Result<SubscrCreate> {
         let mut subscr: ODPISubscrCreateParams = Default::default();
         try_dpi!(
-            externs::dpiContext_initSubscrCreateParams(self.context, &mut subscr),
+            externs::dpiContext_initSubscrCreateParams(self.inner, &mut subscr),
             Ok(SubscrCreate::new(subscr)),
             ErrorKind::Context("dpiContext_initSubscrCreateParams".to_string())
         )
     }
 }
 
+impl From<*mut ODPIContext> for Context {
+    fn from(inner: *mut ODPIContext) -> Context {
+        Context {
+            inner: inner,
+            stdout: None,
+            stderr: None,
+        }
+    }
+}
+
 impl Drop for Context {
     fn drop(&mut self) {
-        if !self.context.is_null() {
+        if !self.inner.is_null() {
             unsafe {
-                externs::dpiContext_destroy(self.context);
+                externs::dpiContext_destroy(self.inner);
             }
         }
+    }
+}
+
+impl ContextBuilder {
+    /// Used by derive_builder to set the default value for the context field.
+    fn default_context(&self) -> ::std::result::Result<*mut ODPIContext, String> {
+        let mut ctxt = ptr::null_mut();
+        let mut err: ODPIErrorInfo = Default::default();
+
+        try_dpi!(
+            externs::dpiContext_create(DPI_MAJOR_VERSION, DPI_MINOR_VERSION, &mut ctxt, &mut err),
+            Ok(ctxt),
+            "dpiContext_create".to_string()
+        )
     }
 }

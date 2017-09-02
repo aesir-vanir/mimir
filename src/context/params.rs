@@ -8,24 +8,28 @@
 
 //! These structs are used for initializing parameters used during connection creation, pool
 //! creation, or subscription creation.
+use error::Result;
 use odpi::{enums, externs, flags};
 use odpi::structs::{ODPIAppContext, ODPICommonCreateParams, ODPIConnCreateParams,
                     ODPIPoolCreateParams, ODPISubscrCreateParams};
 use pool::Pool;
+use std::convert::TryInto;
 use std::ffi::CStr;
 use util::ODPIStr;
 
 /// This structure is used for passing application context to the database during the process of
 /// creating standalone connections. These values are ignored when acquiring a connection from a
 /// session pool or when using DRCP (Database Resident Connection Pooling).
+#[derive(Builder, Clone, Debug)]
 pub struct AppContext {
     /// The ODPI-C dpiAppContext struct.
-    ctxt: ODPIAppContext,
+    #[builder(default)]
+    inner: ODPIAppContext,
 }
 
 impl AppContext {
     /// Create a new `AppContext` struct.
-    pub fn new(namespace: &str, name: &str, value: &str) -> AppContext {
+    pub fn new(namespace: &str, name: &str, value: &str) -> Self {
         let namespace_s = ODPIStr::from(namespace);
         let name_s = ODPIStr::from(name);
         let value_s = ODPIStr::from(value);
@@ -39,12 +43,7 @@ impl AppContext {
             value_length: value_s.len(),
         };
 
-        AppContext { ctxt: ctxt }
-    }
-
-    /// Create a new `AppContext` struct from an ODPI-C dpiAppContext struct.
-    pub fn from_odpi(ctxt: ODPIAppContext) -> AppContext {
-        AppContext { ctxt: ctxt }
+        AppContext { inner: ctxt }
     }
 
     /// Get the `namespace_name` value.
@@ -54,7 +53,7 @@ impl AppContext {
     /// be NULL.
     pub fn get_namespace_name(&self) -> String {
         let namespace_name_s =
-            ODPIStr::new(self.ctxt.namespace_name, self.ctxt.namespace_name_length);
+            ODPIStr::new(self.inner.namespace_name, self.inner.namespace_name_length);
         namespace_name_s.into()
     }
 
@@ -64,7 +63,7 @@ impl AppContext {
     /// byte string in the encoding specified in the `ODPIConnCreateParams` structure and must not
     /// be NULL.
     pub fn get_name(&self) -> String {
-        let name_s = ODPIStr::new(self.ctxt.name, self.ctxt.name_length);
+        let name_s = ODPIStr::new(self.inner.name, self.inner.name_length);
         name_s.into()
     }
 
@@ -74,28 +73,28 @@ impl AppContext {
     /// string in the encoding specified in the `ODPIConnCreateParams` structure and must not be
     /// NULL.
     pub fn get_value(&self) -> String {
-        let value_s = ODPIStr::new(self.ctxt.value, self.ctxt.value_length);
+        let value_s = ODPIStr::new(self.inner.value, self.inner.value_length);
         value_s.into()
+    }
+}
+
+impl From<ODPIAppContext> for AppContext {
+    fn from(inner: ODPIAppContext) -> AppContext {
+        AppContext { inner: inner }
     }
 }
 
 /// This structure is used for creating session pools and standalone connections to the database.
 pub struct CommonCreate {
     /// The ODPI-C dpiCommonCreateParams struct.
-    ccp: ODPICommonCreateParams,
+    inner: ODPICommonCreateParams,
 }
 
 impl CommonCreate {
-    /// Create a new `Create` struct.
-    #[doc(hidden)]
-    pub fn new(ccp: ODPICommonCreateParams) -> CommonCreate {
-        CommonCreate { ccp: ccp }
-    }
-
     /// Get the inner FFI struct.
     #[doc(hidden)]
     pub fn inner(&self) -> ODPICommonCreateParams {
-        self.ccp
+        self.inner
     }
 
     /// Get the `create_mode` value.
@@ -104,12 +103,12 @@ impl CommonCreate {
     /// values from the enumeration `ODPICreateMode`, OR'ed together. The default value is
     /// DPI_MODE_CREATE_DEFAULT.
     pub fn get_create_mode(&self) -> flags::ODPICreateMode {
-        self.ccp.create_mode
+        self.inner.create_mode
     }
 
     /// Set the `create_mode` value.
     pub fn set_create_mode(&mut self, create_mode: flags::ODPICreateMode) -> &mut CommonCreate {
-        self.ccp.create_mode = create_mode;
+        self.inner.create_mode = create_mode;
         self
     }
 
@@ -119,13 +118,13 @@ impl CommonCreate {
     /// IANA or Oracle specific character set name is expected. NULL is also acceptable which
     /// implies the use of the NLS_LANG environment variable. The default value is NULL.
     pub fn get_encoding(&self) -> String {
-        let encoding_cstr = unsafe { CStr::from_ptr(self.ccp.encoding) };
+        let encoding_cstr = unsafe { CStr::from_ptr(self.inner.encoding) };
         encoding_cstr.to_string_lossy().into_owned()
     }
 
     /// Set the `encoding` value.
     pub fn set_encoding(&mut self, encoding: *const ::std::os::raw::c_char) -> &mut CommonCreate {
-        self.ccp.encoding = encoding;
+        self.inner.encoding = encoding;
         self
     }
 
@@ -135,7 +134,7 @@ impl CommonCreate {
     /// IANA or Oracle specific character set name is expected. NULL is also acceptable which
     /// implies the use of the NLS_NCHAR environment variable. The default value is NULL.
     pub fn get_nchar_encoding(&self) -> String {
-        let encoding_cstr = unsafe { CStr::from_ptr(self.ccp.nchar_encoding) };
+        let encoding_cstr = unsafe { CStr::from_ptr(self.inner.nchar_encoding) };
         encoding_cstr.to_string_lossy().into_owned()
     }
 
@@ -144,7 +143,7 @@ impl CommonCreate {
         &mut self,
         nchar_encoding: *const ::std::os::raw::c_char,
     ) -> &mut CommonCreate {
-        self.ccp.nchar_encoding = nchar_encoding;
+        self.inner.nchar_encoding = nchar_encoding;
         self
     }
 
@@ -154,15 +153,15 @@ impl CommonCreate {
     /// NULL (meaning that no edition is set) or a byte string in the encoding specified by the
     /// `encoding` member. The default value is NULL.
     pub fn get_edition(&self) -> String {
-        let edition_s = ODPIStr::new(self.ccp.edition, self.ccp.edition_length);
+        let edition_s = ODPIStr::new(self.inner.edition, self.inner.edition_length);
         edition_s.into()
     }
 
     /// Set the `edition` value.
     pub fn set_edition(&mut self, edition: &str) -> &mut CommonCreate {
         let edition_s = ODPIStr::from(edition);
-        self.ccp.edition = edition_s.ptr();
-        self.ccp.edition_length = edition_s.len();
+        self.inner.edition = edition_s.ptr();
+        self.inner.edition_length = edition_s.len();
         self
     }
 
@@ -172,16 +171,22 @@ impl CommonCreate {
     /// string in the encoding specified by the dpiCommonCreateParams.encoding member. The default
     /// value is NULL.
     pub fn get_driver_name(&self) -> String {
-        let driver_name_s = ODPIStr::new(self.ccp.driver_name, self.ccp.driver_name_length);
+        let driver_name_s = ODPIStr::new(self.inner.driver_name, self.inner.driver_name_length);
         driver_name_s.into()
     }
 
     /// Set the `driver_name` value.
     pub fn set_driver_name(&mut self, driver_name: &str) -> &mut CommonCreate {
         let driver_name_s = ODPIStr::from(driver_name);
-        self.ccp.driver_name = driver_name_s.ptr();
-        self.ccp.driver_name_length = driver_name_s.len();
+        self.inner.driver_name = driver_name_s.ptr();
+        self.inner.driver_name_length = driver_name_s.len();
         self
+    }
+}
+
+impl From<ODPICommonCreateParams> for CommonCreate {
+    fn from(inner: ODPICommonCreateParams) -> CommonCreate {
+        CommonCreate { inner: inner }
     }
 }
 
@@ -199,8 +204,8 @@ pub struct ConnCreate {
 impl ConnCreate {
     /// Create a new `ConnCreate` struct.
     #[doc(hidden)]
-    pub fn new(conn: ODPIConnCreateParams) -> ConnCreate {
-        ConnCreate { conn: conn }
+    pub fn new(conn: ODPIConnCreateParams) -> Self {
+        Self { conn: conn }
     }
 
     /// Get the inner FFI struct.
@@ -287,32 +292,28 @@ impl ConnCreate {
     /// value is only used when creating standalone connections. It is expected to be NULL or an
     /// array of `ODPIAppContext` structures. The context specified here can be used in logon
     /// triggers, for example. The default value is NULL.
-    #[cfg_attr(feature = "cargo-clippy", allow(used_underscore_binding))]
-    pub fn get_app_context(&self) -> Vec<AppContext> {
-        #[cfg_attr(feature = "cargo-clippy", allow(cast_possible_wrap))]
-        let len = self.conn.num_app_context as isize;
+    pub fn get_app_context(&self) -> Result<Vec<AppContext>> {
+        let len: isize = TryInto::try_into(self.conn.num_app_context)?;
         let head_ptr = self.conn.app_context;
 
         let mut app_contexts = Vec::new();
         for i in 0..len {
-            app_contexts.push(AppContext::from_odpi(unsafe { *head_ptr.offset(i) }));
+            app_contexts.push(unsafe { *head_ptr.offset(i) }.into());
         }
-        app_contexts
+        Ok(app_contexts)
     }
 
     /// Set the `app_context` value.
-    #[cfg_attr(feature = "cargo-clippy", allow(used_underscore_binding))]
-    pub fn set_app_context(&mut self, app_contexts: Vec<AppContext>) -> &mut ConnCreate {
-        #[cfg_attr(feature = "cargo-clippy", allow(cast_possible_truncation))]
-        let len = app_contexts.len() as u32;
+    pub fn set_app_context(&mut self, app_contexts: Vec<AppContext>) -> Result<&mut ConnCreate> {
+        let len: u32 = TryInto::try_into(app_contexts.len())?;
         let mut oac_vec: Vec<ODPIAppContext> = Vec::new();
         for ac in &app_contexts {
-            oac_vec.push(ac.ctxt);
+            oac_vec.push(ac.inner);
         }
         let ac_ptr = app_contexts.as_ptr();
         self.conn.app_context = ac_ptr as *mut ODPIAppContext;
         self.conn.num_app_context = len;
-        self
+        Ok(self)
     }
 
     /// Get the `num_app_context` value.

@@ -42,6 +42,19 @@ pub struct ODPIAppContext {
     pub value_length: u32,
 }
 
+impl Default for ODPIAppContext {
+    fn default() -> ODPIAppContext {
+        ODPIAppContext {
+            namespace_name: ptr::null(),
+            namespace_name_length: 0,
+            name: ptr::null(),
+            name_length: 0,
+            value: ptr::null(),
+            value_length: 0,
+        }
+    }
+}
+
 #[repr(C)]
 #[derive(Clone, Copy, Debug)]
 /// This structure is used for passing byte strings to and from the database in the structure

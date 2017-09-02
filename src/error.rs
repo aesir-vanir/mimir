@@ -14,6 +14,7 @@ error_chain! {
         Io(::std::io::Error);
         Nul(::std::ffi::NulError);
         EnvVar(::std::env::VarError);
+        TryFromInt(::std::num::TryFromIntError);
     }
 
     errors {

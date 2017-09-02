@@ -26,6 +26,7 @@ use odpi::opaque::ODPIConn;
 use odpi::structs::{ODPIEncodingInfo, ODPIVersionInfo};
 use slog::Logger;
 use statement::Statement;
+use std::convert::TryFrom;
 use std::ffi::{CStr, CString};
 use std::ptr;
 use subscription::Subscription;
@@ -54,8 +55,8 @@ impl Connection {
     /// * `branch_id` - the branch id of the XID as a byte string. The maximum length permitted is
     /// 64 bytes.
     pub fn begin_distrib_trans(&self, format_id: i64, txn_id: &str, branch_id: &str) -> Result<()> {
-        let txn_id_s = ODPIStr::from(txn_id);
-        let branch_id_s = ODPIStr::from(branch_id);
+        let txn_id_s: ODPIStr = TryFrom::try_from(txn_id)?;
+        let branch_id_s: ODPIStr = TryFrom::try_from(branch_id)?;
 
         if txn_id_s.len() > 64 {
             Err(ErrorKind::TxnId.into())

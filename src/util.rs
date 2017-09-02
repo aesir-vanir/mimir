@@ -7,6 +7,8 @@
 // modified, or distributed except according to those terms.
 
 //! `oic` utilities
+use error::{Error, Result};
+use std::convert::{TryFrom, TryInto};
 use std::os::raw::c_char;
 use std::ptr;
 use std::slice;
@@ -22,8 +24,8 @@ pub struct ODPIStr {
 
 impl ODPIStr {
     /// Create a new `ODPIStr`.
-    pub fn new(ptr: *const c_char, len: u32) -> ODPIStr {
-        ODPIStr { ptr: ptr, len: len }
+    pub fn new(ptr: *const c_char, len: u32) -> Self {
+        Self { ptr: ptr, len: len }
     }
 
     /// Get the `ptr` value.
@@ -43,8 +45,8 @@ impl ODPIStr {
 }
 
 impl Default for ODPIStr {
-    fn default() -> ODPIStr {
-        ODPIStr {
+    fn default() -> Self {
+        Self {
             ptr: ptr::null(),
             len: 0,
         }
@@ -52,43 +54,43 @@ impl Default for ODPIStr {
 }
 
 impl<'a> From<Option<&'a str>> for ODPIStr {
-    fn from(opt_s: Option<&str>) -> ODPIStr {
+    fn from(opt_s: Option<&str>) -> Self {
         match opt_s {
-            Some(s) => ODPIStr::from(s),
+            Some(s) => Self::from(s),
             None => Default::default(),
         }
     }
 }
 
-impl<'a> From<&'a str> for ODPIStr {
-    fn from(s: &str) -> ODPIStr {
-        #[cfg_attr(feature = "cargo-clippy", allow(cast_possible_truncation))]
-        let s_len = s.len() as u32;
-        ODPIStr {
+impl<'a> TryFrom<&'a str> for ODPIStr {
+    type Error = Error;
+    fn try_from(s: &str) -> Result<Self> {
+        let s_len: u32 = TryInto::try_into(s.len())?;
+        Ok(Self {
             ptr: s.as_ptr() as *const c_char,
             len: s_len,
-        }
+        })
     }
 }
 
-impl From<String> for ODPIStr {
-    fn from(s: String) -> ODPIStr {
-        #[cfg_attr(feature = "cargo-clippy", allow(cast_possible_truncation))]
-        let s_len = s.len() as u32;
-        ODPIStr {
+impl TryFrom<String> for ODPIStr {
+    type Error = Error;
+    fn try_from(s: String) -> Result<Self> {
+        let s_len: u32 = TryInto::try_into(s.len())?;
+        Ok(Self {
             ptr: s.as_ptr() as *const c_char,
             len: s_len,
-        }
+        })
     }
 }
 
 impl From<ODPIStr> for String {
-    fn from(s: ODPIStr) -> String {
+    fn from(s: ODPIStr) -> Self {
         if s.ptr.is_null() {
             "".to_string()
         } else {
             let vec = unsafe { slice::from_raw_parts(s.ptr as *mut u8, s.len as usize) };
-            String::from_utf8_lossy(vec).into_owned()
+            Self::from_utf8_lossy(vec).into_owned()
         }
     }
 }

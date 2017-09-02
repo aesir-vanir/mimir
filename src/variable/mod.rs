@@ -57,7 +57,7 @@ impl Var {
     /// * `dst_pos` - the array position into which the data is to be copied. The first position is
     /// 0. If the array position specified exceeds the number of elements allocated in the variable,
     /// an error is returned.
-    pub fn copy_data(&self, src_pos: u32, dst: &mut Var, dst_pos: u32) -> Result<()> {
+    pub fn copy_data(&self, src_pos: u32, dst: &mut Self, dst_pos: u32) -> Result<()> {
         try_dpi!(
             externs::dpiVar_copyData(dst.inner(), dst_pos, self.inner, src_pos),
             Ok(()),
@@ -208,7 +208,7 @@ impl Var {
 }
 
 impl From<*mut ODPIVar> for Var {
-    fn from(inner: *mut ODPIVar) -> Var {
-        Var { inner: inner }
+    fn from(inner: *mut ODPIVar) -> Self {
+        Self { inner: inner }
     }
 }
