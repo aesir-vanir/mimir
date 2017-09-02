@@ -1,11 +1,8 @@
 use CREDS;
-use mimir::ODPIData;
-use mimir::data::Data;
-use mimir::Connection;
-use mimir::Context;
+use mimir::{Connection, Context, Data, ODPIData};
 use mimir::error::Result;
-use mimir::enums::ODPINativeTypeNum::*;
-use mimir::enums::ODPIOracleTypeNum::*;
+use mimir::enums::ODPINativeTypeNum::{Bytes, Int64};
+use mimir::enums::ODPIOracleTypeNum::{Number, Varchar};
 use mimir::flags;
 use std::ffi::CString;
 
@@ -15,14 +12,14 @@ fn var_res(ctxt: &Context) -> Result<()> {
     ccp.set_encoding(enc_cstr.as_ptr());
     ccp.set_nchar_encoding(enc_cstr.as_ptr());
 
-    let conn = Connection::create(&ctxt,
-                                  Some(&CREDS[0]),
-                                  Some(&CREDS[1]),
-                                  Some("//oic.cbsnae86d3iv.us-east-2.rds.amazonaws.com/ORCL"),
-                                  Some(ccp),
-                                  None)?;
-
-    conn.add_ref()?;
+    let conn = Connection::create(
+        ctxt,
+        Some(&CREDS[0]),
+        Some(&CREDS[1]),
+        Some("//oic.cbsnae86d3iv.us-east-2.rds.amazonaws.com/ORCL"),
+        Some(ccp),
+        None,
+    )?;
 
     let var = conn.new_var(Number, Int64, 2, 0, false, false)?;
     let num_elements = var.get_num_elements_in_array()?;
@@ -32,7 +29,7 @@ fn var_res(ctxt: &Context) -> Result<()> {
 
     let str_test = conn.new_var(Varchar, Bytes, 2, 256, false, false)?;
     str_test.set_from_bytes(0, "jozias")?;
-    let mut str_test_data = str_test.get_data()?;
+    let str_test_data = str_test.get_data()?;
     assert_eq!(str_test_data.len(), 2);
     for (idx, d) in str_test_data.iter_mut().enumerate() {
         let data: Data = (d as *mut ODPIData).into();
@@ -43,7 +40,6 @@ fn var_res(ctxt: &Context) -> Result<()> {
         }
     }
 
-    conn.release()?;
     conn.close(flags::DPI_MODE_CONN_CLOSE_DEFAULT, None)?;
 
     Ok(())

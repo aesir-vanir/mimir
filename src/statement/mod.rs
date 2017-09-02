@@ -45,17 +45,6 @@ impl Statement {
         self.inner
     }
 
-    /// Adds a reference to the statement. This is intended for situations where a reference to the
-    /// statement needs to be maintained independently of the reference returned when the statement
-    /// was created.
-    pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiStmt_addRef(self.inner),
-            Ok(()),
-            ErrorKind::Statement("dpiStmt_addRef".to_string())
-        )
-    }
-
     /// Binds a variable to a named placeholder in the statement. A reference to the variable is
     /// retained by the library and is released when the statement itself is released or a new
     /// variable is bound to the same name.
@@ -410,18 +399,6 @@ impl Statement {
         Err(ErrorKind::Statement("Not Implemented!".to_string()).into())
     }
 
-    /// Releases a reference to the statement. A count of the references to the statement is
-    /// maintained and when this count reaches zero, the memory associated with the statement is
-    /// freed and the statement is closed if that has not already taken place using the function
-    /// `close()`.
-    pub fn release(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiStmt_release(self.inner),
-            Ok(()),
-            ErrorKind::Statement("dpiStmt_release".to_string())
-        )
-    }
-
     /// Scrolls the statement to the position in the cursor specified by the mode and offset.
     ///
     /// * `mode` - one of the values from the enumeration `ODPIFetchMode`.
@@ -448,6 +425,22 @@ impl Statement {
     /// DPI_DEFAULT_FETCH_ARRAY_SIZE.
     pub fn set_fetch_array_size(&self, _array_size: u32) -> Result<()> {
         Err(ErrorKind::Statement("Not Implemented!".to_string()).into())
+    }
+}
+
+impl From<*mut ODPIStmt> for Statement {
+    fn from(inner: *mut ODPIStmt) -> Self {
+        Self { inner: inner }
+    }
+}
+
+impl Drop for Statement {
+    fn drop(&mut self) {
+        if !self.inner.is_null() {
+            unsafe {
+                externs::dpiStmt_release(self.inner);
+            }
+        }
     }
 }
 
@@ -498,11 +491,5 @@ impl Info {
     /// Specifies if the statement has a returning clause in it or not.
     pub fn is_returning(&self) -> bool {
         self.inner.is_returning == 1
-    }
-}
-
-impl From<*mut ODPIStmt> for Statement {
-    fn from(inner: *mut ODPIStmt) -> Self {
-        Self { inner: inner }
     }
 }

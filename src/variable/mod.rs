@@ -38,17 +38,6 @@ impl Var {
         self.inner
     }
 
-    /// Adds a reference to the variable. This is intended for situations where a reference to the
-    /// variable needs to be maintained independently of the reference returned when the variable
-    /// was created.
-    pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiVar_addRef(self.inner),
-            Ok(()),
-            ErrorKind::Var("dpiVar_addRef".to_string())
-        )
-    }
-
     /// Copies the data from one variable to another variable.
     ///
     /// * `src_pos` - the array position from which the data is to be copied. The first position is
@@ -112,17 +101,6 @@ impl Var {
             externs::dpiVar_getSizeInBytes(self.inner, &mut size),
             Ok(size),
             ErrorKind::Var("dpiVar_getSizeInBytes".to_string())
-        )
-    }
-
-    /// Releases a reference to the variable. A count of the references to the variable is
-    /// maintained and when this count reaches zero, the memory associated with the variable is
-    /// freed.
-    pub fn release(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiVar_release(self.inner),
-            Ok(()),
-            ErrorKind::Var("dpiVar_release".to_string())
         )
     }
 
@@ -211,5 +189,15 @@ impl Var {
 impl From<*mut ODPIVar> for Var {
     fn from(inner: *mut ODPIVar) -> Self {
         Self { inner: inner }
+    }
+}
+
+impl Drop for Var {
+    fn drop(&mut self) {
+        if !self.inner.is_null() {
+            unsafe {
+                externs::dpiVar_release(self.inner);
+            }
+        }
     }
 }

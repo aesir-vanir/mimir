@@ -32,17 +32,6 @@ impl Options {
         self.inner
     }
 
-    /// Adds a reference to the dequeue options. This is intended for situations where a reference
-    /// to the dequeue options needs to be maintained independently of the reference returned when
-    /// the handle was created.
-    pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiDeqOptions_addRef(self.inner),
-            Ok(()),
-            ErrorKind::DeqOptions("dpiDeqOptions_addRef".to_string())
-        )
-    }
-
     /// Returns the condition that must be satisfied in order for a message to be dequeued. See
     /// function `dequeue::Options::set_condition()` for more information.
     pub fn get_condition(&self) -> Result<String> {
@@ -194,17 +183,6 @@ impl Options {
         )
     }
 
-    /// Releases a reference to the dequeue options. A count of the references to the dequeue
-    /// options is maintained and when this count reaches zero, the memory associated with the
-    /// options is freed.
-    pub fn release(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiDeqOptions_release(self.inner),
-            Ok(()),
-            ErrorKind::DeqOptions("dpiDeqOptions_release".to_string())
-        )
-    }
-
     /// Sets the condition which must be true for messages to be dequeued. The condition must be a
     /// valid boolean expression similar to the where clause of a SQL query. The expression can
     /// include conditions on message properties, user data properties and PL/SQL or SQL functions.
@@ -342,5 +320,15 @@ impl Options {
 impl From<*mut ODPIDeqOptions> for Options {
     fn from(inner: *mut ODPIDeqOptions) -> Self {
         Self { inner: inner }
+    }
+}
+
+impl Drop for Options {
+    fn drop(&mut self) {
+        if !self.inner.is_null() {
+            unsafe {
+                externs::dpiDeqOptions_release(self.inner);
+            }
+        }
     }
 }

@@ -32,17 +32,6 @@ impl Properties {
         self.inner
     }
 
-    /// Adds a reference to the message properties. This is intended for situations where a
-    /// reference to the message properties needs to be maintained independently of the reference
-    /// returned when the handle was created.
-    pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiMsgProps_addRef(self.inner),
-            Ok(()),
-            ErrorKind::MsgProps("dpiMsgProps_addRef".to_string())
-        )
-    }
-
     /// Returns the number of attempts that have been made to dequeue a message.
     pub fn get_num_attempts(&self) -> Result<i32> {
         let mut attempts = 0;
@@ -181,17 +170,6 @@ impl Properties {
         )
     }
 
-    /// Releases a reference to the message properties. A count of the references to the message
-    /// properties is maintained and when this count reaches zero, the memory associated with the
-    /// properties is freed.
-    pub fn release(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiMsgProps_release(self.inner),
-            Ok(()),
-            ErrorKind::MsgProps("dpiMsgProps_release".to_string())
-        )
-    }
-
     /// Sets the correlation of the message to be dequeued. Special pattern matching characters such
     /// as the percent sign (%) and the underscore (_) can be used. If multiple messages satisfy the
     /// pattern, the order of dequeuing is undetermined.
@@ -272,5 +250,15 @@ impl Properties {
 impl From<*mut ODPIMsgProps> for Properties {
     fn from(inner: *mut ODPIMsgProps) -> Self {
         Self { inner: inner }
+    }
+}
+
+impl Drop for Properties {
+    fn drop(&mut self) {
+        if !self.inner.is_null() {
+            unsafe {
+                externs::dpiMsgProps_release(self.inner);
+            }
+        }
     }
 }

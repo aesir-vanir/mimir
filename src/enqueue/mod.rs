@@ -30,17 +30,6 @@ impl Options {
         self.inner
     }
 
-    /// Adds a reference to the enqueue options. This is intended for situations where a reference
-    /// to the enqueue options needs to be maintained independently of the reference returned when
-    /// the handle was created.
-    pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiEnqOptions_addRef(self.inner),
-            Ok(()),
-            ErrorKind::EnqOptions("dpiEnqOptions_addRef".to_string())
-        )
-    }
-
     /// Returns the transformation of the message to be enqueued. See function
     /// `enqueue::Options::set_transformation()` for more information.
     pub fn get_transformation(&self) -> Result<String> {
@@ -71,17 +60,6 @@ impl Options {
             externs::dpiEnqOptions_getVisibility(self.inner, &mut enq_vis_ptr),
             Ok(enq_vis_ptr),
             ErrorKind::EnqOptions("dpiEnqOptions_getMode".to_string())
-        )
-    }
-
-    /// Releases a reference to the enqueue options. A count of the references to the enqueue
-    /// options is maintained and when this count reaches zero, the memory associated with the
-    /// options is freed.
-    pub fn release(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiEnqOptions_release(self.inner),
-            Ok(()),
-            ErrorKind::EnqOptions("dpiEnqOptions_release".to_string())
         )
     }
 
@@ -121,5 +99,16 @@ impl Options {
 impl From<*mut ODPIEnqOptions> for Options {
     fn from(inner: *mut ODPIEnqOptions) -> Self {
         Self { inner: inner }
+    }
+}
+
+
+impl Drop for Options {
+    fn drop(&mut self) {
+        if !self.inner.is_null() {
+            unsafe {
+                externs::dpiEnqOptions_release(self.inner);
+            }
+        }
     }
 }

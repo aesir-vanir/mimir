@@ -124,9 +124,7 @@ fn conn(ctxt: &Context) -> Result<()> {
     assert_eq!(data_arr.len(), 5);
 
     // prepare_stmt
-    let statement = conn.prepare_stmt(Some("select 1 from dual"), None, false)?;
-    statement.add_ref()?;
-    statement.release()?;
+    let _statement = conn.prepare_stmt(Some("select 1 from dual"), None, false)?;
 
     // sets
     conn.set_action("action")?;

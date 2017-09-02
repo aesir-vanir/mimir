@@ -25,7 +25,6 @@ fn dequeue_res(ctxt: &Context) -> Result<()> {
     )?;
 
     let dequeue_opts = conn.new_deq_options()?;
-    dequeue_opts.add_ref()?;
 
     dequeue_opts.set_consumer_name(Some("jozias"))?;
     let consumer_name = dequeue_opts.get_consumer_name()?;
@@ -37,8 +36,8 @@ fn dequeue_res(ctxt: &Context) -> Result<()> {
 
     dequeue_opts.set_msg_id(Some("uno"))?;
     // TODO: Fix get_msg_id (causes SIGSEV)
-    // let _msg_id = dequeue_opts.get_msg_id()?;
-    // assert_eq!(_msg_id, "uno");
+    // let msg_id = dequeue_opts.get_msg_id()?;
+    // assert_eq!(msg_id, "uno");
 
     dequeue_opts.set_wait(100_000)?;
     let wait = dequeue_opts.get_wait()?;
@@ -66,7 +65,6 @@ fn dequeue_res(ctxt: &Context) -> Result<()> {
     nav = dequeue_opts.get_navigation()?;
     assert_eq!(nav, FirstMsg);
 
-    dequeue_opts.release()?;
     conn.close(flags::DPI_MODE_CONN_CLOSE_DEFAULT, None)?;
 
     Ok(())

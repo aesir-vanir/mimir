@@ -287,7 +287,6 @@ fn obj_type(ctxt: &Context) -> Result<()> {
 
     object_col.close(None)?;
     conn.close(flags::DPI_MODE_CONN_CLOSE_DEFAULT, None)?;
-    object_col.release()?;
 
     Ok(())
 }

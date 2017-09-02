@@ -23,7 +23,6 @@ fn enqueue_res(ctxt: &Context) -> Result<()> {
     )?;
 
     let enqueue_opts = conn.new_enq_options()?;
-    enqueue_opts.add_ref()?;
 
     enqueue_opts.set_delivery_mode(Buffered)?;
 
@@ -38,7 +37,6 @@ fn enqueue_res(ctxt: &Context) -> Result<()> {
     visibility = enqueue_opts.get_visibility()?;
     assert_eq!(visibility, Immediate);
 
-    enqueue_opts.release()?;
     conn.close(flags::DPI_MODE_CONN_CLOSE_DEFAULT, None)?;
 
     Ok(())

@@ -17,6 +17,7 @@ mod message;
 mod objecttype;
 mod pool;
 mod statement;
+mod variable;
 
 use std::env;
 use std::fs::File;

@@ -11,15 +11,6 @@ use rand::{self, Rng};
 use std::convert::TryFrom;
 use std::ffi::CString;
 
-fn add_ref_release(conn: &Connection) -> Result<()> {
-    let dual = conn.prepare_stmt(Some("select 1 from dual"), None, false)?;
-    dual.add_ref()?;
-    dual.release()?;
-    dual.close(None)?;
-
-    Ok(())
-}
-
 fn validate_data_type_info(data_type_info: &TypeInfo) -> Result<()> {
     assert_eq!(data_type_info.oracle_type_num(), Number);
     assert_eq!(data_type_info.default_native_type_num(), Double);
@@ -102,8 +93,6 @@ fn stmt_res(ctxt: &Context) -> Result<()> {
     let username_var = conn.new_var(Varchar, Bytes, 1, 256, false, false)?;
     username_var.set_from_bytes(0, "jozias")?;
 
-    // add_ref / release test
-    add_ref_release(&conn)?;
     // bind_by_name / execute / get_num_query_columns / get_query_info test
     bind_by_name(&conn, &username_var)?;
 

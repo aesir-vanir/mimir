@@ -19,6 +19,9 @@ fn ccp(ctxt: &Context) -> Result<()> {
     let default_flags = ccp.get_create_mode();
     let new_flags = default_flags | flags::DPI_MODE_CREATE_THREADED;
     let enc_cstr = CString::new("UTF-8").expect("badness");
+    let mut driver_name = String::from(env!("CARGO_PKG_NAME"));
+    driver_name.push(' ');
+    driver_name.push_str(env!("CARGO_PKG_VERSION"));
 
     ccp.set_create_mode(new_flags);
     ccp.set_edition("1.0")?;
@@ -32,7 +35,7 @@ fn ccp(ctxt: &Context) -> Result<()> {
     assert_eq!(ccp.get_encoding(), "UTF-8");
     assert_eq!(ccp.get_nchar_encoding(), "UTF-8");
     assert_eq!(ccp.get_edition(), "1.0");
-    assert_eq!(ccp.get_driver_name(), "mimir 0.2.0");
+    assert_eq!(ccp.get_driver_name(), driver_name);
     Ok(())
 }
 

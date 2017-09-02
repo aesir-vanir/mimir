@@ -35,17 +35,6 @@ impl ObjectType {
         self.inner
     }
 
-    /// Adds a reference to the object type. This is intended for situations where a reference to
-    /// the object type needs to be maintained independently of the reference returned when the
-    /// object type was created.
-    pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiObjectType_addRef(self.inner),
-            Ok(()),
-            ErrorKind::ObjectType("dpiObjectType_addRef".to_string())
-        )
-    }
-
     /// Creates an object of the specified type and returns a reference to it. This reference should
     ///  be released as soon as it is no longer needed.
     pub fn create(&self) -> Result<Object> {

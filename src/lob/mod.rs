@@ -32,16 +32,6 @@ impl Lob {
         self.inner
     }
 
-    /// Adds a reference to the LOB. This is intended for situations where a reference to the LOB
-    /// needs to be maintained independently of the reference returned when the LOB was created.
-    pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiLob_addRef(self.inner),
-            Ok(()),
-            ErrorKind::Lob("dpiLob_addRef".to_string())
-        )
-    }
-
     /// Closes the LOB resource. This should be done when a batch of writes has been completed so
     /// that the indexes associated with the LOB can be updated. It should only be performed if a
     /// call to function `Lob::open_resource()` has been performed.
@@ -195,17 +185,6 @@ impl Lob {
         )
     }
 
-    /// Releases a reference to the LOB. A count of the references to the LOB is maintained and when
-    /// this count reaches zero, the memory associated with the LOB is freed. The LOB is also closed
-    /// unless that has already taken place using the function `Lob:::close()`.
-    pub fn release(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiLob_release(self.inner),
-            Ok(()),
-            ErrorKind::Lob("dpiLob_release".to_string())
-        )
-    }
-
     /// Sets the directory alias name and file name for a BFILE type LOB.
     ///
     /// * `directory` - the name of the directory alias.
@@ -276,5 +255,16 @@ impl Lob {
 impl From<*mut ODPILob> for Lob {
     fn from(inner: *mut ODPILob) -> Self {
         Self { inner: inner }
+    }
+}
+
+
+impl Drop for Lob {
+    fn drop(&mut self) {
+        if !self.inner.is_null() {
+            unsafe {
+                externs::dpiLob_release(self.inner);
+            }
+        }
     }
 }

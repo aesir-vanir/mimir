@@ -242,7 +242,6 @@ impl Data {
 
     /// Convert `Data` to a `String` given the Oracle Data Type.
     pub fn to_string(&self, type_info: &TypeInfo) -> Result<String> {
-        // use std::io::{self, Write};
         let as_str = if self.null() {
             "(null)".to_string()
         } else {
@@ -256,16 +255,13 @@ impl Data {
                 _ => return Err(ErrorKind::Length.into()),
             }
         };
-        // write!(io::stdout(), "VAL: {} ", as_str)?;
         Ok(as_str)
     }
 
     /// Get the data length (after conversion to a `String`)
     pub fn len(&self, type_info: &TypeInfo) -> Result<usize> {
-        // use std::io::{self, Write};
         let as_str = self.to_string(type_info)?;
         let len = as_str.len();
-        // writeln!(io::stdout(), "LEN: {}", len)?;
         Ok(len)
     }
 }
@@ -277,7 +273,7 @@ impl From<*mut ODPIData> for Data {
 }
 
 /// Wrapper for `ODPIDataTypeInfo` struct.
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct TypeInfo {
     /// The ODPI-C data type info struct.
     inner: ODPIDataTypeInfo,

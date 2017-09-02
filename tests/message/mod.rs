@@ -24,7 +24,6 @@ fn msg(ctxt: &Context) -> Result<()> {
     )?;
 
     let msg_props = conn.new_msg_props()?;
-    msg_props.add_ref()?;
     let num_attempts = msg_props.get_num_attempts()?;
     assert_eq!(num_attempts, 0);
 
@@ -76,7 +75,6 @@ fn msg(ctxt: &Context) -> Result<()> {
     let state = msg_props.get_state()?;
     assert_eq!(state, Ready);
 
-    msg_props.release()?;
     conn.close(flags::DPI_MODE_CONN_CLOSE_DEFAULT, None)?;
 
     Ok(())

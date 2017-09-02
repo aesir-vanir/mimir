@@ -32,17 +32,6 @@ impl Rowid {
         self.inner
     }
 
-    /// Adds a reference to the rowid. This is intended for situations where a reference to the
-    /// rowid needs to be maintained independently of the reference returned when the rowid was
-    /// created.
-    pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiRowid_addRef(self.inner),
-            Ok(()),
-            ErrorKind::Rowid("dpiRowid_addRef".to_string())
-        )
-    }
-
     /// Returns the string (base64) representation of the rowid.
     pub fn get_string_value(&self) -> Result<String> {
         let mut value = ptr::null();
@@ -61,20 +50,20 @@ impl Rowid {
             ErrorKind::Rowid("dpiRowid_getStringValue".to_string())
         )
     }
-
-    /// Releases a reference to the rowid. A count of the references to the rowid is maintained and
-    /// when this count reaches zero, the memory associated with the rowid is freed.
-    pub fn release(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiRowid_release(self.inner),
-            Ok(()),
-            ErrorKind::Rowid("dpiRowid_release".to_string())
-        )
-    }
 }
 
 impl From<*mut ODPIRowid> for Rowid {
     fn from(inner: *mut ODPIRowid) -> Self {
         Self { inner: inner }
+    }
+}
+
+impl Drop for Rowid {
+    fn drop(&mut self) {
+        if !self.inner.is_null() {
+            unsafe {
+                externs::dpiRowid_release(self.inner);
+            }
+        }
     }
 }

@@ -20,7 +20,6 @@ fn pool_res(ctxt: &Context) -> Result<()> {
         Some(ccp),
         None,
     )?;
-    pool.add_ref()?;
 
     let ei = pool.get_encoding_info()?;
     assert_eq!(ei.encoding(), "UTF-8");
@@ -52,45 +51,46 @@ fn pool_res(ctxt: &Context) -> Result<()> {
     timeout = pool.get_timeout()?;
     assert_eq!(timeout, 3600);
 
-    let conn = pool.acquire_connection(None, None, None)?;
+    {
+        let conn = pool.acquire_connection(None, None, None)?;
 
-    let version_info = conn.get_server_version()?;
-    assert_eq!(version_info.version(), "12.1.0.2.0");
-    assert_eq!(version_info.version_num(), 1_201_000_200);
-    assert_eq!(
-        version_info.release(),
-        "Oracle Database 12c Standard Edition Release 12.1.0.2.0 - \
-         64bit Production"
-    );
+        let version_info = conn.get_server_version()?;
+        assert_eq!(version_info.version(), "12.1.0.2.0");
+        assert_eq!(version_info.version_num(), 1_201_000_200);
+        assert_eq!(
+            version_info.release(),
+            "Oracle Database 12c Standard Edition Release 12.1.0.2.0 - \
+             64bit Production"
+        );
 
-    let stmt = conn.prepare_stmt(
-        Some("select * from username where username = 'jozias'"),
-        None,
-        false,
-    )?;
+        {
+            let stmt = conn.prepare_stmt(
+                Some("select * from username where username = 'jozias'"),
+                None,
+                false,
+            )?;
 
-    stmt.execute(flags::DPI_MODE_EXEC_DEFAULT)?;
-    stmt.fetch()?;
-    let (id_type, id_ptr) = stmt.get_query_value(1)?;
-    let (username_type, username_ptr) = stmt.get_query_value(2)?;
+            stmt.execute(flags::DPI_MODE_EXEC_DEFAULT)?;
+            stmt.fetch()?;
+            let (id_type, id_ptr) = stmt.get_query_value(1)?;
+            let (username_type, username_ptr) = stmt.get_query_value(2)?;
 
-    assert_eq!(id_type, Double);
-    let id_data: Data = id_ptr.into();
-    assert!((id_data.get_double() - 1.0) < ::std::f64::EPSILON);
+            assert_eq!(id_type, Double);
+            let id_data: Data = id_ptr.into();
+            assert!((id_data.get_double() - 1.0) < ::std::f64::EPSILON);
 
-    assert_eq!(username_type, Bytes);
-    let username_data: Data = username_ptr.into();
-    assert_eq!(username_data.get_string(), "jozias");
+            assert_eq!(username_type, Bytes);
+            let username_data: Data = username_ptr.into();
+            assert_eq!(username_data.get_string(), "jozias");
 
-    let busy_count = pool.get_busy_count()?;
-    assert_eq!(busy_count, 1);
+            let busy_count = pool.get_busy_count()?;
+            assert_eq!(busy_count, 1);
 
-    let open_count = pool.get_open_count()?;
-    assert_eq!(open_count, 1);
-
-    stmt.release()?;
-    conn.close(flags::DPI_MODE_CONN_CLOSE_DEFAULT, None)?;
-    pool.release()?;
+            let open_count = pool.get_open_count()?;
+            assert_eq!(open_count, 1);
+        }
+        conn.close(flags::DPI_MODE_CONN_CLOSE_DEFAULT, None)?;
+    }
     pool.close(flags::DPI_MODE_POOL_CLOSE_DEFAULT)?;
 
     Ok(())

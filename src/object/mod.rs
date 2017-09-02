@@ -35,17 +35,6 @@ impl Object {
         self.inner
     }
 
-    /// Adds a reference to the object. This is intended for situations where a reference to the
-    /// object needs to be maintained independently of the reference returned when the object was
-    /// created.
-    pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiObject_addRef(self.inner),
-            Ok(()),
-            ErrorKind::Object("dpiObject_addRef".to_string())
-        )
-    }
-
     /// Sets the value of the element found at the specified index.
     pub fn append_element(
         &self,
@@ -186,16 +175,6 @@ impl Object {
         )
     }
 
-    /// Releases a reference to the object. A count of the references to the object is maintained
-    /// and when this count reaches zero, the memory associated with the object is freed.
-    pub fn release(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiObject_release(self.inner),
-            Ok(()),
-            ErrorKind::Object("dpiObject_release".to_string())
-        )
-    }
-
     /// Sets the value of one of the object’s attributes.
     pub fn set_attribute_value(
         &self,
@@ -247,5 +226,15 @@ impl Object {
 impl From<*mut ODPIObject> for Object {
     fn from(inner: *mut ODPIObject) -> Self {
         Self { inner: inner }
+    }
+}
+
+impl Drop for Object {
+    fn drop(&mut self) {
+        if !self.inner.is_null() {
+            unsafe {
+                externs::dpiObject_release(self.inner);
+            }
+        }
     }
 }

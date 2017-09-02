@@ -30,17 +30,6 @@ impl ObjectAttr {
         self.inner
     }
 
-    /// Adds a reference to the attribute. This is intended for situations where a reference to the
-    /// attribute needs to be maintained independently of the reference returned when the attribute
-    /// was created.
-    pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiObjectAttr_addRef(self.inner),
-            Ok(()),
-            ErrorKind::ObjectType("dpiObjectAttr_addRef".to_string())
-        )
-    }
-
     /// Returns information about the attribute.
     pub fn get_info(&self) -> Result<ODPIObjectAttrInfo> {
         let mut object_attr_info: ODPIObjectAttrInfo = Default::default();

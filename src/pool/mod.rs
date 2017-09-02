@@ -78,16 +78,6 @@ impl Pool {
         )
     }
 
-    /// Adds a reference to the pool. This is intended for situations where a reference to the pool
-    /// needs to be maintained independently of the reference returned when the pool was created.
-    pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiPool_addRef(self.inner),
-            Ok(()),
-            ErrorKind::Pool("dpiPool_addRef".to_string())
-        )
-    }
-
     /// Closes the pool and makes it unusable for further activity.
     ///
     /// * `close_mode` - one or more of the values from the enumeration `ODPIPoolCloseMode`, OR'ed
@@ -246,17 +236,6 @@ impl Pool {
         )
     }
 
-    /// Releases a reference to the pool. A count of the references to the pool is maintained and
-    /// when this count reaches zero, the memory associated with the pool is freed and the session
-    /// pool is closed if that has not already taken place using the function `Pool::close()`.
-    pub fn release(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiPool_release(self.inner),
-            Ok(()),
-            ErrorKind::Pool("dpiPool_release".to_string())
-        )
-    }
-
     /// Sets the mode used for acquiring or getting connections from the pool.
     ///
     /// * `get_mode` - A value from the `ODPIGetMode` enumeration.
@@ -306,5 +285,15 @@ impl Pool {
 impl From<*mut ODPIPool> for Pool {
     fn from(inner: *mut ODPIPool) -> Self {
         Self { inner: inner }
+    }
+}
+
+impl Drop for Pool {
+    fn drop(&mut self) {
+        if !self.inner.is_null() {
+            unsafe {
+                externs::dpiPool_release(self.inner);
+            }
+        }
     }
 }

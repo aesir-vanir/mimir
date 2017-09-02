@@ -32,17 +32,6 @@ impl Subscription {
         self.inner
     }
 
-    /// Adds a reference to the subscription. This is intended for situations where a reference to
-    /// the subscription needs to be maintained independently of the reference returned when the
-    /// subscription was created.
-    pub fn add_ref(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiSubscr_addRef(self.inner),
-            Ok(()),
-            ErrorKind::Subscription("dpiSubscr_addRef".to_string())
-        )
-    }
-
     /// Closes the subscription now, rather than when the last reference is released. This
     /// deregisters it so that notifications will no longer be sent.
     pub fn close(&self) -> Result<()> {
@@ -66,22 +55,20 @@ impl Subscription {
             ErrorKind::Subscription("dpiSubscr_prepareStmt".to_string())
         )
     }
-
-    /// Releases a reference to the subscription. A count of the references to the subscription is
-    /// maintained and when this count reaches zero, the memory associated with the subscription is
-    /// freed. The subscription is also deregistered so that notifications are no longer sent, if
-    /// this was not already done using the function `Subscription::close()`.
-    pub fn release(&self) -> Result<()> {
-        try_dpi!(
-            externs::dpiSubscr_release(self.inner),
-            Ok(()),
-            ErrorKind::Subscription("dpiSubscr_release".to_string())
-        )
-    }
 }
 
 impl From<*mut ODPISubscr> for Subscription {
     fn from(inner: *mut ODPISubscr) -> Self {
         Self { inner: inner }
+    }
+}
+
+impl Drop for Subscription {
+    fn drop(&mut self) {
+        if !self.inner.is_null() {
+            unsafe {
+                externs::dpiSubscr_release(self.inner);
+            }
+        }
     }
 }

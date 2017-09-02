@@ -268,7 +268,6 @@ extern "C" {
 }
 
 extern "C" {
-    pub fn dpiDeqOptions_addRef(options: *mut opaque::ODPIDeqOptions) -> ::std::os::raw::c_int;
     pub fn dpiDeqOptions_getCondition(
         options: *mut opaque::ODPIDeqOptions,
         value: *mut *const ::std::os::raw::c_char,
@@ -355,7 +354,6 @@ extern "C" {
 }
 
 extern "C" {
-    pub fn dpiEnqOptions_addRef(options: *mut opaque::ODPIEnqOptions) -> ::std::os::raw::c_int;
     pub fn dpiEnqOptions_getTransformation(
         options: *mut opaque::ODPIEnqOptions,
         value: *mut *const ::std::os::raw::c_char,
@@ -382,7 +380,6 @@ extern "C" {
 }
 
 extern "C" {
-    pub fn dpiLob_addRef(lob: *mut opaque::ODPILob) -> ::std::os::raw::c_int;
     pub fn dpiLob_closeResource(lob: *mut opaque::ODPILob) -> ::std::os::raw::c_int;
     pub fn dpiLob_copy(
         lob: *mut opaque::ODPILob,
@@ -442,7 +439,6 @@ extern "C" {
 }
 
 extern "C" {
-    pub fn dpiMsgProps_addRef(props: *mut opaque::ODPIMsgProps) -> ::std::os::raw::c_int;
     pub fn dpiMsgProps_getNumAttempts(
         props: *mut opaque::ODPIMsgProps,
         value: *mut i32,
@@ -517,7 +513,6 @@ extern "C" {
 }
 
 extern "C" {
-    pub fn dpiObject_addRef(obj: *mut opaque::ODPIObject) -> ::std::os::raw::c_int;
     pub fn dpiObject_appendElement(
         obj: *mut opaque::ODPIObject,
         nativeTypeNum: enums::ODPINativeTypeNum,
@@ -589,7 +584,6 @@ extern "C" {
 }
 
 extern "C" {
-    pub fn dpiObjectAttr_addRef(attr: *mut opaque::ODPIObjectAttr) -> ::std::os::raw::c_int;
     pub fn dpiObjectAttr_getInfo(
         attr: *mut opaque::ODPIObjectAttr,
         info: *mut structs::ODPIObjectAttrInfo,
@@ -598,7 +592,6 @@ extern "C" {
 }
 
 extern "C" {
-    pub fn dpiObjectType_addRef(objType: *mut opaque::ODPIObjectType) -> ::std::os::raw::c_int;
     pub fn dpiObjectType_release(objType: *mut opaque::ODPIObjectType) -> ::std::os::raw::c_int;
     pub fn dpiObjectType_createObject(
         objType: *mut opaque::ODPIObjectType,
@@ -625,7 +618,6 @@ extern "C" {
         createParams: *mut structs::ODPIConnCreateParams,
         conn: *mut *mut opaque::ODPIConn,
     ) -> ::std::os::raw::c_int;
-    pub fn dpiPool_addRef(pool: *mut opaque::ODPIPool) -> ::std::os::raw::c_int;
     pub fn dpiPool_close(
         pool: *mut opaque::ODPIPool,
         closeMode: flags::ODPIPoolCloseMode,
@@ -687,7 +679,6 @@ extern "C" {
 }
 
 extern "C" {
-    pub fn dpiRowid_addRef(rowid: *mut opaque::ODPIRowid) -> ::std::os::raw::c_int;
     pub fn dpiRowid_getStringValue(
         rowid: *mut opaque::ODPIRowid,
         value: *mut *const ::std::os::raw::c_char,
@@ -697,7 +688,6 @@ extern "C" {
 }
 
 extern "C" {
-    pub fn dpiStmt_addRef(stmt: *mut opaque::ODPIStmt) -> ::std::os::raw::c_int;
     pub fn dpiStmt_bindByName(
         stmt: *mut opaque::ODPIStmt,
         name: *const ::std::os::raw::c_char,
@@ -805,7 +795,6 @@ extern "C" {
 }
 
 extern "C" {
-    pub fn dpiSubscr_addRef(subscr: *mut opaque::ODPISubscr) -> ::std::os::raw::c_int;
     pub fn dpiSubscr_close(subscr: *mut opaque::ODPISubscr) -> ::std::os::raw::c_int;
     pub fn dpiSubscr_prepareStmt(
         subscr: *mut opaque::ODPISubscr,
