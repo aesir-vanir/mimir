@@ -25,11 +25,28 @@ getset = "0.0.5"
 hex-slice = "0.1.0"
 lazy_static = "0.2.8"
 rand = "0.3.15"
-slog = "2.0.2"
+slog-try = "0.1.0"
 
 [dependencies.chrono]
 features = ["serde"]
 version = "0.4"
 
-[replace]
-"derive_builder:0.5.0" = { path = "../rust-derive-builder/derive_builder" }
+[dependencies.slog]
+optional = true
+version = "2"
+
+[dev-dependencies]
+slog-term = "2.2.0"
+
+[features]
+debug = [
+    "slog/max_level_debug",
+    "slog/release_max_level_debug",
+]
+default = ["slog"]
+trace = [
+    "slog/max_level_trace",
+    "slog/release_max_level_trace",
+]
+[replace."derive_builder:0.5.0"]
+path = "../rust-derive-builder/derive_builder"

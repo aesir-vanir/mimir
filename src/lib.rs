@@ -21,10 +21,13 @@ extern crate error_chain;
 extern crate getset;
 #[macro_use]
 mod macros;
+#[macro_use]
+extern crate slog;
+#[macro_use]
+extern crate slog_try;
 
 extern crate chrono;
 extern crate hex_slice;
-extern crate slog;
 
 mod common;
 mod connection;
@@ -51,7 +54,7 @@ mod variable;
 pub mod error;
 
 pub use connection::Connection;
-pub use context::Context;
+pub use context::{Context, ContextBuilder};
 pub use context::params::AppContext;
 pub use data::{Data, TypeInfo};
 pub use dequeue::Options as DeqOptions;

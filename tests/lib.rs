@@ -3,10 +3,13 @@
 extern crate lazy_static;
 #[macro_use]
 mod macros;
+#[macro_use]
+extern crate slog;
 
 extern crate chrono;
 extern crate mimir;
 extern crate rand;
+extern crate slog_term;
 
 mod context;
 mod connection;

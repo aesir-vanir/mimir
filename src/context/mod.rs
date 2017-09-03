@@ -20,6 +20,7 @@ use odpi::structs::{ODPICommonCreateParams, ODPIConnCreateParams, ODPIErrorInfo,
 use slog::Logger;
 use std::convert::TryFrom;
 use std::ptr;
+use std::time::Instant;
 use util::ODPIStr;
 
 pub mod params;
@@ -37,7 +38,7 @@ pub struct Context {
     #[set = "pub"]
     #[builder(default)]
     stdout: Option<Logger>,
-    /// Optoinal stderr logger.
+    /// Optional stderr logger.
     #[get = "pub"]
     #[set = "pub"]
     #[builder(default)]
@@ -45,18 +46,6 @@ pub struct Context {
 }
 
 impl Context {
-    /// Create a new `Context` struct.
-    pub fn create() -> Result<Self> {
-        let mut ctxt = ptr::null_mut();
-        let mut err: ODPIErrorInfo = Default::default();
-
-        try_dpi!(
-            externs::dpiContext_create(DPI_MAJOR_VERSION, DPI_MINOR_VERSION, &mut ctxt, &mut err),
-            Ok(ctxt.into()),
-            ErrorKind::Context("dpiContext_create".to_string())
-        )
-    }
-
     /// Get the pointer to the inner ODPI struct.
     #[doc(hidden)]
     pub fn inner(&self) -> *mut ODPIContext {
