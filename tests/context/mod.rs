@@ -10,7 +10,11 @@ extern "C" fn subscr_callback(
     // For testing
 }
 
-fn no_op(_ctxt: &Context) -> Result<()> {
+fn no_op(ctxt: &Context) -> Result<()> {
+    assert_eq!(
+        "12.2.0.1.0 (1202000100)",
+        format!("{}", ctxt.get_client_version()?)
+    );
     Ok(())
 }
 

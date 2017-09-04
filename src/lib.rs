@@ -21,13 +21,17 @@ extern crate error_chain;
 extern crate getset;
 #[macro_use]
 mod macros;
+#[cfg(feature = "trace")]
 #[macro_use]
 extern crate slog;
+#[cfg(feature = "trace")]
 #[macro_use]
 extern crate slog_try;
 
 extern crate chrono;
 extern crate hex_slice;
+#[cfg(not(feature = "trace"))]
+extern crate slog;
 
 mod common;
 mod connection;

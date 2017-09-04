@@ -20,7 +20,6 @@ use odpi::structs::{ODPICommonCreateParams, ODPIConnCreateParams, ODPIErrorInfo,
 use slog::Logger;
 use std::convert::TryFrom;
 use std::ptr;
-use std::time::Instant;
 use util::ODPIStr;
 
 pub mod params;
@@ -28,19 +27,15 @@ pub mod params;
 use self::params::{CommonCreate, ConnCreate, PoolCreate, SubscrCreate};
 
 /// This structure represents the context in which all activity in the library takes place.
-#[derive(Builder, Clone, Debug, Getters, Setters)]
+#[derive(Builder, Clone, Debug)]
 pub struct Context {
     /// A pointer the the ODPI-C dpiContext struct.
     #[builder(default = "self.default_context()?")]
     inner: *mut ODPIContext,
     /// Optional stdout logger.
-    #[get = "pub"]
-    #[set = "pub"]
     #[builder(default)]
     stdout: Option<Logger>,
     /// Optional stderr logger.
-    #[get = "pub"]
-    #[set = "pub"]
     #[builder(default)]
     stderr: Option<Logger>,
 }
@@ -53,12 +48,28 @@ impl Context {
     }
 
     /// Return information about the version of the Oracle Client that is being used.
+    #[cfg(feature = "trace")]
     pub fn get_client_version(&self) -> Result<version::Info> {
+        logperf!(
+            self.base_get_client_version(),
+            self.stdout,
+            "get_client_version"
+        )
+    }
+
+    /// Return information about the version of the Oracle Client that is being used.
+    #[cfg(not(feature = "trace"))]
+    pub fn get_client_version(&self) -> Result<version::Info> {
+        self.base_get_client_version()
+    }
+
+    /// The base (non-traced) version of `get_client_version`.
+    fn base_get_client_version(&self) -> Result<version::Info> {
         let mut version_info: ODPIVersionInfo = Default::default();
         try_dpi!(
             externs::dpiContext_getClientVersion(self.inner, &mut version_info),
             Ok(version_info.into()),
-            ErrorKind::Connection("dpiContext_getClientVersion".to_string())
+            ErrorKind::Context("dpiContext_getClientVersion".to_string())
         )
     }
 

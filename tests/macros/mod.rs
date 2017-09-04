@@ -1,20 +1,20 @@
 use mimir::{Context, ContextBuilder};
 use mimir::error::Result;
 use slog::{Drain, Logger};
-use slog_term;
-use std::io;
+use slog_async::Async;
+use slog_term::{CompactFormat, TermDecorator};
 
 pub fn within_context(f: &Fn(&Context) -> Result<()>) -> Result<()> {
-    let stdout_plain = slog_term::PlainSyncDecorator::new(io::stdout());
-    let stdout_logger = Logger::root(
-        slog_term::FullFormat::new(stdout_plain).build().fuse(),
-        o!(),
-    );
-    let stderr_plain = slog_term::PlainSyncDecorator::new(io::stderr());
-    let stderr_logger = Logger::root(
-        slog_term::FullFormat::new(stderr_plain).build().fuse(),
-        o!(),
-    );
+    let stdout_decorator = TermDecorator::new().build();
+    let stdout_drain = CompactFormat::new(stdout_decorator).build().fuse();
+    let stdout_async_drain = Async::new(stdout_drain).build().fuse();
+    let stdout_logger = Logger::root(stdout_async_drain, o!());
+
+    let stderr_decorator = TermDecorator::new().stderr().build();
+    let stderr_drain = CompactFormat::new(stderr_decorator).build().fuse();
+    let stderr_async_drain = Async::new(stderr_drain).build().fuse();
+    let stderr_logger = Logger::root(stderr_async_drain, o!());
+
     let ctxt: Context = ContextBuilder::default()
         .stdout(Some(stdout_logger))
         .stderr(Some(stderr_logger))

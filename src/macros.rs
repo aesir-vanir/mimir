@@ -7,6 +7,7 @@
 // modified, or distributed except according to those terms.
 
 //! `oci` macros
+
 #[doc(hidden)]
 macro_rules! try_dpi {
     ($code:expr, $ret:expr, $err:expr) => {{
@@ -15,5 +16,18 @@ macro_rules! try_dpi {
         } else {
             Err($err.into())
         }
+    }};
+}
+
+#[doc(hidden)]
+#[cfg(feature = "trace")]
+macro_rules! logperf {
+    ($func:expr, $logger:expr, $msg:expr) => {{
+        let timer = ::std::time::Instant::now();
+        let res = $func;
+        let elapsed = timer.elapsed();
+        let elapsed_f64 = elapsed.as_secs() as f64 + elapsed.subsec_nanos() as f64 * 1e-9;
+        try_trace!($logger, "{}: {:.9}s", $msg, elapsed_f64);
+        res
     }};
 }

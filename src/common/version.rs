@@ -12,6 +12,7 @@ use odpi::structs::ODPIVersionInfo;
 use std::fmt;
 
 /// Wrapper for the `ODPIVersionInfo` structure.
+#[derive(Clone, Debug)]
 pub struct Info {
     /// The version.
     version: String,
@@ -68,10 +69,10 @@ impl From<ODPIVersionInfo> for Info {
 
 impl fmt::Display for Info {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "{}", self.version)?;
+        write!(f, "{} ({})", self.version, self.version_num)?;
 
         if let Some(ref release) = self.release {
-            writeln!(f, "{}", release)?;
+            write!(f, "{}", release)?;
         }
 
         Ok(())

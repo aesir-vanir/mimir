@@ -9,6 +9,7 @@ extern crate slog;
 extern crate chrono;
 extern crate mimir;
 extern crate rand;
+extern crate slog_async;
 extern crate slog_term;
 
 mod context;

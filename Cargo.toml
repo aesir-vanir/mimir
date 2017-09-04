@@ -36,6 +36,7 @@ optional = true
 version = "2"
 
 [dev-dependencies]
+slog-async = "2.1.0"
 slog-term = "2.2.0"
 
 [features]
