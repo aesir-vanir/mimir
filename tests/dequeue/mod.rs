@@ -6,13 +6,11 @@ use mimir::enums::ODPIDeqMode::{Browse, Remove};
 use mimir::enums::ODPIDeqNavigation::{FirstMsg, NextMsg};
 use mimir::enums::ODPIVisibility::{Immediate, OnCommit};
 use mimir::flags;
-use std::ffi::CString;
 
 fn dequeue_res(ctxt: &Context) -> Result<()> {
     let mut ccp = ctxt.init_common_create_params()?;
-    let enc_cstr = CString::new("UTF-8").expect("badness");
-    ccp.set_encoding(enc_cstr.as_ptr());
-    ccp.set_nchar_encoding(enc_cstr.as_ptr());
+    ccp.set_encoding("UTF-8")?;
+    ccp.set_nchar_encoding("UTF-8")?;
     ccp.set_create_mode(flags::DPI_MODE_CREATE_EVENTS);
 
     let conn = Connection::create(

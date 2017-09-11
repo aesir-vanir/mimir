@@ -14,7 +14,7 @@ use odpi::structs::{ODPIAppContext, ODPICommonCreateParams, ODPIConnCreateParams
                     ODPIPoolCreateParams, ODPISubscrCreateParams};
 use pool::Pool;
 use std::convert::{TryFrom, TryInto};
-use std::ffi::CStr;
+use std::ffi::{CStr, CString};
 use util::ODPIStr;
 
 /// This structure is used for passing application context to the database during the process of
@@ -88,6 +88,10 @@ impl From<ODPIAppContext> for AppContext {
 pub struct CommonCreate {
     /// The ODPI-C dpiCommonCreateParams struct.
     inner: ODPICommonCreateParams,
+    /// Encoding
+    encoding: Option<CString>,
+    /// NChar Encoding
+    nchar_encoding: Option<CString>,
 }
 
 impl CommonCreate {
@@ -123,9 +127,14 @@ impl CommonCreate {
     }
 
     /// Set the `encoding` value.
-    pub fn set_encoding(&mut self, encoding: *const ::std::os::raw::c_char) -> &mut Self {
-        self.inner.encoding = encoding;
-        self
+    pub fn set_encoding(&mut self, encoding: &str) -> Result<&mut Self> {
+        // Put the CString into the struct so it isn't dropped immediately, ensure the pointer
+        // is valid.
+        let enc_cstr = CString::new(encoding)?;
+        let enc_ptr = enc_cstr.as_ptr();
+        self.encoding = Some(enc_cstr);
+        self.inner.encoding = enc_ptr;
+        Ok(self)
     }
 
     /// Get the `nchar_encoding` value.
@@ -139,12 +148,15 @@ impl CommonCreate {
     }
 
     /// Set the `nchar_encoding` value.
-    pub fn set_nchar_encoding(
-        &mut self,
-        nchar_encoding: *const ::std::os::raw::c_char,
-    ) -> &mut Self {
-        self.inner.nchar_encoding = nchar_encoding;
-        self
+    pub fn set_nchar_encoding(&mut self, nchar_encoding: &str) -> Result<&mut Self> {
+        // Put the CString into the struct so it isn't dropped immediately, ensure the pointer
+        // is valid.
+        let nchar_enc_cstr = CString::new(nchar_encoding)?;
+        let nchar_enc_ptr = nchar_enc_cstr.as_ptr();
+        self.nchar_encoding = Some(nchar_enc_cstr);
+        self.inner.encoding = nchar_enc_ptr;
+        self.inner.nchar_encoding = nchar_enc_ptr;
+        Ok(self)
     }
 
     /// Get the `edition` value.
@@ -186,7 +198,11 @@ impl CommonCreate {
 
 impl From<ODPICommonCreateParams> for CommonCreate {
     fn from(inner: ODPICommonCreateParams) -> Self {
-        Self { inner: inner }
+        Self {
+            inner: inner,
+            encoding: None,
+            nchar_encoding: None,
+        }
     }
 }
 
@@ -361,8 +377,8 @@ impl ConnCreate {
     ///
     /// Specifies the session pool from which to acquire a connection or NULL if a standalone
     /// connection should be created. The default value is NULL.
-    pub fn get_pool(&self) -> Pool {
-        self.conn.pool.into()
+    pub fn get_pool(&self) -> Result<Pool> {
+        Ok(TryFrom::try_from(self.conn.pool)?)
     }
 
     /// Set the `pool` value.

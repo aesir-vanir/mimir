@@ -5,7 +5,6 @@ use mimir::{Connection, Context, Data, ODPIData, ODPIObjectAttrInfo, ODPIObjectT
 use mimir::enums;
 use mimir::error::Result;
 use mimir::flags;
-use std::ffi::CString;
 
 fn validate_object_attr_info(idx: usize, attr_info: &ODPIObjectAttrInfo) -> Result<()> {
     let name_s = ODPIStr::new(attr_info.name, attr_info.name_length);
@@ -250,9 +249,8 @@ fn validate_object_type(object_col: &Statement, object_type: &ObjectType) -> Res
 
 fn obj_type(ctxt: &Context) -> Result<()> {
     let mut ccp = ctxt.init_common_create_params()?;
-    let enc_cstr = CString::new("UTF-8").expect("badness");
-    ccp.set_encoding(enc_cstr.as_ptr());
-    ccp.set_nchar_encoding(enc_cstr.as_ptr());
+    ccp.set_encoding("UTF-8")?;
+    ccp.set_nchar_encoding("UTF-8")?;
 
     let conn = Connection::create(
         ctxt,

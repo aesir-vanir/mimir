@@ -1,7 +1,6 @@
 use mimir::{enums, flags};
 use mimir::{AppContext, Context, ODPISubscrMessage};
 use mimir::error::Result;
-use std::ffi::CString;
 
 extern "C" fn subscr_callback(
     _ctxt: *mut ::std::os::raw::c_void,
@@ -22,15 +21,14 @@ fn ccp(ctxt: &Context) -> Result<()> {
     let mut ccp = ctxt.init_common_create_params()?;
     let default_flags = ccp.get_create_mode();
     let new_flags = default_flags | flags::DPI_MODE_CREATE_THREADED;
-    let enc_cstr = CString::new("UTF-8").expect("badness");
     let mut driver_name = String::from(env!("CARGO_PKG_NAME"));
     driver_name.push(' ');
     driver_name.push_str(env!("CARGO_PKG_VERSION"));
 
     ccp.set_create_mode(new_flags);
     ccp.set_edition("1.0")?;
-    ccp.set_encoding(enc_cstr.as_ptr());
-    ccp.set_nchar_encoding(enc_cstr.as_ptr());
+    ccp.set_encoding("UTF-8")?;
+    ccp.set_nchar_encoding("UTF-8")?;
 
     assert_eq!(
         ccp.get_create_mode(),

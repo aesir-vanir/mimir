@@ -8,7 +8,6 @@ use mimir::enums::ODPIOracleTypeNum::{Clob, Varchar};
 use mimir::enums::ODPIVisibility::OnCommit;
 use mimir::error::Result;
 use rand::{self, Rng};
-use std::ffi::CString;
 
 extern "C" fn subscr_callback(
     _context: *mut ::std::os::raw::c_void,
@@ -19,9 +18,8 @@ extern "C" fn subscr_callback(
 
 fn conn(ctxt: &Context) -> Result<()> {
     let mut common_create_params = ctxt.init_common_create_params()?;
-    let enc_cstr = CString::new("UTF-8").expect("badness");
-    common_create_params.set_encoding(enc_cstr.as_ptr());
-    common_create_params.set_nchar_encoding(enc_cstr.as_ptr());
+    common_create_params.set_encoding("UTF-8")?;
+    common_create_params.set_nchar_encoding("UTF-8")?;
     common_create_params.set_create_mode(flags::DPI_MODE_CREATE_EVENTS);
 
     let conn = Connection::create(

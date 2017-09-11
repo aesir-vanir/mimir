@@ -4,13 +4,11 @@ use mimir::enums;
 use mimir::enums::ODPINativeTypeNum::{Bytes, Double};
 use mimir::error::Result;
 use mimir::flags;
-use std::ffi::CString;
 
 fn pool_res(ctxt: &Context) -> Result<()> {
     let mut ccp = ctxt.init_common_create_params()?;
-    let enc_cstr = CString::new("UTF-8").expect("badness");
-    ccp.set_encoding(enc_cstr.as_ptr());
-    ccp.set_nchar_encoding(enc_cstr.as_ptr());
+    ccp.set_encoding("UTF-8")?;
+    ccp.set_nchar_encoding("UTF-8")?;
 
     let pool = Pool::create(
         ctxt,

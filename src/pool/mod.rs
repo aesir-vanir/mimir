@@ -14,26 +14,26 @@ use common::encoding;
 use connection::Connection;
 use context::Context;
 use context::params::{CommonCreate, ConnCreate, PoolCreate};
-use error::{ErrorKind, Result};
+use error::{Error, ErrorKind, Result};
 use odpi::{enums, externs, flags};
 use odpi::opaque::{ODPIConn, ODPIPool};
 use odpi::structs::ODPIEncodingInfo;
 use std::convert::TryFrom;
-use std::ptr;
+use std::ptr::{self, Unique};
 use util::ODPIStr;
 
 /// This structure represents session pools and is available by handle to a calling application or '
 /// driver.
 pub struct Pool {
     /// An ODPI-C dpiPool opaque struct pointer.
-    inner: *mut ODPIPool,
+    inner: Unique<ODPIPool>,
 }
 
 impl Pool {
     /// Get the `inner` value.
     #[doc(hidden)]
     pub fn inner(&self) -> *mut ODPIPool {
-        self.inner
+        self.inner.as_ptr()
     }
 
     /// Acquires a connection from the pool and returns a reference to it. This reference should be
@@ -65,7 +65,7 @@ impl Pool {
 
         try_dpi!(
             externs::dpiPool_acquireConnection(
-                self.inner,
+                self.inner.as_ptr(),
                 username_s.ptr(),
                 username_s.len(),
                 password_s.ptr(),
@@ -84,7 +84,7 @@ impl Pool {
     /// together.
     pub fn close(&self, close_mode: flags::ODPIPoolCloseMode) -> Result<()> {
         try_dpi!(
-            externs::dpiPool_close(self.inner, close_mode),
+            externs::dpiPool_close(self.inner.as_ptr(), close_mode),
             Ok(()),
             ErrorKind::Pool("dpiPool_close".to_string())
         )
@@ -148,7 +148,7 @@ impl Pool {
                 &mut pool_cp.inner(),
                 &mut inner
             ),
-            Ok(inner.into()),
+            Ok(TryFrom::try_from(inner)?),
             ErrorKind::Pool("dpiPool_create".to_string())
         )
     }
@@ -158,7 +158,7 @@ impl Pool {
         let mut busy_count = 0;
 
         try_dpi!(
-            externs::dpiPool_getBusyCount(self.inner, &mut busy_count),
+            externs::dpiPool_getBusyCount(self.inner.as_ptr(), &mut busy_count),
             Ok(busy_count),
             ErrorKind::Pool("dpiPool_getBusyCount".to_string())
         )
@@ -171,7 +171,7 @@ impl Pool {
         let mut enc_info: ODPIEncodingInfo = Default::default();
 
         try_dpi!(
-            externs::dpiPool_getEncodingInfo(self.inner, &mut enc_info),
+            externs::dpiPool_getEncodingInfo(self.inner.as_ptr(), &mut enc_info),
             Ok(enc_info.into()),
             ErrorKind::Pool("dpiPool_getEncodingInfo".to_string())
         )
@@ -182,7 +182,7 @@ impl Pool {
         let mut get_mode = enums::ODPIPoolGetMode::NoWait;
 
         try_dpi!(
-            externs::dpiPool_getGetMode(self.inner, &mut get_mode),
+            externs::dpiPool_getGetMode(self.inner.as_ptr(), &mut get_mode),
             Ok(get_mode),
             ErrorKind::Pool("dpiPool_getGetMode".to_string())
         )
@@ -195,7 +195,7 @@ impl Pool {
         let mut max_lifetime_session = 0;
 
         try_dpi!(
-            externs::dpiPool_getMaxLifetimeSession(self.inner, &mut max_lifetime_session),
+            externs::dpiPool_getMaxLifetimeSession(self.inner.as_ptr(), &mut max_lifetime_session),
             Ok(max_lifetime_session),
             ErrorKind::Pool("dpiPool_getMaxLifetimeSession".to_string())
         )
@@ -206,7 +206,7 @@ impl Pool {
         let mut open_count = 0;
 
         try_dpi!(
-            externs::dpiPool_getOpenCount(self.inner, &mut open_count),
+            externs::dpiPool_getOpenCount(self.inner.as_ptr(), &mut open_count),
             Ok(open_count),
             ErrorKind::Pool("dpiPool_getOpenCount".to_string())
         )
@@ -218,7 +218,7 @@ impl Pool {
         let mut stmt_cache_size = 0;
 
         try_dpi!(
-            externs::dpiPool_getStmtCacheSize(self.inner, &mut stmt_cache_size),
+            externs::dpiPool_getStmtCacheSize(self.inner.as_ptr(), &mut stmt_cache_size),
             Ok(stmt_cache_size),
             ErrorKind::Pool("dpiPool_getStmtCacheSize".to_string())
         )
@@ -230,7 +230,7 @@ impl Pool {
         let mut timeout = 0;
 
         try_dpi!(
-            externs::dpiPool_getTimeout(self.inner, &mut timeout),
+            externs::dpiPool_getTimeout(self.inner.as_ptr(), &mut timeout),
             Ok(timeout),
             ErrorKind::Pool("dpiPool_getTimeout".to_string())
         )
@@ -241,7 +241,7 @@ impl Pool {
     /// * `get_mode` - A value from the `ODPIGetMode` enumeration.
     pub fn set_get_mode(&self, get_mode: enums::ODPIPoolGetMode) -> Result<()> {
         try_dpi!(
-            externs::dpiPool_setGetMode(self.inner, get_mode),
+            externs::dpiPool_setGetMode(self.inner.as_ptr(), get_mode),
             Ok(()),
             ErrorKind::Pool("dpiPool_setGetMode".to_string())
         )
@@ -254,7 +254,7 @@ impl Pool {
     /// * `max_lifetime` - the maximum lifetime of all sessions in the pool, in seconds.
     pub fn set_max_lifetime_session(&self, max_lifetime: u32) -> Result<()> {
         try_dpi!(
-            externs::dpiPool_setMaxLifetimeSession(self.inner, max_lifetime),
+            externs::dpiPool_setMaxLifetimeSession(self.inner.as_ptr(), max_lifetime),
             Ok(()),
             ErrorKind::Pool("dpiPool_setMaxLifetimeSession".to_string())
         )
@@ -265,7 +265,7 @@ impl Pool {
     /// * `stmt_cache_size` - the new size of the statement cache, in number of statements.
     pub fn set_stmt_cache_size(&self, stmt_cache_size: u32) -> Result<()> {
         try_dpi!(
-            externs::dpiPool_setStmtCacheSize(self.inner, stmt_cache_size),
+            externs::dpiPool_setStmtCacheSize(self.inner.as_ptr(), stmt_cache_size),
             Ok(()),
             ErrorKind::Pool("dpiPool_setStmtCacheSize".to_string())
         )
@@ -275,24 +275,27 @@ impl Pool {
     /// but only when another session is released back to the pool.
     pub fn set_timeout(&self, timeout: u32) -> Result<()> {
         try_dpi!(
-            externs::dpiPool_setTimeout(self.inner, timeout),
+            externs::dpiPool_setTimeout(self.inner.as_ptr(), timeout),
             Ok(()),
             ErrorKind::Pool("dpiPool_setTimeout".to_string())
         )
     }
 }
 
-impl From<*mut ODPIPool> for Pool {
-    fn from(inner: *mut ODPIPool) -> Self {
-        Self { inner: inner }
+impl TryFrom<*mut ODPIPool> for Pool {
+    type Error = Error;
+
+    fn try_from(inner: *mut ODPIPool) -> Result<Self> {
+        let pool = Unique::new(inner).ok_or_else(|| ErrorKind::Pool("try_from".to_string()))?;
+        Ok(Self { inner: pool })
     }
 }
 
 impl Drop for Pool {
     fn drop(&mut self) {
-        if !self.inner.is_null() {
+        if !self.inner.as_ptr().is_null() {
             unsafe {
-                externs::dpiPool_release(self.inner);
+                externs::dpiPool_release(self.inner.as_ptr());
             }
         }
     }
