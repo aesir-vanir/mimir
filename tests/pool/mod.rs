@@ -86,6 +86,24 @@ fn pool_res(ctxt: &Context) -> Result<()> {
 
             let open_count = pool.get_open_count()?;
             assert_eq!(open_count, 1);
+
+            let pl_sql = conn.prepare_stmt(
+                Some(
+                    r"
+BEGIN
+   EXECUTE IMMEDIATE 'DROP TABLE person';
+EXCEPTION
+   WHEN OTHERS THEN
+      IF SQLCODE != -942 THEN
+         RAISE;
+      END IF;
+END;
+",
+                ),
+                None,
+                false,
+            )?;
+            pl_sql.execute(flags::DPI_MODE_EXEC_DEFAULT)?;
         }
         conn.close(flags::DPI_MODE_CONN_CLOSE_DEFAULT, None)?;
     }
