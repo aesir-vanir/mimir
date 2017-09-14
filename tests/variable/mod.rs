@@ -4,6 +4,7 @@ use mimir::error::Result;
 use mimir::enums::ODPINativeTypeNum::{Bytes, Int64};
 use mimir::enums::ODPIOracleTypeNum::{Number, Varchar};
 use mimir::flags;
+use std::convert::TryFrom;
 
 fn var_res(ctxt: &Context) -> Result<()> {
     let mut ccp = ctxt.init_common_create_params()?;
@@ -30,7 +31,7 @@ fn var_res(ctxt: &Context) -> Result<()> {
     let str_test_data = str_test.get_data()?;
     assert_eq!(str_test_data.len(), 2);
     for (idx, d) in str_test_data.iter_mut().enumerate() {
-        let data: Data = (d as *mut ODPIData).into();
+        let data: Data = TryFrom::try_from(d as *mut ODPIData)?;
         match idx {
             0 => assert_eq!(data.get_string(), "jozias"),
             1 => assert_eq!(data.get_string(), ""),
