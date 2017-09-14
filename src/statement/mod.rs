@@ -406,7 +406,7 @@ impl Statement {
 
         try_dpi!(
             externs::dpiStmt_getQueryValue(self.inner, pos, &mut native_type, &mut data),
-            Ok((native_type.into(), data.into())),
+            Ok((native_type.into(), TryFrom::try_from(data)?)),
             ErrorKind::Statement("dpiStmt_getQueryValue".to_string())
         )
     }

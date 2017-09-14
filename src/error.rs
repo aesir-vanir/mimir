@@ -62,6 +62,10 @@ error_chain! {
             description("MsgProps: call to ODPI-C function failed!")
             display("MsgProps: call to '{}' function failed!", fn_name)
         }
+        NullPtr {
+            description("Null pointer")
+            display("Null pointer")
+        }
         Object(fn_name: String) {
             description("Object: call to ODPI-C function failed!")
             display("Object: call to '{}' function failed!", fn_name)

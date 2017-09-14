@@ -1,6 +1,7 @@
 target
 .creds
 Cargo.lock
+*.log
 
 # Visual Studio Code
 .vscode/*

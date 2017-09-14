@@ -12,7 +12,7 @@
 //! to process macros. For this reason, none of these functions perform any error checking. They are
 //! assumed to be replacements for direct manipulation of the various members of the structure.
 use chrono::{DateTime, Datelike, Duration, TimeZone, Timelike, Utc};
-use error::{ErrorKind, Result};
+use error::{Error, ErrorKind, Result};
 use hex_slice::AsHex;
 use objecttype::ObjectType;
 use odpi::{enums, externs, opaque};
@@ -266,9 +266,15 @@ impl Data {
     }
 }
 
-impl From<*mut ODPIData> for Data {
-    fn from(inner: *mut ODPIData) -> Self {
-        Self { inner: inner }
+impl TryFrom<*mut ODPIData> for Data {
+    type Error = Error;
+
+    fn try_from(inner: *mut ODPIData) -> Result<Self> {
+        if inner.is_null() {
+            Err(ErrorKind::NullPtr.into())
+        } else {
+            Ok(Self { inner: inner })
+        }
     }
 }
 
