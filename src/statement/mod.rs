@@ -160,6 +160,43 @@ impl Statement {
     //     Ok(())
     // }
 
+    /// Defines the type of data that will be used to fetch rows from the statement. This is
+    /// intended for use with the function `Statement::get_query_value()`, when the default
+    /// data type derived from the column metadata needs to be overridden by the application.
+    /// Internally, a variable is created with the specified data type and size.
+    pub fn define_value(
+        &self,
+        pos: u32,
+        oracle_type: enums::ODPIOracleTypeNum,
+        native_type: enums::ODPINativeTypeNum,
+        size: Option<u32>,
+        size_is_bytes: Option<bool>,
+    ) -> Result<()> {
+        let inner_size = if let Some(sz) = size { sz } else { 0 };
+        let inner_size_is_bytes = if let Some(szib) = size_is_bytes {
+            if szib {
+                1
+            } else {
+                0
+            }
+        } else {
+            0
+        };
+        try_dpi!(
+            externs::dpiStmt_defineValue(
+                self.inner,
+                pos,
+                oracle_type,
+                native_type,
+                inner_size,
+                inner_size_is_bytes,
+                ptr::null_mut()
+            ),
+            Ok(()),
+            ErrorKind::Statement("dpiStmt_execute".to_string())
+        )
+    }
+
     /// Executes the statement using the bound values. For queries this makes available metadata
     /// which can be acquired using the function dpiStmt_getQueryInfo(). For non-queries, out and
     /// in-out variables are populated with their values.

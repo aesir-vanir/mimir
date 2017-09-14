@@ -717,6 +717,15 @@ extern "C" {
         tag: *const ::std::os::raw::c_char,
         tagLength: u32,
     ) -> ::std::os::raw::c_int;
+    pub fn dpiStmt_defineValue(
+        stmt: *mut opaque::ODPIStmt,
+        pos: u32,
+        oracleTypeNum: enums::ODPIOracleTypeNum,
+        nativeTypeNum: enums::ODPINativeTypeNum,
+        size: u32,
+        sizeIsBytes: ::std::os::raw::c_int,
+        objType: *mut opaque::ODPIObjectType,
+    ) -> ::std::os::raw::c_int;
     pub fn dpiStmt_execute(
         stmt: *mut opaque::ODPIStmt,
         mode: flags::ODPIExecMode,
