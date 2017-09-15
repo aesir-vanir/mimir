@@ -17,7 +17,7 @@ use hex_slice::AsHex;
 use objecttype::ObjectType;
 use odpi::{enums, externs, opaque};
 use odpi::enums::ODPIOracleTypeNum;
-use odpi::structs::{ODPIData, ODPIDataTypeInfo, ODPIDataValueUnion};
+use odpi::structs::{ODPIData, ODPIDataBuffer, ODPIDataTypeInfo};
 use std::convert::TryFrom;
 use std::slice;
 use util::ODPIStr;
@@ -46,7 +46,7 @@ pub struct Data {
 impl Data {
     /// Create a new `Data` struct;
     #[doc(hidden)]
-    pub fn new(is_null: bool, val: ODPIDataValueUnion) -> Self {
+    pub fn new(is_null: bool, val: ODPIDataBuffer) -> Self {
         let mut odpi_data = ODPIData {
             is_null: if is_null { 1 } else { 0 },
             value: val,

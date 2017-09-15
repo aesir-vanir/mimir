@@ -1,6 +1,6 @@
 use CREDS;
-use mimir::{Connection, Context, Data, ODPIBytes, ODPIDataValueUnion, ODPIStr, QueryInfo,
-            TypeInfo, Var};
+use mimir::{Connection, Context, Data, ODPIBytes, ODPIDataBuffer, ODPIStr, QueryInfo, TypeInfo,
+            Var};
 use mimir::enums::ODPIFetchMode::Last;
 use mimir::enums::ODPINativeTypeNum::{Bytes, Double, Int64};
 use mimir::enums::ODPIOracleTypeNum::{Number, Varchar};
@@ -116,7 +116,7 @@ fn stmt_res(ctxt: &Context) -> Result<()> {
 
     let t_data = Data::new(
         false,
-        ODPIDataValueUnion {
+        ODPIDataBuffer {
             as_bytes: odpi_bytes,
         },
     );
@@ -143,7 +143,7 @@ fn stmt_res(ctxt: &Context) -> Result<()> {
     )?;
     let t_data_1 = Data::new(
         false,
-        ODPIDataValueUnion {
+        ODPIDataBuffer {
             as_bytes: odpi_bytes,
         },
     );

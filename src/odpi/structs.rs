@@ -197,6 +197,14 @@ pub struct ODPIConnCreateParams {
     /// filled in if the connection was acquired from a session pool and a tag was initially
     /// specified.
     pub out_tag_found: c_int,
+    /// TODO
+    pub sharding_key_columns: *mut ODPIShardingKeyColumn,
+    /// TODO
+    pub num_sharding_key_columns: u8,
+    /// TODO
+    pub super_sharding_key_columns: *mut ODPIShardingKeyColumn,
+    /// TODO
+    pub num_super_sharding_key_columns: u8,
 }
 
 impl Default for ODPIConnCreateParams {
@@ -219,6 +227,10 @@ impl Default for ODPIConnCreateParams {
             out_tag: ptr::null(),
             out_tag_length: 0,
             out_tag_found: 0,
+            sharding_key_columns: ptr::null_mut(),
+            num_sharding_key_columns: 0,
+            super_sharding_key_columns: ptr::null_mut(),
+            num_super_sharding_key_columns: 0,
         }
     }
 }
@@ -231,14 +243,14 @@ pub struct ODPIData {
     /// Specifies if the value refers to a null value (1) or not (0).
     pub is_null: ::std::os::raw::c_int,
     /// Specifies the value that is being passed or received.
-    pub value: ODPIDataValueUnion,
+    pub value: ODPIDataBuffer,
 }
 
 impl Default for ODPIData {
     fn default() -> Self {
         Self {
             is_null: 1,
-            value: ODPIDataValueUnion { as_boolean: 0 },
+            value: ODPIDataBuffer { as_boolean: 0 },
         }
     }
 }
@@ -290,7 +302,7 @@ impl Default for ODPIDataTypeInfo {
 #[derive(Clone, Copy)]
 #[cfg_attr(rustfmt, rustfmt_skip)]
 /// Struct represention C union type for `ODPIData`.
-pub union ODPIDataValueUnion {
+pub union ODPIDataBuffer {
     /// Value that is used when `ODPIData.is_null` is 0 and the native type that is being used is
     /// `ODPINativeTypeNum::Boolean`. The value should be either 1 (true) or 0 (false).
     pub as_boolean: ::std::os::raw::c_int,
@@ -334,6 +346,8 @@ pub union ODPIDataValueUnion {
     /// `ODPINativeTypeNum::Rowid`. This is a reference to a rowid which is used to uniquely
     /// identify a row in a table in the database.
     pub as_rowid: *mut opaque::ODPIRowid,
+    /// Alignment
+    _bindgen_union_align: [u64; 3_usize],
 }
 
 #[repr(C)]
@@ -596,6 +610,18 @@ impl Default for ODPIQueryInfo {
             null_ok: 0,
         }
     }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+/// TODO
+pub struct ODPIShardingKeyColumn {
+    /// TODO
+    pub oracle_type_num: enums::ODPIOracleTypeNum,
+    /// TODO
+    pub native_type_num: enums::ODPINativeTypeNum,
+    /// TODO
+    pub value: ODPIDataBuffer,
 }
 
 #[repr(C)]
