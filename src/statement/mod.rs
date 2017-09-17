@@ -441,7 +441,9 @@ impl Statement {
     /// * `mode` - one of the values from the enumeration `ODPIFetchMode`.
     /// * `offset` - a value which is used with the mode in order to determine the row position in
     /// the cursor.
-    /// * `row_count_offset` -
+    /// * `row_count_offset` - an offset to the row count used when calculating the desired row to
+    /// be fetched. This is needed when a client has fetched multiple rows but has not yet
+    /// consumed all of them. If this is not being done by the client, the value 0 is appropriate.
     pub fn scroll(
         &self,
         mode: enums::ODPIFetchMode,
