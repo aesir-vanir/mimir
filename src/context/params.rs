@@ -211,7 +211,7 @@ impl From<ODPICommonCreateParams> for CommonCreate {
 /// `init_common_conn_params` function. Care should be taken to ensure a copy of this structure
 /// exists only as long as needed to create the connection since it can contain a clear text copy of
 /// credentials used for connecting to the database.
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct ConnCreate {
     /// The ODPI-C dpiConnCreateParams struct.
     conn: ODPIConnCreateParams,

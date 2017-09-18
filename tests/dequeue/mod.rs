@@ -8,18 +8,21 @@ use mimir::enums::ODPIVisibility::{Immediate, OnCommit};
 use mimir::flags;
 
 fn dequeue_res(ctxt: &Context) -> Result<()> {
-    let mut ccp = ctxt.init_common_create_params()?;
-    ccp.set_encoding("UTF-8")?;
-    ccp.set_nchar_encoding("UTF-8")?;
-    ccp.set_create_mode(flags::DPI_MODE_CREATE_EVENTS);
+    let mut common_create_params = ctxt.init_common_create_params()?;
+    common_create_params.set_encoding("UTF-8")?;
+    common_create_params.set_nchar_encoding("UTF-8")?;
+    common_create_params.set_create_mode(flags::DPI_MODE_CREATE_EVENTS);
+
+    let mut common_connection_params = ctxt.init_conn_create_params()?;
+    common_connection_params.set_auth_mode(flags::DPI_MODE_AUTH_DEFAULT);
 
     let conn = Connection::create(
         ctxt,
         Some(&CREDS[0]),
         Some(&CREDS[1]),
         Some("//oic.cbsnae86d3iv.us-east-2.rds.amazonaws.com/ORCL"),
-        Some(ccp),
-        None,
+        Some(common_create_params),
+        Some(common_connection_params),
     )?;
 
     let dequeue_opts = conn.new_deq_options()?;

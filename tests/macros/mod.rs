@@ -1,4 +1,4 @@
-use mimir::{Context, ContextBuilder};
+use mimir::Context;
 use mimir::error::Result;
 use slog::{Drain, Logger};
 use slog_async::Async;
@@ -15,10 +15,10 @@ pub fn within_context(f: &Fn(&Context) -> Result<()>) -> Result<()> {
     let stderr_async_drain = Async::new(stderr_drain).build().fuse();
     let stderr_logger = Logger::root(stderr_async_drain, o!());
 
-    let ctxt: Context = ContextBuilder::default()
-        .stdout(Some(stdout_logger))
-        .stderr(Some(stderr_logger))
-        .build()?;
+    let mut ctxt = Context::create()?;
+    ctxt.set_stdout(Some(stdout_logger));
+    ctxt.set_stderr(Some(stderr_logger));
+
     match f(&ctxt) {
         Ok(_) => Ok(()),
         Err(e) => {

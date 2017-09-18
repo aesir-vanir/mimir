@@ -22,6 +22,9 @@ fn conn(ctxt: &Context) -> Result<()> {
     common_create_params.set_nchar_encoding("UTF-8")?;
     common_create_params.set_create_mode(flags::DPI_MODE_CREATE_EVENTS);
 
+    let mut common_connection_params = ctxt.init_conn_create_params()?;
+    common_connection_params.set_auth_mode(flags::DPI_MODE_AUTH_DEFAULT);
+
     let conn = Connection::create(
         ctxt,
         Some(&CREDS[0]),
