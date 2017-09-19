@@ -150,9 +150,7 @@ fn scp(ctxt: &Context) -> Result<()> {
     assert_eq!(scp.get_recipient_name(), "");
 
     scp.set_protocol(enums::ODPISubscrProtocol::HTTP);
-    scp.set_qos(
-        flags::DPI_SUBSCR_QOS_BEST_EFFORT | flags::DPI_SUBSCR_QOS_ROWIDS,
-    );
+    scp.set_qos(flags::DPI_SUBSCR_QOS_BEST_EFFORT | flags::DPI_SUBSCR_QOS_ROWIDS);
     scp.set_operations(flags::DPI_OPCODE_ALTER | flags::DPI_OPCODE_DROP);
     scp.set_port_number(32_276);
     scp.set_timeout(10_000);

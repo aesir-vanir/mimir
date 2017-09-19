@@ -511,9 +511,7 @@ impl Connection {
             ),
             {
                 if subscr_ptr.is_null() {
-                    Err(
-                        ErrorKind::Connection("dpiConn_newSubscription".to_string()).into(),
-                    )
+                    Err(ErrorKind::Connection("dpiConn_newSubscription".to_string()).into())
                 } else {
                     let sub: Subscription = subscr_ptr.into();
                     Ok((subscr_id, sub))
@@ -535,11 +533,7 @@ impl Connection {
             enums::ODPIOracleTypeNum::Clob |
             enums::ODPIOracleTypeNum::NClob |
             enums::ODPIOracleTypeNum::Blob => {}
-            _ => {
-                return Err(
-                    ErrorKind::Connection("invalid oracle type".to_string()).into(),
-                )
-            }
+            _ => return Err(ErrorKind::Connection("invalid oracle type".to_string()).into()),
         }
 
         try_dpi!(
