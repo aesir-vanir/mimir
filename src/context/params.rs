@@ -309,7 +309,7 @@ impl ConnCreate {
     /// array of `ODPIAppContext` structures. The context specified here can be used in logon
     /// triggers, for example. The default value is NULL.
     pub fn get_app_context(&self) -> Result<Vec<AppContext>> {
-        let len: isize = TryInto::try_into(self.conn.num_app_context)?;
+        let len: isize = isize::try_from(self.conn.num_app_context)?;
         let head_ptr = self.conn.app_context;
 
         let mut app_contexts = Vec::new();
