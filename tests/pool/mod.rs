@@ -1,5 +1,5 @@
 use CREDS;
-use mimir::{Context, Data, Pool};
+use mimir::{Context, Pool};
 use mimir::enums;
 use mimir::enums::ODPINativeTypeNum::{Bytes, Double};
 use mimir::error::Result;
@@ -70,15 +70,13 @@ fn pool_res(ctxt: &Context) -> Result<()> {
 
             stmt.execute(flags::DPI_MODE_EXEC_DEFAULT)?;
             stmt.fetch()?;
-            let (id_type, id_ptr) = stmt.get_query_value(1)?;
-            let (username_type, username_ptr) = stmt.get_query_value(2)?;
+            let (id_type, id_data) = stmt.get_query_value(1)?;
+            let (username_type, username_data) = stmt.get_query_value(2)?;
 
             assert_eq!(id_type, Double);
-            let id_data: Data = id_ptr.into();
             assert!((id_data.get_double() - 1.0) < ::std::f64::EPSILON);
 
             assert_eq!(username_type, Bytes);
-            let username_data: Data = username_ptr.into();
             assert_eq!(username_data.get_string(), "jozias");
 
             let busy_count = pool.get_busy_count()?;

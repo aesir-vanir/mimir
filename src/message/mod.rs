@@ -79,7 +79,7 @@ impl Properties {
 
         try_dpi!(
             externs::dpiMsgProps_getDeliveryMode(self.inner, &mut del_mode_ptr),
-            Ok(del_mode_ptr.into()),
+            Ok(del_mode_ptr),
             ErrorKind::MsgProps("dpiEnqOptions_getMode".to_string())
         )
     }

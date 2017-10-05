@@ -1,6 +1,6 @@
 use CREDS;
 use chrono::{TimeZone, Utc};
-use mimir::{Connection, Context, Data, ODPIData, ODPIObjectAttrInfo, ODPIObjectTypeInfo, ODPIStr,
+use mimir::{Connection, Context, ODPIData, ODPIObjectAttrInfo, ODPIObjectTypeInfo, ODPIStr,
             Object, ObjectAttr, ObjectType, Statement};
 use mimir::enums;
 use mimir::error::Result;
@@ -226,16 +226,15 @@ fn validate_object_type(object_col: &Statement, object_type: &ObjectType) -> Res
 
     // Create an object of this type.
     let created_obj = object_type.create()?;
-    let _created: Object = created_obj.into();
+    let _created: Object = created_obj;
     // let (first_idx, exists) = created.get_first_index()?;
     // assert_eq!(first_idx, 0);
     // assert_eq!(exists, 1);
 
     // Get the object value out of the query.
-    let (object_col_type, object_col_ptr) = object_col.get_query_value(1)?;
+    let (object_col_type, object_col_data) = object_col.get_query_value(1)?;
     assert_eq!(object_col_type, enums::ODPINativeTypeNum::Object);
-    let data: Data = object_col_ptr.into();
-    let obj: Object = data.get_object().into();
+    let obj: Object = object_col_data.get_object().into();
 
     for (idx, (obj_attr, attr_info)) in obj_attrs.iter().zip(attr_infos.iter()).enumerate() {
         validate_query_value(idx, &obj, obj_attr, attr_info)?;

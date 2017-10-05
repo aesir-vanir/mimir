@@ -62,14 +62,12 @@ fn bind_by_name(conn: &Connection, username_var: &Var) -> Result<()> {
     assert!(data_type_info.object_type().is_none());
 
     bind_by_name.fetch()?;
-    let (id_type, id_ptr) = bind_by_name.get_query_value(1)?;
+    let (id_type, id_data) = bind_by_name.get_query_value(1)?;
     assert_eq!(id_type, Double);
-    let data: Data = id_ptr.into();
-    assert!((data.get_double() - 1.0).abs() < ::std::f64::EPSILON);
-    let (un_type, un_ptr) = bind_by_name.get_query_value(2)?;
+    assert!((id_data.get_double() - 1.0).abs() < ::std::f64::EPSILON);
+    let (un_type, un_data) = bind_by_name.get_query_value(2)?;
     assert_eq!(un_type, Bytes);
-    let data: Data = un_ptr.into();
-    assert_eq!(data.get_string(), "jozias");
+    assert_eq!(un_data.get_string(), "jozias");
 
     bind_by_name.close(None)?;
     Ok(())
