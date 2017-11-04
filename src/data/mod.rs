@@ -234,7 +234,7 @@ impl Data {
     }
 
     /// Sets the value of the data when the native type is DPI_NATIVE_TYPE_INTERVAL_YM.
-    pub fn set_years_months(&self, val: YearsMonths) {
+    pub fn set_years_months(&self, val: &YearsMonths) {
         let mut odpi_int_ym = unsafe { (*self.inner).value.as_interval_ym };
         odpi_int_ym.years = *val.years();
         odpi_int_ym.months = *val.months();

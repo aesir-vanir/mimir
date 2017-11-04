@@ -126,7 +126,7 @@ impl Var {
     /// * `pos` - the array position in the variable which is to be set. The first position is 0. If
     /// the position exceeds the number of elements allocated by the variable an error is returned.
     /// * `lob` - the LOB which should be set.
-    pub fn set_from_lob(&self, pos: u32, lob: Lob) -> Result<()> {
+    pub fn set_from_lob(&self, pos: u32, lob: &Lob) -> Result<()> {
         try_dpi!(
             externs::dpiVar_setFromLob(self.inner, pos, lob.inner()),
             Ok(()),
@@ -139,7 +139,7 @@ impl Var {
     /// * `pos` - the array position in the variable which is to be set. The first position is 0. If
     /// the position exceeds the number of elements allocated by the variable an error is returned.
     /// * `obj` - the object which should be set.
-    pub fn set_from_object(&self, pos: u32, obj: Object) -> Result<()> {
+    pub fn set_from_object(&self, pos: u32, obj: &Object) -> Result<()> {
         try_dpi!(
             externs::dpiVar_setFromObject(self.inner, pos, obj.inner()),
             Ok(()),
@@ -152,7 +152,7 @@ impl Var {
     /// * `pos` - the array position in the variable which is to be set. The first position is 0. If
     /// the position exceeds the number of elements allocated by the variable an error is returned.
     /// * `rowid` - the rowid which should be set.
-    pub fn set_from_rowid(&self, pos: u32, rowid: Rowid) -> Result<()> {
+    pub fn set_from_rowid(&self, pos: u32, rowid: &Rowid) -> Result<()> {
         try_dpi!(
             externs::dpiVar_setFromRowid(self.inner, pos, rowid.inner()),
             Ok(()),
@@ -165,7 +165,7 @@ impl Var {
     /// * `pos` - the array position in the variable which is to be set. The first position is 0. If
     /// the position exceeds the number of elements allocated by the variable an error is returned.
     /// * `stmt` - the statement which should be set.
-    pub fn set_from_stmt(&self, pos: u32, stmt: Statement) -> Result<()> {
+    pub fn set_from_stmt(&self, pos: u32, stmt: &Statement) -> Result<()> {
         try_dpi!(
             externs::dpiVar_setFromStmt(self.inner, pos, stmt.inner()),
             Ok(()),

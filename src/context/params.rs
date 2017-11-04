@@ -320,10 +320,10 @@ impl ConnCreate {
     }
 
     /// Set the `app_context` value.
-    pub fn set_app_context(&mut self, app_contexts: Vec<AppContext>) -> Result<&mut Self> {
+    pub fn set_app_context(&mut self, app_contexts: &[AppContext]) -> Result<&mut Self> {
         let len: u32 = TryInto::try_into(app_contexts.len())?;
         let mut oac_vec: Vec<ODPIAppContext> = Vec::new();
-        for ac in &app_contexts {
+        for ac in app_contexts {
             oac_vec.push(ac.inner);
         }
         let ac_ptr = app_contexts.as_ptr();
@@ -382,7 +382,7 @@ impl ConnCreate {
     }
 
     /// Set the `pool` value.
-    pub fn set_pool(&mut self, pool: Pool) -> &mut Self {
+    pub fn set_pool(&mut self, pool: &Pool) -> &mut Self {
         self.conn.pool = pool.inner();
         self
     }

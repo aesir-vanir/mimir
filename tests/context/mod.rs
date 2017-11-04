@@ -58,7 +58,7 @@ fn conn_cp(ctxt: &Context) -> Result<()> {
     conn.set_connection_class("conn_class")?;
     conn.set_purity(enums::ODPIPurity::New);
     conn.set_new_password("password")?;
-    conn.set_app_context(app_ctxt_vec)?;
+    conn.set_app_context(&app_ctxt_vec)?;
     conn.set_external_auth(1);
     conn.set_tag("you're it")?;
     conn.set_match_any_tag(true);
@@ -132,7 +132,6 @@ fn pcp(ctxt: &Context) -> Result<()> {
     Ok(())
 }
 
-#[cfg_attr(feature = "cargo-clippy", allow(should_assert_eq))]
 fn scp(ctxt: &Context) -> Result<()> {
     let mut scp = ctxt.init_subscr_create_params()?;
     assert_eq!(

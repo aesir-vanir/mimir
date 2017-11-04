@@ -178,9 +178,9 @@ impl Object {
     /// Sets the value of one of the object’s attributes.
     pub fn set_attribute_value(
         &self,
-        attribute: ObjectAttr,
+        attribute: &ObjectAttr,
         native_type: enums::ODPINativeTypeNum,
-        value: Data,
+        value: &Data,
     ) -> Result<()> {
         try_dpi!(
             externs::dpiObject_setAttributeValue(
@@ -199,7 +199,7 @@ impl Object {
         &self,
         index: i32,
         native_type: enums::ODPINativeTypeNum,
-        value: Data,
+        value: &Data,
     ) -> Result<()> {
         try_dpi!(
             externs::dpiObject_setElementValueByIndex(
