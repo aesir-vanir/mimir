@@ -767,6 +767,10 @@ pub struct ODPISubscrMessage {
     /// taken place. If this value is not NULL the other members in this structure may not contain
     /// valid values.
     pub error_info: *mut ODPIErrorInfo,
+    /// txid
+    pub tx_id: *const c_void,
+    /// txid length
+    pub tx_id_length: u32,
 }
 
 #[repr(C)]
