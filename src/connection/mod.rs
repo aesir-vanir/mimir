@@ -530,9 +530,9 @@ impl Connection {
         let mut lob_ptr = ptr::null_mut();
 
         match lob_type {
-            enums::ODPIOracleTypeNum::Clob |
-            enums::ODPIOracleTypeNum::NClob |
-            enums::ODPIOracleTypeNum::Blob => {}
+            enums::ODPIOracleTypeNum::Clob
+            | enums::ODPIOracleTypeNum::NClob
+            | enums::ODPIOracleTypeNum::Blob => {}
             _ => return Err(ErrorKind::Connection("invalid oracle type".to_string()).into()),
         }
 
