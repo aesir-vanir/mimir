@@ -12,16 +12,24 @@ bitflags! {
     /// This enumeration identifies the mode to use when authorizing connections to the database.
     pub struct ODPIAuthMode: u32 {
         /// Default value used when creating connections.
-        const DPI_MODE_AUTH_DEFAULT = 0b0000_0000;
+        const DPI_MODE_AUTH_DEFAULT = 0x0;
         /// Authenticates with SYSDBA access.
-        const DPI_MODE_AUTH_SYSDBA  = 0b0000_0010;
+        const DPI_MODE_AUTH_SYSDBA  = 0x2;
         /// Authenticates with SYSOPER access.
-        const DPI_MODE_AUTH_SYSOPER = 0b0000_0100;
+        const DPI_MODE_AUTH_SYSOPER = 0x04;
         /// Used together with DPI_MODE_AUTH_SYSDBA or DPI_MODE_AUTH_SYSOPER to authenticate for
         /// certain administrative tasks (such as starting up or shutting down the database).
-        const DPI_MODE_AUTH_PRELIM  = 0b0000_1000;
+        const DPI_MODE_AUTH_PRELIM  = 0x8;
         /// Authenticates with SYSASM access.
-        const DPI_MODE_AUTH_SYSASM  = 0b1000_0000_0000_0000;
+        const DPI_MODE_AUTH_SYSASM  = 0x8000;
+        /// Authenticate with SYSBKP access.
+        const DPI_MODE_AUTH_SYSBKP = 0x20000;
+        /// Authenticate with SYSDGD access.
+        const DPI_MODE_AUTH_SYSDGD = 0x40000;
+        /// Authenticate with SYSKMT access.
+        const DPI_MODE_AUTH_SYSKMT = 0x80000;
+        /// Authenticate with SYSRAC access.
+        const DPI_MODE_AUTH_SYSRAC = 0x100000;
     }
 }
 
