@@ -23,13 +23,13 @@ bitflags! {
         /// Authenticates with SYSASM access.
         const DPI_MODE_AUTH_SYSASM  = 0x8000;
         /// Authenticate with SYSBKP access.
-        const DPI_MODE_AUTH_SYSBKP = 0x20000;
+        const DPI_MODE_AUTH_SYSBKP = 0x2_0000;
         /// Authenticate with SYSDGD access.
-        const DPI_MODE_AUTH_SYSDGD = 0x40000;
+        const DPI_MODE_AUTH_SYSDGD = 0x4_0000;
         /// Authenticate with SYSKMT access.
-        const DPI_MODE_AUTH_SYSKMT = 0x80000;
+        const DPI_MODE_AUTH_SYSKMT = 0x8_0000;
         /// Authenticate with SYSRAC access.
-        const DPI_MODE_AUTH_SYSRAC = 0x100000;
+        const DPI_MODE_AUTH_SYSRAC = 0x10_0000;
     }
 }
 
