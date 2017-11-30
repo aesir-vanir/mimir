@@ -109,8 +109,9 @@ impl fmt::Display for Info {
 
 impl From<ODPIErrorInfo> for Info {
     fn from(err: ODPIErrorInfo) -> Self {
-        let slice =
-            unsafe { slice::from_raw_parts(err.message as *mut u8, err.message_length as usize) };
+        let slice = unsafe {
+            slice::from_raw_parts(err.message as *mut u8, err.message_length as usize)
+        };
         let fn_name = unsafe { CStr::from_ptr(err.fn_name) }
             .to_string_lossy()
             .into_owned();

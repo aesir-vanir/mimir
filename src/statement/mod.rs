@@ -292,7 +292,8 @@ impl Statement {
         try_dpi!(
             externs::dpiStmt_getBatchErrors(self.inner, num_errors, err_ptr),
             {
-                let err_slice = unsafe { slice::from_raw_parts(err_ptr, num_errors as usize) };
+                let err_slice =
+                    unsafe { slice::from_raw_parts(err_ptr, num_errors as usize) };
                 let odpi_vec = Vec::from(err_slice);
                 let res_vec = odpi_vec.iter().map(|x| (*x).into()).collect();
                 Ok(res_vec)
