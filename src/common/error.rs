@@ -97,12 +97,7 @@ impl fmt::Display for Info {
         writeln!(
             f,
             "{}: {}\nfn: {}\naction: {}\nsql_state: {}\nrecoverable: {}",
-            self.code,
-            self.message,
-            self.fn_name,
-            self.action,
-            self.sql_state,
-            self.recoverable
+            self.code, self.message, self.fn_name, self.action, self.sql_state, self.recoverable
         )
     }
 }
