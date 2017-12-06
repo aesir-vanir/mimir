@@ -491,7 +491,6 @@ pub struct Info {
     inner: ODPIStmtInfo,
 }
 
-
 impl Info {
     /// Create a new statement from an `ODPIStmtInfo` pointer
     #[doc(hidden)]

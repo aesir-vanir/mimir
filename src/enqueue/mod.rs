@@ -102,7 +102,6 @@ impl From<*mut ODPIEnqOptions> for Options {
     }
 }
 
-
 impl Drop for Options {
     fn drop(&mut self) {
         if !self.inner.is_null() {

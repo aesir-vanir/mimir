@@ -746,7 +746,6 @@ impl Connection {
         )
     }
 
-
     /// Sets the external name that is being used by the connection. This value is used when logging
     /// distributed transactions.
     ///

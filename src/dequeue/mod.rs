@@ -137,7 +137,6 @@ impl Options {
         )
     }
 
-
     /// Returns the transformation of the message to be dequeued. See function
     /// `dequeue::Options::set_transformation()` for more information.
     pub fn get_transformation(&self) -> Result<String> {

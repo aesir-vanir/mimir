@@ -258,7 +258,6 @@ impl From<*mut ODPILob> for Lob {
     }
 }
 
-
 impl Drop for Lob {
     fn drop(&mut self) {
         if !self.inner.is_null() {
