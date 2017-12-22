@@ -70,9 +70,7 @@ impl Var {
                 if data_arr_ptr.is_null() || num_elements == 0 {
                     Ok(&mut [])
                 } else {
-                    Ok(unsafe {
-                        slice::from_raw_parts_mut(data_arr_ptr, num_elements as usize)
-                    })
+                    Ok(unsafe { slice::from_raw_parts_mut(data_arr_ptr, num_elements as usize) })
                 }
             },
             ErrorKind::Var("dpiVar_getData".to_string())
