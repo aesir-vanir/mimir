@@ -49,6 +49,3 @@ trace = [
     "slog/max_level_trace",
     "slog/release_max_level_trace",
 ]
-
-[patch.crates-io.derive_builder]
-path = "../rust-derive-builder/derive_builder"
