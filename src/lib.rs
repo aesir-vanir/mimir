@@ -8,7 +8,7 @@
 
 //! Rust bindings over the Oracle Database Programming Interface for Drivers and Applications.
 #![deny(missing_docs)]
-#![feature(try_from, unique, untagged_unions)]
+#![feature(ptr_internals, try_from, unique, untagged_unions)]
 #![recursion_limit = "128"]
 
 #[macro_use]
