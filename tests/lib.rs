@@ -18,7 +18,7 @@ mod dequeue;
 mod enqueue;
 mod lob;
 mod message;
-#[cfg(not(target_arch = "macos"))]
+#[cfg(any(target_arch = "linux", target_arch = "windows"))]
 mod objecttype;
 mod pool;
 mod statement;
