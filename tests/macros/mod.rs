@@ -30,7 +30,7 @@ pub fn within_context(f: &Fn(&Context) -> Result<()>) -> Result<()> {
 }
 
 macro_rules! check_with_ctxt {
-    ($f:ident) => {{
+    ($f: ident) => {{
         match $crate::macros::within_context(&$f) {
             Ok(_) => assert!(true),
             Err(e) => {
