@@ -8,7 +8,6 @@
 
 //! `mimir` errors
 use common::error::Info;
-use std::convert::Infallible;
 
 error_chain! {
     foreign_links {
@@ -103,11 +102,5 @@ error_chain! {
             description("Var: call to ODPI-C function failed!")
             display("Var: call to '{}' function failed!", fn_name)
         }
-    }
-}
-
-impl From<Infallible> for Error {
-    fn from(infallible: Infallible) -> Self {
-        match infallible {}
     }
 }

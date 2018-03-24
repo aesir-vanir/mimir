@@ -16,8 +16,8 @@
 use data::Data;
 use error::{ErrorKind, Result};
 use objectattr::ObjectAttr;
-use odpi::{enums, externs, structs};
 use odpi::opaque::ODPIObject;
+use odpi::{enums, externs, structs};
 use std::ptr;
 
 /// This structure represents instances of the types created by the SQL command CREATE OR REPLACE

@@ -20,8 +20,8 @@ use odpi::opaque::ODPIVar;
 use odpi::structs::ODPIData;
 use rowid::Rowid;
 use statement::Statement;
-use std::{ptr, slice};
 use std::convert::TryFrom;
+use std::{ptr, slice};
 use util::ODPIStr;
 
 /// This structure represents memory areas used for transferring data to and from the database and

@@ -1,9 +1,9 @@
 use CREDS;
-use mimir::{Connection, Context, Data, ODPIData};
-use mimir::error::Result;
 use mimir::enums::ODPINativeTypeNum::{Bytes, Int64};
 use mimir::enums::ODPIOracleTypeNum::{Number, Varchar};
+use mimir::error::Result;
 use mimir::flags;
+use mimir::{Connection, Context, Data, ODPIData};
 use std::convert::TryFrom;
 
 fn var_res(ctxt: &Context) -> Result<()> {

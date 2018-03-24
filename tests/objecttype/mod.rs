@@ -1,10 +1,10 @@
 use CREDS;
 use chrono::{TimeZone, Utc};
-use mimir::{Connection, Context, ODPIData, ODPIObjectAttrInfo, ODPIObjectTypeInfo, ODPIStr,
-            Object, ObjectAttr, ObjectType, Statement};
 use mimir::enums;
 use mimir::error::Result;
 use mimir::flags;
+use mimir::{Connection, Context, ODPIData, ODPIObjectAttrInfo, ODPIObjectTypeInfo, ODPIStr,
+            Object, ObjectAttr, ObjectType, Statement};
 
 fn validate_object_attr_info(idx: usize, attr_info: &ODPIObjectAttrInfo) -> Result<()> {
     let name_s = ODPIStr::new(attr_info.name, attr_info.name_length);

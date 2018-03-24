@@ -11,8 +11,8 @@
 //! are destroyed by releasing the last reference by calling the function
 //! `enqueue::Options::release()`.
 use error::{ErrorKind, Result};
-use odpi::{enums, externs};
 use odpi::opaque::ODPIEnqOptions;
+use odpi::{enums, externs};
 use std::convert::TryFrom;
 use std::ptr;
 use util::ODPIStr;

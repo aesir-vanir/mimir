@@ -170,7 +170,7 @@ impl Lob {
 
     /// Reads data from the LOB at the specified offset into the provided buffer.
     pub fn read_bytes(&self, offset: u64, length: u64) -> Result<Vec<i8>> {
-        let length_usize: usize = TryFrom::try_from(length)?;
+        let length_usize: usize = length as usize;
         let mut buffer: Vec<i8> = Vec::with_capacity(length_usize);
         let buf_ptr = buffer.as_mut_ptr();
         let mut buf_len = length;
@@ -178,7 +178,7 @@ impl Lob {
         try_dpi!(
             externs::dpiLob_readBytes(self.inner, offset, length, buf_ptr, &mut buf_len),
             {
-                unsafe { buffer.set_len(TryFrom::try_from(buf_len)?) };
+                unsafe { buffer.set_len(buf_len as usize) };
                 Ok(buffer)
             },
             ErrorKind::Lob("dpiLob_readBytes".to_string())

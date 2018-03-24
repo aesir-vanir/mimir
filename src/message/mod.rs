@@ -12,9 +12,9 @@
 //! function `Properties::release()`.
 use chrono::{DateTime, Utc};
 use error::{ErrorKind, Result};
-use odpi::{enums, externs};
 use odpi::opaque::ODPIMsgProps;
 use odpi::structs::ODPITimestamp;
+use odpi::{enums, externs};
 use std::convert::TryFrom;
 use std::ptr;
 use util::ODPIStr;

@@ -1,12 +1,12 @@
 use CREDS;
-use mimir::flags;
-use mimir::{Connection, Context, ODPISubscrMessage};
 use mimir::enums::ODPIDeqMode::Remove;
 use mimir::enums::ODPIMessageDeliveryMode::NotSet;
 use mimir::enums::ODPINativeTypeNum::Bytes;
 use mimir::enums::ODPIOracleTypeNum::{Clob, Varchar};
 use mimir::enums::ODPIVisibility::OnCommit;
 use mimir::error::Result;
+use mimir::flags;
+use mimir::{Connection, Context, ODPISubscrMessage};
 use rand::{self, Rng};
 
 extern "C" fn subscr_callback(

@@ -415,7 +415,7 @@ pub enum ODPIStartupMode {
 /// part of the structure `ODPIStmtInfo`.
 pub enum ODPIStatementType {
     /// Statement type not set.
-    NotSet = 0,
+    Unknown = 0,
     /// Identifies a select statement. The member `ODPIStmtInfo.is_query` will be set to 1.
     Select = 1,
     /// Identifies an update statement. The member `ODPIStmtInfo.is_dml` will be set to 1.
@@ -439,6 +439,14 @@ pub enum ODPIStatementType {
     /// Identifies a CALL statement used for calling stored procedures and functions. The member
     /// `ODPIStmtInfo.is_plsql` will be set to 1.
     Call = 10,
+    /// Explain plan
+    ExplainPlan = 15,
+    /// Merge
+    Merge = 16,
+    /// Rollback
+    Rollback = 17,
+    /// Commit
+    Commit = 21,
 }
 
 #[repr(u32)]

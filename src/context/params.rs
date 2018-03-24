@@ -9,9 +9,9 @@
 //! These structs are used for initializing parameters used during connection creation, pool
 //! creation, or subscription creation.
 use error::Result;
-use odpi::{enums, externs, flags};
 use odpi::structs::{ODPIAppContext, ODPICommonCreateParams, ODPIConnCreateParams,
                     ODPIPoolCreateParams, ODPISubscrCreateParams};
+use odpi::{enums, externs, flags};
 use pool::Pool;
 use std::convert::{TryFrom, TryInto};
 use std::ffi::{CStr, CString};
@@ -309,7 +309,7 @@ impl ConnCreate {
     /// array of `ODPIAppContext` structures. The context specified here can be used in logon
     /// triggers, for example. The default value is NULL.
     pub fn get_app_context(&self) -> Result<Vec<AppContext>> {
-        let len: isize = isize::try_from(self.conn.num_app_context)?;
+        let len: isize = self.conn.num_app_context as isize;
         let head_ptr = self.conn.app_context;
 
         let mut app_contexts = Vec::new();

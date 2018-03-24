@@ -1,12 +1,12 @@
 use CREDS;
-use mimir::{Connection, Context, Data, ODPIBytes, ODPIDataBuffer, ODPIStr, QueryInfo, TypeInfo,
-            Var};
 use mimir::enums::ODPIFetchMode::Last;
 use mimir::enums::ODPINativeTypeNum::{Bytes, Double, Int64};
 use mimir::enums::ODPIOracleTypeNum::{Number, Varchar};
 use mimir::enums::ODPIStatementType::Insert;
 use mimir::error::Result;
 use mimir::flags;
+use mimir::{Connection, Context, Data, ODPIBytes, ODPIDataBuffer, ODPIStr, QueryInfo, TypeInfo,
+            Var};
 use rand::{self, Rng};
 use std::convert::TryFrom;
 

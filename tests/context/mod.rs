@@ -1,6 +1,6 @@
-use mimir::{enums, flags};
-use mimir::{AppContext, Context, ODPISubscrMessage};
 use mimir::error::Result;
+use mimir::{AppContext, Context, ODPISubscrMessage};
+use mimir::{enums, flags};
 
 extern "C" fn subscr_callback(
     _ctxt: *mut ::std::os::raw::c_void,

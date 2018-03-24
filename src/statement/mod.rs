@@ -15,13 +15,13 @@
 use common::error;
 use data::Data;
 use error::{ErrorKind, Result};
-use odpi::{enums, externs};
 use odpi::flags::ODPIExecMode;
 use odpi::opaque::ODPIStmt;
 use odpi::structs::{ODPIQueryInfo, ODPIStmtInfo};
+use odpi::{enums, externs};
 use query;
-use std::{ptr, slice};
 use std::convert::TryFrom;
+use std::{ptr, slice};
 use util::ODPIStr;
 use variable::Var;
 
