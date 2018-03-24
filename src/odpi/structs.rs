@@ -654,7 +654,7 @@ impl Default for ODPIStmtInfo {
             is_plsql: 0,
             is_ddl: 0,
             is_dml: 0,
-            statement_type: enums::ODPIStatementType::NotSet,
+            statement_type: enums::ODPIStatementType::Unknown,
             is_returning: 0,
         }
     }
