@@ -8,7 +8,7 @@
 
 //! `oic` utilities
 use error::{Error, Result};
-use std::convert::{TryFrom, TryInto};
+use std::convert::TryFrom;
 use std::os::raw::c_char;
 use std::ptr;
 use std::slice;
@@ -25,7 +25,7 @@ pub struct ODPIStr {
 impl ODPIStr {
     /// Create a new `ODPIStr`.
     pub fn new(ptr: *const c_char, len: u32) -> Self {
-        Self { ptr: ptr, len: len }
+        Self { ptr, len }
     }
 
     /// Get the `ptr` value.
@@ -68,7 +68,7 @@ impl<'a> TryFrom<&'a str> for ODPIStr {
     type Error = Error;
 
     fn try_from(s: &str) -> Result<Self> {
-        let s_len: u32 = TryInto::try_into(s.len())?;
+        let s_len: u32 = u32::private_try_from(s.len())?;
         Ok(Self {
             ptr: s.as_ptr() as *const c_char,
             len: s_len,
@@ -80,7 +80,7 @@ impl TryFrom<String> for ODPIStr {
     type Error = Error;
 
     fn try_from(s: String) -> Result<Self> {
-        let s_len: u32 = TryInto::try_into(s.len())?;
+        let s_len: u32 = u32::private_try_from(s.len())?;
         Ok(Self {
             ptr: s.as_ptr() as *const c_char,
             len: s_len,
@@ -97,4 +97,80 @@ impl From<ODPIStr> for String {
             Self::from_utf8_lossy(vec).into_owned()
         }
     }
+}
+
+///
+pub trait PrivateTryFromUsize: Sized {
+    ///
+    fn private_try_from(n: usize) -> Result<Self>;
+}
+
+// impl<T> PrivateTryFromUsize for T
+// where
+//     T: TryFrom<usize>,
+// {
+//     #[inline]
+//     fn private_try_from(n: usize) -> ::std::result::Result<Self, ()> {
+//         T::try_from(n).map_err(|_| ())
+//     }
+// }
+
+/// no possible bounds violation
+macro_rules! try_from_unbounded {
+    ($($target:ty),*) => {$(
+        impl PrivateTryFromUsize for $target {
+            #[inline]
+            fn private_try_from(value: usize) -> ::error::Result<Self> {
+                Ok(value as $target)
+            }
+        }
+    )*}
+}
+
+/// unsigned to signed (only positive bound)
+macro_rules! try_from_upper_bounded {
+    ($($target:ty),*) => {$(
+        impl PrivateTryFromUsize for $target {
+            #[inline]
+            #[cfg_attr(feature = "cargo-clippy", allow(cast_possible_truncation, cast_possible_wrap, cast_sign_loss))]
+            fn private_try_from(u: usize) -> ::error::Result<$target> {
+                if u > (<$target>::max_value() as usize) {
+                    Err("failed".into())
+                } else {
+                    Ok(u as $target)
+                }
+            }
+        }
+    )*}
+}
+
+///
+#[cfg(target_pointer_width = "16")]
+mod ptr_try_from_impls {
+    use super::PrivateTryFromUsize;
+
+    try_from_unbounded!(u16, u32, u64, u128);
+    try_from_unbounded!(i32, i64, i128);
+}
+
+///
+#[cfg(target_pointer_width = "32")]
+mod ptr_try_from_impls {
+    use super::PrivateTryFromUsize;
+
+    try_from_upper_bounded!(u16);
+    try_from_unbounded!(u32, u64, u128);
+    try_from_upper_bounded!(i32);
+    try_from_unbounded!(i64, i128);
+}
+
+///
+#[cfg(target_pointer_width = "64")]
+mod ptr_try_from_impls {
+    use super::PrivateTryFromUsize;
+
+    try_from_upper_bounded!(u16, u32);
+    try_from_unbounded!(u64, u128);
+    try_from_upper_bounded!(i32, i64);
+    try_from_unbounded!(i128);
 }

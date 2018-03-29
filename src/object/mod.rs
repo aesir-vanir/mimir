@@ -225,7 +225,7 @@ impl Object {
 
 impl From<*mut ODPIObject> for Object {
     fn from(inner: *mut ODPIObject) -> Self {
-        Self { inner: inner }
+        Self { inner }
     }
 }
 

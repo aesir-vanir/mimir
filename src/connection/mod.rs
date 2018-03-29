@@ -31,6 +31,7 @@ use std::ffi::{CStr, CString};
 use std::ptr;
 use subscription::Subscription;
 use util::ODPIStr;
+use util::PrivateTryFromUsize;
 use variable::Var;
 
 /// Connection handles are used to represent connections to the database.
@@ -760,7 +761,7 @@ impl Connection {
                 externs::dpiConn_setExternalName(
                     self.inner,
                     external_name_cstr.as_ptr(),
-                    TryFrom::try_from(external_name_len)?
+                    u32::private_try_from(external_name_len)?,
                 ),
                 Ok(()),
                 ErrorKind::Connection("dpiConn_setExternalName".to_string())
@@ -785,7 +786,7 @@ impl Connection {
                 externs::dpiConn_setInternalName(
                     self.inner,
                     internal_name_cstr.as_ptr(),
-                    TryFrom::try_from(internal_name_len)?
+                    u32::private_try_from(internal_name_len)?,
                 ),
                 Ok(()),
                 ErrorKind::Connection("dpiConn_setInternalName".to_string())
@@ -853,7 +854,7 @@ impl Connection {
 impl From<*mut ODPIConn> for Connection {
     fn from(inner: *mut ODPIConn) -> Self {
         Self {
-            inner: inner,
+            inner,
             stdout: None,
             stderr: None,
         }

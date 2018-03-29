@@ -318,7 +318,7 @@ impl Options {
 
 impl From<*mut ODPIDeqOptions> for Options {
     fn from(inner: *mut ODPIDeqOptions) -> Self {
-        Self { inner: inner }
+        Self { inner }
     }
 }
 

@@ -10,7 +10,7 @@
 
 #[doc(hidden)]
 macro_rules! try_dpi {
-    ($code: expr, $ret: expr, $err: expr) => {{
+    ($code:expr, $ret:expr, $err:expr) => {{
         if unsafe { $code } == ::odpi::constants::DPI_SUCCESS {
             $ret
         } else {
@@ -22,7 +22,7 @@ macro_rules! try_dpi {
 #[doc(hidden)]
 #[cfg(feature = "trace")]
 macro_rules! logperf {
-    ($func: expr, $logger: expr, $msg: expr) => {{
+    ($func:expr, $logger:expr, $msg:expr) => {{
         let timer = ::std::time::Instant::now();
         let res = $func;
         let elapsed = timer.elapsed();

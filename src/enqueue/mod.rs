@@ -98,7 +98,7 @@ impl Options {
 
 impl From<*mut ODPIEnqOptions> for Options {
     fn from(inner: *mut ODPIEnqOptions) -> Self {
-        Self { inner: inner }
+        Self { inner }
     }
 }
 

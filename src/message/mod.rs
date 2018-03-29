@@ -249,7 +249,7 @@ impl Properties {
 
 impl From<*mut ODPIMsgProps> for Properties {
     fn from(inner: *mut ODPIMsgProps) -> Self {
-        Self { inner: inner }
+        Self { inner }
     }
 }
 

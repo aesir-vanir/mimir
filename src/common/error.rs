@@ -46,13 +46,13 @@ impl Info {
         recoverable: bool,
     ) -> Self {
         Self {
-            code: code,
-            offset: offset,
-            message: message,
-            fn_name: fn_name,
-            action: action,
-            sql_state: sql_state,
-            recoverable: recoverable,
+            code,
+            offset,
+            message,
+            fn_name,
+            action,
+            sql_state,
+            recoverable,
         }
     }
 

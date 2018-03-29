@@ -169,6 +169,7 @@ impl Lob {
     }
 
     /// Reads data from the LOB at the specified offset into the provided buffer.
+    #[cfg_attr(feature = "cargo-clippy", allow(cast_possible_truncation))]
     pub fn read_bytes(&self, offset: u64, length: u64) -> Result<Vec<i8>> {
         let length_usize: usize = length as usize;
         let mut buffer: Vec<i8> = Vec::with_capacity(length_usize);
@@ -254,7 +255,7 @@ impl Lob {
 
 impl From<*mut ODPILob> for Lob {
     fn from(inner: *mut ODPILob) -> Self {
-        Self { inner: inner }
+        Self { inner }
     }
 }
 

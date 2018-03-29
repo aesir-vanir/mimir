@@ -853,18 +853,19 @@ pub struct ODPITimestamp {
 
 impl From<ODPITimestamp> for DateTime<Utc> {
     fn from(timestamp: ODPITimestamp) -> Self {
-        let y = i32::from(timestamp.year);
-        let m = u32::from(timestamp.month);
-        let d = u32::from(timestamp.day);
-        let h = u32::from(timestamp.hour);
-        let mm = u32::from(timestamp.minute);
-        let s = u32::from(timestamp.second);
+        let year = i32::from(timestamp.year);
+        let month = u32::from(timestamp.month);
+        let day = u32::from(timestamp.day);
+        let hour = u32::from(timestamp.hour);
+        let minute = u32::from(timestamp.minute);
+        let second = u32::from(timestamp.second);
         let fs = timestamp.fsecond * 1000;
 
-        if y == -10_100 && m == 0 && d == 0 {
+        if year == -10_100 && month == 0 && day == 0 {
             Utc::now()
         } else {
-            Utc.ymd(y, m, d).and_hms_micro(h, mm, s, fs)
+            Utc.ymd(year, month, day)
+                .and_hms_micro(hour, minute, second, fs)
         }
     }
 }

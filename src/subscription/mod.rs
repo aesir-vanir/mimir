@@ -59,7 +59,7 @@ impl Subscription {
 
 impl From<*mut ODPISubscr> for Subscription {
     fn from(inner: *mut ODPISubscr) -> Self {
-        Self { inner: inner }
+        Self { inner }
     }
 }
 

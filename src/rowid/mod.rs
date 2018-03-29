@@ -54,7 +54,7 @@ impl Rowid {
 
 impl From<*mut ODPIRowid> for Rowid {
     fn from(inner: *mut ODPIRowid) -> Self {
-        Self { inner: inner }
+        Self { inner }
     }
 }
 

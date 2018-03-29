@@ -13,9 +13,9 @@ use odpi::structs::{ODPIAppContext, ODPICommonCreateParams, ODPIConnCreateParams
                     ODPIPoolCreateParams, ODPISubscrCreateParams};
 use odpi::{enums, externs, flags};
 use pool::Pool;
-use std::convert::{TryFrom, TryInto};
+use std::convert::TryFrom;
 use std::ffi::{CStr, CString};
-use util::ODPIStr;
+use util::{ODPIStr, PrivateTryFromUsize};
 
 /// This structure is used for passing application context to the database during the process of
 /// creating standalone connections. These values are ignored when acquiring a connection from a
@@ -80,7 +80,7 @@ impl AppContext {
 
 impl From<ODPIAppContext> for AppContext {
     fn from(inner: ODPIAppContext) -> Self {
-        Self { inner: inner }
+        Self { inner }
     }
 }
 
@@ -199,7 +199,7 @@ impl CommonCreate {
 impl From<ODPICommonCreateParams> for CommonCreate {
     fn from(inner: ODPICommonCreateParams) -> Self {
         Self {
-            inner: inner,
+            inner,
             encoding: None,
             nchar_encoding: None,
         }
@@ -221,7 +221,7 @@ impl ConnCreate {
     /// Create a new `ConnCreate` struct.
     #[doc(hidden)]
     pub fn new(conn: ODPIConnCreateParams) -> Self {
-        Self { conn: conn }
+        Self { conn }
     }
 
     /// Get the inner FFI struct.
@@ -308,6 +308,7 @@ impl ConnCreate {
     /// value is only used when creating standalone connections. It is expected to be NULL or an
     /// array of `ODPIAppContext` structures. The context specified here can be used in logon
     /// triggers, for example. The default value is NULL.
+    #[cfg_attr(feature = "cargo-clippy", allow(cast_possible_wrap))]
     pub fn get_app_context(&self) -> Result<Vec<AppContext>> {
         let len: isize = self.conn.num_app_context as isize;
         let head_ptr = self.conn.app_context;
@@ -321,7 +322,7 @@ impl ConnCreate {
 
     /// Set the `app_context` value.
     pub fn set_app_context(&mut self, app_contexts: &[AppContext]) -> Result<&mut Self> {
-        let len: u32 = TryInto::try_into(app_contexts.len())?;
+        let len: u32 = u32::private_try_from(app_contexts.len())?;
         let mut oac_vec: Vec<ODPIAppContext> = Vec::new();
         for ac in app_contexts {
             oac_vec.push(ac.inner);
@@ -458,7 +459,7 @@ impl PoolCreate {
     /// Create a new `PoolCreate` struct.
     #[doc(hidden)]
     pub fn new(pool: ODPIPoolCreateParams) -> Self {
-        Self { pool: pool }
+        Self { pool }
     }
 
     /// Get the inner FFI struct.
@@ -616,7 +617,7 @@ impl SubscrCreate {
     #[doc(hidden)]
     /// Create a new `SubscrCreate` struct.
     pub fn new(subscr: ODPISubscrCreateParams) -> Self {
-        Self { subscr: subscr }
+        Self { subscr }
     }
 
     /// Get the inner FFI struct.

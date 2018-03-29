@@ -36,7 +36,7 @@ impl Statement {
     /// Create a new statement from an `ODPIStmt` pointer
     #[doc(hidden)]
     pub fn new(inner: *mut ODPIStmt) -> Self {
-        Self { inner: inner }
+        Self { inner }
     }
 
     /// Get the `inner` value.
@@ -469,7 +469,7 @@ impl Statement {
 
 impl From<*mut ODPIStmt> for Statement {
     fn from(inner: *mut ODPIStmt) -> Self {
-        Self { inner: inner }
+        Self { inner }
     }
 }
 
@@ -494,7 +494,7 @@ impl Info {
     /// Create a new statement from an `ODPIStmtInfo` pointer
     #[doc(hidden)]
     pub fn new(inner: ODPIStmtInfo) -> Self {
-        Self { inner: inner }
+        Self { inner }
     }
 
     /// Specifies if the statement refers to a query or not.

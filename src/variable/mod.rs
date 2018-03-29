@@ -186,7 +186,7 @@ impl Var {
 
 impl From<*mut ODPIVar> for Var {
     fn from(inner: *mut ODPIVar) -> Self {
-        Self { inner: inner }
+        Self { inner }
     }
 }
 

@@ -832,6 +832,12 @@ extern "C" {
         var: *mut opaque::ODPIVar,
         numElements: *mut u32,
     ) -> ::std::os::raw::c_int;
+    pub fn dpiVar_getReturnedData(
+        var: *mut opaque::ODPIVar,
+        pos: u32,
+        numElements: *mut u32,
+        data: *mut *mut structs::ODPIData,
+    ) -> ::std::os::raw::c_int;
     pub fn dpiVar_getSizeInBytes(
         var: *mut opaque::ODPIVar,
         sizeInBytes: *mut u32,

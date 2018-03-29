@@ -60,7 +60,7 @@ impl From<ODPIVersionInfo> for Info {
             ovi.port_update_num
         );
         Self {
-            version: version,
+            version,
             version_num: ovi.full_version_num,
             release: None,
         }

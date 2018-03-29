@@ -203,13 +203,14 @@ impl Data {
     /// Get the value as a `Utc` when the native type is DPI_NATIVE_TYPE_TIMESTAMP.
     pub fn get_utc(&self) -> DateTime<Utc> {
         let odpi_ts = unsafe { (*self.inner).value.as_timestamp };
-        let y = i32::from(odpi_ts.year);
-        let m = u32::from(odpi_ts.month);
-        let d = u32::from(odpi_ts.day);
-        let h = u32::from(odpi_ts.hour);
-        let mi = u32::from(odpi_ts.minute);
-        let s = u32::from(odpi_ts.second);
-        Utc.ymd(y, m, d).and_hms_nano(h, mi, s, odpi_ts.fsecond)
+        let year = i32::from(odpi_ts.year);
+        let month = u32::from(odpi_ts.month);
+        let day = u32::from(odpi_ts.day);
+        let hour = u32::from(odpi_ts.hour);
+        let minute = u32::from(odpi_ts.minute);
+        let second = u32::from(odpi_ts.second);
+        Utc.ymd(year, month, day)
+            .and_hms_nano(hour, minute, second, odpi_ts.fsecond)
     }
 
     /// Sets the value of the data when the native type is DPI_NATIVE_TYPE_TIMESTAMP.
@@ -273,7 +274,7 @@ impl TryFrom<*mut ODPIData> for Data {
         if inner.is_null() {
             Err(ErrorKind::NullPtr.into())
         } else {
-            Ok(Self { inner: inner })
+            Ok(Self { inner })
         }
     }
 }
@@ -288,7 +289,7 @@ pub struct TypeInfo {
 impl TypeInfo {
     /// Create a new `TypeInfo` struct.
     pub fn new(inner: ODPIDataTypeInfo) -> Self {
-        Self { inner: inner }
+        Self { inner }
     }
 
     /// Get the `oracle_type_num` value.
@@ -364,6 +365,6 @@ impl TypeInfo {
 
 impl From<ODPIDataTypeInfo> for TypeInfo {
     fn from(inner: ODPIDataTypeInfo) -> Self {
-        Self { inner: inner }
+        Self { inner }
     }
 }

@@ -23,7 +23,7 @@ pub struct Info {
 impl Info {
     /// Create a new `Info` struct.
     pub fn new(inner: ODPIQueryInfo) -> Self {
-        Self { inner: inner }
+        Self { inner }
     }
 
     /// Get the `name` value.
