@@ -1,9 +1,9 @@
-use CREDS;
-use mimir::Connection;
-use mimir::Context;
 use mimir::enums::ODPIOracleTypeNum::Blob;
 use mimir::error::Result;
 use mimir::flags;
+use mimir::Connection;
+use mimir::Context;
+use CREDS;
 
 fn lob_res(ctxt: &Context) -> Result<()> {
     let mut ccp = ctxt.init_common_create_params()?;

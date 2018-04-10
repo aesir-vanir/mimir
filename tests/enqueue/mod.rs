@@ -1,10 +1,10 @@
-use CREDS;
-use mimir::Connection;
-use mimir::Context;
 use mimir::enums::ODPIMessageDeliveryMode::Buffered;
 use mimir::enums::ODPIVisibility::{Immediate, OnCommit};
 use mimir::error::Result;
 use mimir::flags;
+use mimir::Connection;
+use mimir::Context;
+use CREDS;
 
 fn enqueue_res(ctxt: &Context) -> Result<()> {
     let mut ccp = ctxt.init_common_create_params()?;

@@ -12,8 +12,8 @@
 //! `close()` or releasing the last reference to the connection by calling the function `release()`.
 //! Connection handles are used to create all handles other than session pools and context handles.
 use common::{encoding, version};
-use context::Context;
 use context::params::{CommonCreate, ConnCreate, SubscrCreate};
+use context::Context;
 use dequeue;
 use enqueue;
 use error::{ErrorKind, Result};

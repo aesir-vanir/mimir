@@ -1,11 +1,11 @@
-use CREDS;
 use chrono::{Datelike, Timelike, Utc};
-use mimir::Connection;
-use mimir::Context;
 use mimir::enums::ODPIMessageDeliveryMode::NotSet;
 use mimir::enums::ODPIMessageState::Ready;
 use mimir::error::Result;
 use mimir::flags;
+use mimir::Connection;
+use mimir::Context;
+use CREDS;
 
 fn msg(ctxt: &Context) -> Result<()> {
     let mut ccp = ctxt.init_common_create_params()?;

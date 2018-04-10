@@ -1,11 +1,11 @@
-use CREDS;
-use mimir::Connection;
-use mimir::Context;
 use mimir::enums::ODPIDeqMode::{Browse, Remove};
 use mimir::enums::ODPIDeqNavigation::{FirstMsg, NextMsg};
 use mimir::enums::ODPIVisibility::{Immediate, OnCommit};
 use mimir::error::Result;
 use mimir::flags;
+use mimir::Connection;
+use mimir::Context;
+use CREDS;
 
 fn dequeue_res(ctxt: &Context) -> Result<()> {
     let mut common_create_params = ctxt.init_common_create_params()?;

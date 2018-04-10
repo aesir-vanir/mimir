@@ -1,5 +1,5 @@
-use mimir::Context;
 use mimir::error::Result;
+use mimir::Context;
 use slog::{Drain, Logger};
 use slog_async::Async;
 use slog_term::{CompactFormat, TermDecorator};

@@ -1,10 +1,10 @@
-use CREDS;
 use mimir::enums::ODPINativeTypeNum::{Bytes, Int64};
 use mimir::enums::ODPIOracleTypeNum::{Number, Varchar};
 use mimir::error::Result;
 use mimir::flags;
 use mimir::{Connection, Context, Data, ODPIData};
 use std::convert::TryFrom;
+use CREDS;
 
 fn var_res(ctxt: &Context) -> Result<()> {
     let mut ccp = ctxt.init_common_create_params()?;

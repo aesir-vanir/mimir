@@ -12,8 +12,8 @@
 //! function `acquireConnection()`.
 use common::encoding;
 use connection::Connection;
-use context::Context;
 use context::params::{CommonCreate, ConnCreate, PoolCreate};
+use context::Context;
 use error::{Error, ErrorKind, Result};
 use odpi::opaque::{ODPIConn, ODPIPool};
 use odpi::structs::ODPIEncodingInfo;

@@ -1,4 +1,3 @@
-use CREDS;
 use mimir::enums::ODPIDeqMode::Remove;
 use mimir::enums::ODPIMessageDeliveryMode::NotSet;
 use mimir::enums::ODPINativeTypeNum::Bytes;
@@ -8,6 +7,7 @@ use mimir::error::Result;
 use mimir::flags;
 use mimir::{Connection, Context, ODPISubscrMessage};
 use rand::{self, Rng};
+use CREDS;
 
 extern "C" fn subscr_callback(
     _context: *mut ::std::os::raw::c_void,
