@@ -9,8 +9,10 @@
 //! These structs are used for initializing parameters used during connection creation, pool
 //! creation, or subscription creation.
 use error::Result;
-use odpi::structs::{ODPIAppContext, ODPICommonCreateParams, ODPIConnCreateParams,
-                    ODPIPoolCreateParams, ODPISubscrCreateParams};
+use odpi::structs::{
+    ODPIAppContext, ODPICommonCreateParams, ODPIConnCreateParams, ODPIPoolCreateParams,
+    ODPISubscrCreateParams,
+};
 use odpi::{enums, externs, flags};
 use pool::Pool;
 use std::convert::TryFrom;

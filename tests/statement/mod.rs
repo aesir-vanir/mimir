@@ -4,8 +4,9 @@ use mimir::enums::ODPIOracleTypeNum::{Number, Varchar};
 use mimir::enums::ODPIStatementType::Insert;
 use mimir::error::Result;
 use mimir::flags;
-use mimir::{Connection, Context, Data, ODPIBytes, ODPIDataBuffer, ODPIStr, QueryInfo, TypeInfo,
-            Var};
+use mimir::{
+    Connection, Context, Data, ODPIBytes, ODPIDataBuffer, ODPIStr, QueryInfo, TypeInfo, Var,
+};
 use rand::{self, Rng};
 use std::convert::TryFrom;
 use CREDS;

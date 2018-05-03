@@ -68,8 +68,9 @@ pub use message::Properties as MsgProps;
 pub use object::Object;
 pub use objectattr::ObjectAttr;
 pub use objecttype::ObjectType;
-pub use odpi::structs::{ODPIBytes, ODPIData, ODPIDataBuffer, ODPIObjectAttrInfo,
-                        ODPIObjectTypeInfo, ODPISubscrMessage};
+pub use odpi::structs::{
+    ODPIBytes, ODPIData, ODPIDataBuffer, ODPIObjectAttrInfo, ODPIObjectTypeInfo, ODPISubscrMessage,
+};
 pub use odpi::{constants, enums, flags};
 pub use pool::Pool;
 pub use query::Info as QueryInfo;

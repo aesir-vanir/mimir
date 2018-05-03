@@ -15,8 +15,10 @@ use error::{Error, ErrorKind, Result};
 use odpi::constants::{DPI_MAJOR_VERSION, DPI_MINOR_VERSION};
 use odpi::externs;
 use odpi::opaque::ODPIContext;
-use odpi::structs::{ODPICommonCreateParams, ODPIConnCreateParams, ODPIErrorInfo,
-                    ODPIPoolCreateParams, ODPISubscrCreateParams, ODPIVersionInfo};
+use odpi::structs::{
+    ODPICommonCreateParams, ODPIConnCreateParams, ODPIErrorInfo, ODPIPoolCreateParams,
+    ODPISubscrCreateParams, ODPIVersionInfo,
+};
 use slog::Logger;
 use std::convert::TryFrom;
 use std::ptr::{self, Unique};
