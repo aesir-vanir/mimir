@@ -717,6 +717,12 @@ pub struct ODPISubscrCreateParams {
     pub recipient_name: *const c_char,
     /// Specifies the length of the `recipient_name` member, in bytes. The default value is 0.
     pub recipient_name_length: u32,
+    ///
+    pub grouping_class: u8,
+    ///
+    pub grouping_value: u32,
+    ///
+    pub grouping_type: u8,
 }
 
 impl Default for ODPISubscrCreateParams {
@@ -734,6 +740,9 @@ impl Default for ODPISubscrCreateParams {
             callback_context: ptr::null_mut(),
             recipient_name: ptr::null(),
             recipient_name_length: 0,
+            grouping_class: 0,
+            grouping_value: 0,
+            grouping_type: 0,
         }
     }
 }
