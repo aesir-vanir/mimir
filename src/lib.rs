@@ -8,7 +8,7 @@
 
 //! Rust bindings over the Oracle Database Programming Interface for Drivers and Applications.
 #![deny(missing_docs)]
-#![feature(ptr_internals, try_from, unique, untagged_unions)]
+#![feature(ptr_internals, try_from, untagged_unions)]
 #![recursion_limit = "128"]
 
 #[macro_use]
@@ -54,7 +54,7 @@ mod util;
 mod variable;
 
 // Public API
-#[allow(missing_docs, unused_doc_comment)]
+#[allow(missing_docs, unused_doc_comments)]
 pub mod error;
 
 pub use connection::Connection;
