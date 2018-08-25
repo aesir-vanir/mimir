@@ -1,7 +1,7 @@
 use mimir::enums;
 use mimir::enums::ODPINativeTypeNum::{Bytes, Double};
-use mimir::error::Result;
 use mimir::flags;
+use mimir::Result;
 use mimir::{Context, Pool};
 use CREDS;
 

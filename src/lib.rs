@@ -39,6 +39,7 @@ mod context;
 mod data;
 mod dequeue;
 mod enqueue;
+mod error;
 mod lob;
 mod message;
 mod object;
@@ -54,8 +55,6 @@ mod util;
 mod variable;
 
 // Public API
-#[allow(missing_docs, unused_doc_comments)]
-pub mod error;
 
 pub use connection::Connection;
 pub use context::params::AppContext;
@@ -63,6 +62,7 @@ pub use context::Context;
 pub use data::{Data, TypeInfo};
 pub use dequeue::Options as DeqOptions;
 pub use enqueue::Options as EnqOptions;
+pub use error::{Error, Result};
 pub use lob::Lob;
 pub use message::Properties as MsgProps;
 pub use object::Object;

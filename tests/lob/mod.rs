@@ -1,8 +1,8 @@
 use mimir::enums::ODPIOracleTypeNum::Blob;
-use mimir::error::Result;
 use mimir::flags;
 use mimir::Connection;
 use mimir::Context;
+use mimir::Result;
 use CREDS;
 
 fn lob_res(ctxt: &Context) -> Result<()> {

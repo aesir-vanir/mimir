@@ -1,10 +1,10 @@
 use chrono::{Datelike, Timelike, Utc};
 use mimir::enums::ODPIMessageDeliveryMode::NotSet;
 use mimir::enums::ODPIMessageState::Ready;
-use mimir::error::Result;
 use mimir::flags;
 use mimir::Connection;
 use mimir::Context;
+use mimir::Result;
 use CREDS;
 
 fn msg(ctxt: &Context) -> Result<()> {

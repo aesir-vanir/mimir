@@ -1,9 +1,9 @@
 use mimir::enums::ODPIMessageDeliveryMode::Buffered;
 use mimir::enums::ODPIVisibility::{Immediate, OnCommit};
-use mimir::error::Result;
 use mimir::flags;
 use mimir::Connection;
 use mimir::Context;
+use mimir::Result;
 use CREDS;
 
 fn enqueue_res(ctxt: &Context) -> Result<()> {

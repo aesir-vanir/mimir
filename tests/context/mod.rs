@@ -1,4 +1,4 @@
-use mimir::error::Result;
+use mimir::Result;
 use mimir::{enums, flags};
 use mimir::{AppContext, Context, ODPISubscrMessage};
 

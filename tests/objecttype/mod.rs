@@ -1,7 +1,7 @@
 use chrono::{TimeZone, Utc};
 use mimir::enums;
-use mimir::error::Result;
 use mimir::flags;
+use mimir::Result;
 use mimir::{
     Connection, Context, ODPIData, ODPIObjectAttrInfo, ODPIObjectTypeInfo, ODPIStr, Object,
     ObjectAttr, ObjectType, Statement,

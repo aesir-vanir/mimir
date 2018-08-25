@@ -1,7 +1,7 @@
 use mimir::enums::ODPINativeTypeNum::{Bytes, Int64};
 use mimir::enums::ODPIOracleTypeNum::{Number, Varchar};
-use mimir::error::Result;
 use mimir::flags;
+use mimir::Result;
 use mimir::{Connection, Context, Data, ODPIData};
 use std::convert::TryFrom;
 use CREDS;
